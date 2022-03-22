@@ -50,7 +50,4 @@ public class Ability {
 	public AreaOfEffect getCastArea() {
 		return castArea;
 	}
-
-
-	//testing git commit
 }
