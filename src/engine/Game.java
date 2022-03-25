@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
+import engine.PriorityQueue;
 
 import java.io.*;
 
@@ -19,8 +20,8 @@ public class Game {
 	private static ArrayList<Champion> availableChampions;
 	private static ArrayList<Ability> availableAbilities;
 	private PriorityQueue turnOrder;
-	private static int BOARDHEIGHT = 5;
-	private static int BOARDWIDTH = 5;
+	private static final int BOARDHEIGHT = 5;
+	private static final int BOARDWIDTH = 5;
 	
 	public Game(Player first, Player second) {
 		this.firstPlayer = first;
@@ -28,22 +29,24 @@ public class Game {
 		board = new Object[BOARDHEIGHT][BOARDWIDTH];
 		availableChampions = new ArrayList<Champion>();
 		availableAbilities = new ArrayList<Ability>();
-		turnOrder = new PriorityQueue(15);
+		turnOrder = new PriorityQueue(6);
 		placeChampions();
 		placeCovers();
 	}
 	
 	private void placeChampions() {
-		for(int i = 0; i<firstPlayer.getTeams().size();i++) {
-			board[0][i+1] = firstPlayer.getTeams().get(i);
+		for(int i = 0; i<firstPlayer.getTeam().size();i++) {
+			board[0][i+1] = firstPlayer.getTeam().get(i);
+			firstPlayer.getTeam().get(i).setLocation(new Point(0,i+1));
 		}
-		for(int i = 0; i<secondPlayer.getTeams().size();i++) {
-			board[BOARDHEIGHT-1][i+1] = secondPlayer.getTeams().get(i);
+		for(int i = 0; i<secondPlayer.getTeam().size();i++) {
+			board[BOARDHEIGHT-1][i+1] = secondPlayer.getTeam().get(i);
+			secondPlayer.getTeam().get(i).setLocation(new Point(BOARDHEIGHT-1,i+1));
 		}
 	}
 	
-	private void placeCovers() { //ben7ot 2l 8attah hena ya kes 25tak
-		/*for(int i=0;i<5;i++){
+	private void placeCovers() { //ben7ot 2l 8attah hena
+		for(int i=0;i<5;i++){
 			int h;
 			int w;
 			do {
@@ -52,7 +55,7 @@ public class Game {
 			}
 			while (board [h][w]!=null);
 			board [h][w] = new Cover(h,w);
-		}*/
+		}
 	}
 	
 	///////////////////////
@@ -61,10 +64,10 @@ public class Game {
 	/////////////////////
 	/////////////////////
 	public static void loadAbilities(String filePath) throws Exception {
-		BufferedReader br= new BufferedReader(new FileReader(filePath)); //copied, no ba3basah
+		BufferedReader br= new BufferedReader(new FileReader(filePath)); //copied
 		String row;
 		while ((row=br.readLine())!=null) {
-			//metba3bas, ab is the string array of abilities from the abilities csv
+			//ab is the string array of abilities from the abilities csv
 			String [] ab = row.split(",");
 
 			if (ab[0].equals("DMG"))
@@ -128,10 +131,11 @@ public class Game {
 		String row;
 		while ((row = br.readLine()) != null) {
 			String[] champ = row.split(",");
+			Champion newChamp;
 
 			if(champ[0].equals("H"))
 				availableChampions.add(
-						new Hero(
+						newChamp = new Hero(
 								champ[1],
 								Integer.parseInt(champ[2]),
 								Integer.parseInt(champ[3]),
@@ -143,7 +147,7 @@ public class Game {
 				);
 			else if(champ[0].equals("A"))
 				availableChampions.add(
-						new AntiHero(
+						newChamp = new AntiHero(
 								champ[1],
 								Integer.parseInt(champ[2]),
 								Integer.parseInt(champ[3]),
@@ -155,7 +159,7 @@ public class Game {
 				);
 			else
 				availableChampions.add(
-						new Villain(
+						newChamp = new Villain(
 								champ[1],
 								Integer.parseInt(champ[2]),
 								Integer.parseInt(champ[3]),
@@ -204,11 +208,11 @@ public class Game {
 		return turnOrder;
 	}
 
-	public static int getBOARDHEIGHT() {
+	public static int getBoardheight() {
 		return BOARDHEIGHT;
 	}
 
-	public static int getBOARDWIDTH() {
+	public static int getBoardwidth() {
 		return BOARDWIDTH;
 	}
 }

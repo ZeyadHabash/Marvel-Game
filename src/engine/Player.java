@@ -7,11 +7,11 @@ public class Player {
 
 	private String name;
 	private Champion leader;
-	private ArrayList<Champion> teams;
+	private ArrayList<Champion> team;
 	
 	public Player(String name) {
 		this.name = name;
-		teams = new ArrayList<Champion>();
+		team = new ArrayList<Champion>();
 	}
 
 	public Champion getLeader() {
@@ -26,8 +26,8 @@ public class Player {
 		return name;
 	}
 
-	public ArrayList<Champion> getTeams() {
-		return teams;
+	public ArrayList<Champion> getTeam() {
+		return team;
 	}
 	
 }

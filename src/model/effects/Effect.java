@@ -15,14 +15,10 @@ public class Effect {
 		return name;
 	}
 
-	public int getDuration() {
-		return duration;
-	}
-	
-	
+	public int getDuration() { return duration; }
 
-	public EffectType getType() {
-		return type;
-	}
+	public void setDuration(int duration) { this.duration = duration; }
+
+	public EffectType getType() { return type; }
 
 }
