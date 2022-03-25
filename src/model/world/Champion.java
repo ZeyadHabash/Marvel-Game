@@ -30,6 +30,8 @@ public class Champion {
 		this.speed = speed;
 		this.attackRange = attackRange;
 		this.attackDamage = attackDamage;
+		abilities = new ArrayList<Ability>();
+		appliedEffects = new ArrayList<Effect>();
 	}
 	
 	public int getCurrentHP() {

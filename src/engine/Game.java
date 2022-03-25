@@ -4,14 +4,13 @@ import java.awt.*;
 import java.awt.Point;
 import java.util.ArrayList;
 import model.abilities.*;
-import model.effects.Effect;
-import model.effects.EffectType;
+import model.effects.*;
 import model.world.*;
 
 import java.io.*;
 
 public class Game {
-	
+
 	private Player firstPlayer;
 	private Player secondPlayer;
 	private boolean  firstLeaderAbilityUsed;
@@ -27,6 +26,11 @@ public class Game {
 		this.firstPlayer = first;
 		this.secondPlayer = second;
 		board = new Object[BOARDHEIGHT][BOARDWIDTH];
+		availableChampions = new ArrayList<Champion>();
+		availableAbilities = new ArrayList<Ability>();
+		turnOrder = new PriorityQueue(15);
+		placeChampions();
+		placeCovers();
 	}
 	
 	private void placeChampions() {
@@ -39,7 +43,7 @@ public class Game {
 	}
 	
 	private void placeCovers() { //ben7ot 2l 8attah hena ya kes 25tak
-		for(int i=0;i<5;i++){
+		/*for(int i=0;i<5;i++){
 			int h;
 			int w;
 			do {
@@ -48,7 +52,7 @@ public class Game {
 			}
 			while (board [h][w]!=null);
 			board [h][w] = new Cover(h,w);
-		}
+		}*/
 	}
 	
 	///////////////////////
@@ -87,7 +91,22 @@ public class Game {
 									Integer.parseInt(ab[7])
 							)
 					);
-			else
+			else{
+				Effect abilityEffect;
+				int duration = Integer.parseInt(ab[8]);
+				switch(ab[7]){
+					case "Shield": abilityEffect = new Shield(duration);break;
+					case "Disarm": abilityEffect = new Disarm(duration);break;
+					case "PowerUp": abilityEffect = new PowerUp(duration);break;
+					case "Silence": abilityEffect = new Silence(duration);break;
+					case "SpeedUp": abilityEffect = new SpeedUp(duration);break;
+					case "Embrace": abilityEffect = new Embrace(duration);break;
+					case "Root": abilityEffect = new Root(duration);break;
+					case "Shock": abilityEffect = new Shock(duration);break;
+					case "Dodge": abilityEffect = new Dodge(duration);break;
+					case "Stun": abilityEffect = new Stun(duration);break;
+					default: abilityEffect = null;
+				}
 				availableAbilities.add(
 						new CrowdControlAbility(
 								ab[1],
@@ -96,10 +115,11 @@ public class Game {
 								Integer.parseInt(ab[3]),
 								AreaOfEffect.valueOf(ab[5]),
 								Integer.parseInt(ab[6]),
-								// Next param feels wrong? calling effect constructor instead of specific class?
-								new Effect(ab[1], Integer.parseInt(ab[8]),EffectType.valueOf(ab[7]))
+								// abilityEffect corresponds to its respective ability, done using a switch case
+								abilityEffect
 						)
 				);
+			}
 		}
 	}
 
@@ -152,6 +172,43 @@ public class Game {
 		}
 	}
 
+	public Player getFirstPlayer() {
+		return firstPlayer;
+	}
 
+	public Player getSecondPlayer() {
+		return secondPlayer;
+	}
 
+	public boolean isFirstLeaderAbilityUsed() {
+		return firstLeaderAbilityUsed;
+	}
+
+	public boolean isSecondLeaderAbilityUsed() {
+		return secondLeaderAbilityUsed;
+	}
+
+	public Object[][] getBoard() {
+		return board;
+	}
+
+	public static ArrayList<Champion> getAvailableChampions() {
+		return availableChampions;
+	}
+
+	public static ArrayList<Ability> getAvailableAbilities() {
+		return availableAbilities;
+	}
+
+	public PriorityQueue getTurnOrder() {
+		return turnOrder;
+	}
+
+	public static int getBOARDHEIGHT() {
+		return BOARDHEIGHT;
+	}
+
+	public static int getBOARDWIDTH() {
+		return BOARDWIDTH;
+	}
 }

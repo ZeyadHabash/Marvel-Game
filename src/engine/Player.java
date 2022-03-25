@@ -11,6 +11,7 @@ public class Player {
 	
 	public Player(String name) {
 		this.name = name;
+		teams = new ArrayList<Champion>();
 	}
 
 	public Champion getLeader() {
