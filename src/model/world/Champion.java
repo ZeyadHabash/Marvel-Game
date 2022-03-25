@@ -25,8 +25,10 @@ public class Champion {
 		this.condition = Condition.ACTIVE;
 		this.name = name;
 		this.maxHP = maxHP;
+		this.currentHP = maxHP;
 		this.mana = mana;
 		this.maxActionPointsPerTurn = maxActions;
+		this.currentActionPoints = maxActions;
 		this.speed = speed;
 		this.attackRange = attackRange;
 		this.attackDamage = attackDamage;
@@ -37,59 +39,82 @@ public class Champion {
 	public int getCurrentHP() {
 		return currentHP;
 	}
+
 	public void setCurrentHP(int currentHP) {
-		this.currentHP = currentHP;
+		if(currentHP<0)
+			this.currentHP =0;
+		else
+			this.currentHP = currentHP;
 	}
+
 	public int getMaxActionPointsPerTurn() {
 		return maxActionPointsPerTurn;
 	}
+
 	public void setMaxActionPointsPerTurn(int maxActionPointsPerTurn) {
 		this.maxActionPointsPerTurn = maxActionPointsPerTurn;
 	}
+
 	public int getAttackDamage() {
 		return attackDamage;
 	}
+
 	public void setAttackDamage(int attackDamage) {
 		this.attackDamage = attackDamage;
 	}
+
 	public int getSpeed() {
 		return speed;
 	}
+
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
+
 	public Condition getCondition() {
 		return condition;
 	}
+
 	public void setCondition(Condition condition) {
 		this.condition = condition;
 	}
+
 	public Point getLocation() {
 		return location;
 	}
+
 	public void setLocation(Point location) {
 		this.location = location;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public int getMaxHP() {
 		return maxHP;
 	}
+
 	public int getMana() {
 		return mana;
 	}
+
 	public void setMana(int mana) { this.mana = mana; }
+
 	public int getCurrentActionPoints() {
 		return currentActionPoints;
 	}
+
 	public void setCurrentActionPoints(int currentActionPoints) { this.currentActionPoints = currentActionPoints; }
+
 	public int getAttackRange() {
 		return attackRange;
 	}
+
 	public ArrayList<Ability> getAbilities() {
 		return abilities;
 	}
+
 	public ArrayList<Effect> getAppliedEffects() {
 		return appliedEffects;
 	}
