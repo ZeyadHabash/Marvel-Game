@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import model.abilities.*;
 import model.effects.Effect;
 import model.effects.EffectType;
-import model.world.Champion;
-import model.world.Cover;
+import model.world.*;
+
 import java.io.*;
 
 public class Game {
@@ -16,7 +16,7 @@ public class Game {
 	private Player secondPlayer;
 	private boolean  firstLeaderAbilityUsed;
 	private boolean  secondLeaderAbilityUsed;
-	private Object [][] board;
+	private Object [][] board; // [height][width]
 	private static ArrayList<Champion> availableChampions;
 	private static ArrayList<Ability> availableAbilities;
 	private PriorityQueue turnOrder;
@@ -53,25 +53,105 @@ public class Game {
 	
 	///////////////////////
 	//////////////////////
-	//hatedrab fy weshena ya kes 25tak
+	//hatedrab fy weshena (probably)
 	/////////////////////
-	////**
+	/////////////////////
 	public static void loadAbilities(String filePath) throws Exception {
 		BufferedReader br= new BufferedReader(new FileReader(filePath)); //copied, no ba3basah
 		String row;
 		while ((row=br.readLine())!=null) {
-			String [] ab = row.split(","); //metba3bas, ab is the string array of abilities from the abilities csv 
-			if (ab[0].equals("DMG")) {
-				availableAbilities.add(new DamagingAbility(ab[1],Integer.parseInt(ab[2]),Integer.parseInt(ab[4]),Integer.parseInt(ab[3]),AreaOfEffect.valueOf(ab[5]),Integer.parseInt(ab[6]),Integer.parseInt(ab[7])));
-			}
-			else if(ab[0].equals("HEL")) {
-					availableAbilities.add(new HealingAbility(ab[1],Integer.parseInt(ab[2]),Integer.parseInt(ab[4]),Integer.parseInt(ab[3]),AreaOfEffect.valueOf(ab[5]),Integer.parseInt(ab[6]),Integer.parseInt(ab[7])));
-			}
-			else {
-				availableAbilities.add(new CrowdControlAbility(ab[1],Integer.parseInt(ab[2]),Integer.parseInt(ab[4]),Integer.parseInt(ab[3]),AreaOfEffect.valueOf(ab[5]),Integer.parseInt(ab[6]),new Effect(ab[1], Integer.parseInt(ab[8]),EffectType.valueOf(ab[7]))));
-			}
+			//metba3bas, ab is the string array of abilities from the abilities csv
+			String [] ab = row.split(",");
+
+			if (ab[0].equals("DMG"))
+				availableAbilities.add(
+						new DamagingAbility(
+								ab[1],
+								Integer.parseInt(ab[2]),
+								Integer.parseInt(ab[4]),
+								Integer.parseInt(ab[3]),
+								AreaOfEffect.valueOf(ab[5]),
+								Integer.parseInt(ab[6]),
+								Integer.parseInt(ab[7])
+						)
+				);
+			else if(ab[0].equals("HEL"))
+					availableAbilities.add(
+							new HealingAbility(
+									ab[1],
+									Integer.parseInt(ab[2]),
+									Integer.parseInt(ab[4]),
+									Integer.parseInt(ab[3]),
+									AreaOfEffect.valueOf(ab[5]),
+									Integer.parseInt(ab[6]),
+									Integer.parseInt(ab[7])
+							)
+					);
+			else
+				availableAbilities.add(
+						new CrowdControlAbility(
+								ab[1],
+								Integer.parseInt(ab[2]),
+								Integer.parseInt(ab[4]),
+								Integer.parseInt(ab[3]),
+								AreaOfEffect.valueOf(ab[5]),
+								Integer.parseInt(ab[6]),
+								// Next param feels wrong? calling effect constructor instead of specific class?
+								new Effect(ab[1], Integer.parseInt(ab[8]),EffectType.valueOf(ab[7]))
+						)
+				);
 		}
 	}
-	
-	
+
+	public static void loadChampions(String filePath) throws  Exception {
+		BufferedReader br = new BufferedReader(new FileReader(filePath));
+		String row;
+		while ((row = br.readLine()) != null) {
+			String[] champ = row.split(",");
+
+			if(champ[0].equals("H"))
+				availableChampions.add(
+						new Hero(
+								champ[1],
+								Integer.parseInt(champ[2]),
+								Integer.parseInt(champ[3]),
+								Integer.parseInt(champ[4]),
+								Integer.parseInt(champ[5]),
+								Integer.parseInt(champ[6]),
+								Integer.parseInt(champ[7])
+						)
+				);
+			else if(champ[0].equals("A"))
+				availableChampions.add(
+						new AntiHero(
+								champ[1],
+								Integer.parseInt(champ[2]),
+								Integer.parseInt(champ[3]),
+								Integer.parseInt(champ[4]),
+								Integer.parseInt(champ[5]),
+								Integer.parseInt(champ[6]),
+								Integer.parseInt(champ[7])
+						)
+				);
+			else
+				availableChampions.add(
+						new Villain(
+								champ[1],
+								Integer.parseInt(champ[2]),
+								Integer.parseInt(champ[3]),
+								Integer.parseInt(champ[4]),
+								Integer.parseInt(champ[5]),
+								Integer.parseInt(champ[6]),
+								Integer.parseInt(champ[7])
+						)
+				);
+										////////////////////////
+			// HOW TO INSERT THE CHAMP'S ABILITIES IF THE ARRAYLIST OF ABILITIES IS PRIVATE???????????
+			// Champion's abilities are champ[8], champ[9] and champ[10]
+										///////////////////////
+		}
+	}
+
+
+
 }
