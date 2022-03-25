@@ -2,6 +2,8 @@ package engine;
 
 import java.awt.*;
 import java.awt.Point;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import model.abilities.*;
 import model.effects.*;
@@ -169,12 +171,32 @@ public class Game {
 								Integer.parseInt(champ[7])
 						)
 				);
-										////////////////////////
-			// HOW TO INSERT THE CHAMP'S ABILITIES IF THE ARRAYLIST OF ABILITIES IS PRIVATE???????????
-			// Champion's abilities are champ[8], champ[9] and champ[10]
-										///////////////////////
+
+			Ability first_ability = retrieveAbility(availableAbilities,champ[8]);
+			Ability second_ability = retrieveAbility(availableAbilities,champ[9]);
+			Ability third_ability = retrieveAbility(availableAbilities,champ[10]);
+
+			newChamp.getAbilities().add(first_ability);
+			newChamp.getAbilities().add(second_ability);
+			newChamp.getAbilities().add(third_ability);
+
 		}
 	}
+
+
+	// FOUND IN THE PUBLIC TESTS, SEEMS GOOD IDK IF WE'RE ALLOWED TO DO THIS THO
+	// method that uses the available ability array to populate each champion's individual ability array
+	private static Ability retrieveAbility(ArrayList<Ability> availableAbilities, String abilityName)
+			throws Exception{
+		for (int i = 0; i < availableAbilities.size(); i++) {
+			String name = availableAbilities.get(i).getName();
+			if (name.equals(abilityName)) {
+				return (Ability) availableAbilities.get(i);
+			}
+		}
+		return null;
+	}
+
 
 	public Player getFirstPlayer() {
 		return firstPlayer;
