@@ -17,7 +17,10 @@ public class Cover {
 	}
 
 	public void setCurrentHP(int currentHP) {
-		this.currentHP = currentHP;
+		if(currentHP<0)
+			this.currentHP = 0;
+		else
+			this.currentHP = currentHP;
 	}
 
 	public Point getLocation() {

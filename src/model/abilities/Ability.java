@@ -14,6 +14,7 @@ public class Ability {
 		this.name = name;
 		this.manaCost = cost;
 		this.baseCooldown = baseCoolDown;
+		this.currentCooldown = 0;
 		this.castRange = castRange;
 		this.castArea = area;
 		this.requiredActionPoints = required;
@@ -24,7 +25,12 @@ public class Ability {
 	}
 
 	public void setCurrentCooldown(int currentCooldown) {
-		this.currentCooldown = currentCooldown;
+		if(currentCooldown<0)
+			this.currentCooldown = 0;
+		else if(currentCooldown>baseCooldown)
+			this.currentCooldown = baseCooldown;
+		else
+			this.currentCooldown = currentCooldown;
 	}
 
 	public String getName() {

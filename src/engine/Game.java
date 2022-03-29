@@ -25,7 +25,7 @@ public class Game {
 	private static final int BOARDHEIGHT = 5;
 	private static final int BOARDWIDTH = 5;
 	
-	public Game(Player first, Player second) {
+	public Game(Player first, Player second) throws Exception {
 		this.firstPlayer = first;
 		this.secondPlayer = second;
 		board = new Object[BOARDHEIGHT][BOARDWIDTH];
@@ -47,59 +47,54 @@ public class Game {
 		}
 	}
 	
-	private void placeCovers() { //ben7ot 2l 8attah hena
+	private void placeCovers() {
 		for(int i=0;i<5;i++){
-			int h;
-			int w;
+			int height;
+			int width;
 			do {
-				h =(int) (Math.random() * ((BOARDHEIGHT-1)-1) + 1);
-				w =(int) (Math.random() * (BOARDWIDTH));
+				height =(int) (Math.random() * ((BOARDHEIGHT-1)-1) + 1);
+				width =(int) (Math.random() * (BOARDWIDTH));
 			}
-			while (board [h][w]!=null);
-			board [h][w] = new Cover(h,w);
+			while (board [height][width]!=null);
+			board [height][width] = new Cover(height,width);
 		}
 	}
-	
-	///////////////////////
-	//////////////////////
-	//hatedrab fy weshena (probably)
-	/////////////////////
-	/////////////////////
+
 	public static void loadAbilities(String filePath) throws Exception {
-		BufferedReader br= new BufferedReader(new FileReader(filePath)); //copied
+		BufferedReader br= new BufferedReader(new FileReader(filePath));
 		String row;
 		while ((row=br.readLine())!=null) {
-			//ab is the string array of abilities from the abilities csv
-			String [] ab = row.split(",");
+			String [] abilities = row.split(",");
 
-			if (ab[0].equals("DMG"))
+
+			if (abilities[0].equals("DMG"))
 				availableAbilities.add(
 						new DamagingAbility(
-								ab[1],
-								Integer.parseInt(ab[2]),
-								Integer.parseInt(ab[4]),
-								Integer.parseInt(ab[3]),
-								AreaOfEffect.valueOf(ab[5]),
-								Integer.parseInt(ab[6]),
-								Integer.parseInt(ab[7])
+								abilities[1],
+								Integer.parseInt(abilities[2]),
+								Integer.parseInt(abilities[4]),
+								Integer.parseInt(abilities[3]),
+								AreaOfEffect.valueOf(abilities[5]),
+								Integer.parseInt(abilities[6]),
+								Integer.parseInt(abilities[7])
 						)
 				);
-			else if(ab[0].equals("HEL"))
+			else if(abilities[0].equals("HEL"))
 					availableAbilities.add(
 							new HealingAbility(
-									ab[1],
-									Integer.parseInt(ab[2]),
-									Integer.parseInt(ab[4]),
-									Integer.parseInt(ab[3]),
-									AreaOfEffect.valueOf(ab[5]),
-									Integer.parseInt(ab[6]),
-									Integer.parseInt(ab[7])
+									abilities[1],
+									Integer.parseInt(abilities[2]),
+									Integer.parseInt(abilities[4]),
+									Integer.parseInt(abilities[3]),
+									AreaOfEffect.valueOf(abilities[5]),
+									Integer.parseInt(abilities[6]),
+									Integer.parseInt(abilities[7])
 							)
 					);
 			else{
 				Effect abilityEffect;
-				int duration = Integer.parseInt(ab[8]);
-				switch(ab[7]){
+				int duration = Integer.parseInt(abilities[8]);
+				switch(abilities[7]){
 					case "Shield": abilityEffect = new Shield(duration);break;
 					case "Disarm": abilityEffect = new Disarm(duration);break;
 					case "PowerUp": abilityEffect = new PowerUp(duration);break;
@@ -114,12 +109,12 @@ public class Game {
 				}
 				availableAbilities.add(
 						new CrowdControlAbility(
-								ab[1],
-								Integer.parseInt(ab[2]),
-								Integer.parseInt(ab[4]),
-								Integer.parseInt(ab[3]),
-								AreaOfEffect.valueOf(ab[5]),
-								Integer.parseInt(ab[6]),
+								abilities[1],
+								Integer.parseInt(abilities[2]),
+								Integer.parseInt(abilities[4]),
+								Integer.parseInt(abilities[3]),
+								AreaOfEffect.valueOf(abilities[5]),
+								Integer.parseInt(abilities[6]),
 								// abilityEffect corresponds to its respective ability, done using a switch case
 								abilityEffect
 						)
@@ -132,7 +127,7 @@ public class Game {
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		String row;
 		while ((row = br.readLine()) != null) {
-			String[] champ = row.split(",");
+			String[] champ = row.split(",");        //string array of champions from the csv file
 			Champion newChamp;
 
 			if(champ[0].equals("H"))
@@ -171,28 +166,25 @@ public class Game {
 								Integer.parseInt(champ[7])
 						)
 				);
-
-			Ability first_ability = retrieveAbility(availableAbilities,champ[8]);
-			Ability second_ability = retrieveAbility(availableAbilities,champ[9]);
-			Ability third_ability = retrieveAbility(availableAbilities,champ[10]);
-
-			newChamp.getAbilities().add(first_ability);
-			newChamp.getAbilities().add(second_ability);
-			newChamp.getAbilities().add(third_ability);
+			
+            //populates the Abilities ArrayList in the Champion class using the ability names in the csv file
+			newChamp.getAbilities().add(findAbility(champ[8]));
+			newChamp.getAbilities().add(findAbility(champ[9]));
+			newChamp.getAbilities().add(findAbility(champ[10]));
 
 		}
 	}
 
 
-	// FOUND IN THE PUBLIC TESTS, SEEMS GOOD IDK IF WE'RE ALLOWED TO DO THIS THO
 	// method that uses the available ability array to populate each champion's individual ability array
-	private static Ability retrieveAbility(ArrayList<Ability> availableAbilities, String abilityName)
-			throws Exception{
-		for (int i = 0; i < availableAbilities.size(); i++) {
-			String name = availableAbilities.get(i).getName();
-			if (name.equals(abilityName)) {
-				return (Ability) availableAbilities.get(i);
+	public static Ability findAbility(String abilityName) {
+		int i = 0; 
+		while (i < availableAbilities.size()) {
+			String currAbility = availableAbilities.get(i).getName();
+			if (abilityName.equals(currAbility)) {
+				return availableAbilities.get(i);
 			}
+			else i++;
 		}
 		return null;
 	}
