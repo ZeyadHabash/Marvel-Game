@@ -21,7 +21,7 @@ public class Game {
 	private Object [][] board; // [height][width]
 	private static ArrayList<Champion> availableChampions;
 	private static ArrayList<Ability> availableAbilities;
-	private PriorityQueue turnOrder;
+	private PriorityQueue turnOrder; //contains available characters to pick from
 	private static final int BOARDHEIGHT = 5;
 	private static final int BOARDWIDTH = 5;
 	
@@ -36,24 +36,24 @@ public class Game {
 		placeCovers();
 	}
 	
-	private void placeChampions() {
-		for(int i = 0; i<firstPlayer.getTeam().size();i++) {
+	private void placeChampions() {  
+		for(int i = 0; i<firstPlayer.getTeam().size();i++) {  //iterates the firstPlayer's team arraylist and places the champions on the board as well as sets their location (attribute of champion)
 			board[0][i+1] = firstPlayer.getTeam().get(i);
 			firstPlayer.getTeam().get(i).setLocation(new Point(0,i+1));
 		}
-		for(int i = 0; i<secondPlayer.getTeam().size();i++) {
+		for(int i = 0; i<secondPlayer.getTeam().size();i++) {  //iterates the secondPlayer's team arraylist and places the champions on the board as well as sets their location (attribute of champion)
 			board[BOARDHEIGHT-1][i+1] = secondPlayer.getTeam().get(i);
 			secondPlayer.getTeam().get(i).setLocation(new Point(BOARDHEIGHT-1,i+1));
 		}
 	}
 	
-	private void placeCovers() {
-		for(int i=0;i<5;i++){
+	private void placeCovers() {  //places 5 covers on the board
+		for(int i=0; i<5; i++){
 			int height;
 			int width;
 			do {
-				height =(int) (Math.random() * ((BOARDHEIGHT-1)-1) + 1);
-				width =(int) (Math.random() * (BOARDWIDTH));
+				height =(int) (Math.random() * ((BOARDHEIGHT-1)-1) + 1);  //picks a random no. for the height between 1(inc) & 4(exc) to place the covers anywhere except the bottom and top rows
+				width =(int) (Math.random() * (BOARDWIDTH)); 
 			}
 			while (board [height][width]!=null);
 			board [height][width] = new Cover(height,width);
@@ -176,8 +176,8 @@ public class Game {
 	}
 
 
-	// method that uses the available ability array to populate each champion's individual ability array
-	public static Ability findAbility(String abilityName) {
+	//helper method that uses the available ability array to populate each champion's individual ability array list
+	private static Ability findAbility(String abilityName) {
 		int i = 0; 
 		while (i < availableAbilities.size()) {
 			String currAbility = availableAbilities.get(i).getName();

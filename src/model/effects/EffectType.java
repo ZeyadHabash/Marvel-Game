@@ -1,6 +1,6 @@
 package model.effects;
 
-public enum EffectType {
+public enum EffectType { 
 	BUFF,
 	DEBUFF
 }

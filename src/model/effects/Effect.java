@@ -11,9 +11,7 @@ public class Effect {
 		this.type = type;
 	}
 
-	public String getName() {
-		return name;
-	}
+	public String getName() { return name; }
 
 	public int getDuration() { return duration; }
 

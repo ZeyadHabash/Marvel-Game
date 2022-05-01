@@ -16,7 +16,7 @@ public class Cover {
 		return currentHP;
 	}
 
-	public void setCurrentHP(int currentHP) {
+	public void setCurrentHP(int currentHP) { //currentHP must never be below 0
 		if(currentHP<0)
 			this.currentHP = 0;
 		else

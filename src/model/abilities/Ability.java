@@ -4,8 +4,8 @@ public class Ability {
 	
 	private String name;
 	private int manaCost;
-	private int baseCooldown;
-	private int currentCooldown;
+	private int baseCooldown;  //no. of turns a champ must wait after casting the ability in order to cast it again.
+	private int currentCooldown;  //no. of turns the champ is currently waiting to recast the ability
 	private int castRange;
 	private int requiredActionPoints;
 	private AreaOfEffect castArea;
@@ -14,7 +14,7 @@ public class Ability {
 		this.name = name;
 		this.manaCost = cost;
 		this.baseCooldown = baseCoolDown;
-		this.currentCooldown = 0;
+		this.currentCooldown = 0;  //starts off with a value of 0 since the ability hasn't been used yet.
 		this.castRange = castRange;
 		this.castArea = area;
 		this.requiredActionPoints = required;

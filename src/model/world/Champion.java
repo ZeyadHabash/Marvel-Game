@@ -25,10 +25,10 @@ public class Champion {
 		this.condition = Condition.ACTIVE;
 		this.name = name;
 		this.maxHP = maxHP;
-		this.currentHP = maxHP;
+		this.currentHP = maxHP;  //starts with the maximum value and decreases with each attack made on the champ
 		this.mana = mana;
 		this.maxActionPointsPerTurn = maxActions;
-		this.currentActionPoints = maxActions;
+		this.currentActionPoints = maxActions;  //starts with the maximum value and decreases with each action the champ makes
 		this.speed = speed;
 		this.attackRange = attackRange;
 		this.attackDamage = attackDamage;
@@ -107,7 +107,14 @@ public class Champion {
 		return currentActionPoints;
 	}
 
-	public void setCurrentActionPoints(int currentActionPoints) { this.currentActionPoints = currentActionPoints; }
+	public void setCurrentActionPoints(int currentActionPoints) {
+		if(currentActionPoints<0)
+			this.currentActionPoints = 0;
+		else if(currentActionPoints>maxActionPointsPerTurn)
+			this.currentActionPoints = maxActionPointsPerTurn;
+		else
+			this.currentActionPoints = currentActionPoints;
+	}
 
 	public int getAttackRange() {
 		return attackRange;
@@ -120,5 +127,6 @@ public class Champion {
 	public ArrayList<Effect> getAppliedEffects() {
 		return appliedEffects;
 	}
+
 
 }
