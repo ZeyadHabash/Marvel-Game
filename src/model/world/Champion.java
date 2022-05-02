@@ -132,4 +132,5 @@ public abstract class Champion implements Damageable, Comparable {
 	public int compareTo(Object o) {
 		return 0;
 	}
+
 }
