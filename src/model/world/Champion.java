@@ -1,7 +1,7 @@
 package model.world;
 
 import model.abilities.Ability;
-import model.effects.Effect;
+import model.effects.*;
 
 import java.awt.*;
 import java.util.ArrayList;
