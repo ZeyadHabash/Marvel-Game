@@ -5,7 +5,7 @@ import model.abilities.*;
 import model.effects.*;
 import java.awt.*;
 
-public abstract class Champion implements Damageable {
+public abstract class Champion implements Damageable, Comparable {
 	
 	private String name;
 	private int maxHP;
@@ -128,5 +128,8 @@ public abstract class Champion implements Damageable {
 		return appliedEffects;
 	}
 
-
+	@Override
+	public int compareTo(Object o) {
+		return 0;
+	}
 }
