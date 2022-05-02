@@ -5,7 +5,7 @@ import model.abilities.*;
 import model.effects.*;
 import java.awt.*;
 
-public class Champion implements Damageable {
+public abstract class Champion implements Damageable {
 	
 	private String name;
 	private int maxHP;
