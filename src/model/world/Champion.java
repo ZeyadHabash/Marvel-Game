@@ -1,9 +1,10 @@
 package model.world;
 
-import java.util.*;
-import model.abilities.*;
-import model.effects.*;
+import model.abilities.Ability;
+import model.effects.Effect;
+
 import java.awt.*;
+import java.util.ArrayList;
 
 public abstract class Champion implements Damageable, Comparable {
 	
@@ -34,6 +35,41 @@ public abstract class Champion implements Damageable, Comparable {
 		this.attackDamage = attackDamage;
 		abilities = new ArrayList<Ability>();
 		appliedEffects = new ArrayList<Effect>();
+	}
+	//add an exceptionS here matenseesh
+	public void useLeaderAbility(ArrayList<Champion> targets) {
+		try {
+			if (this instanceof Hero) {
+				for (int i = 0; i < 3; i++) {
+					Champion a = targets.get(i);
+					Disarm.remove(a);
+					Dodge.remove(a);
+					Root.remove(a);
+					Shock.remove(a);
+					Silence.remove(a);
+					Stun.remove(a);
+					Embrace.apply(a); //See how to make it last for 2 turns only
+				}
+			} else {
+				if (this instanceof Villain) {
+					for (int i = 0; i < 3; i++) {
+						Champion a = targets.get(i);
+						if (a.getCurrentHP() == 0.3 * a.getMaxHP()) {
+						a.setCurrentHP(0);
+						a.setCondition(Condition.INACTIVE);
+						}
+					}
+				}
+				else if (this instanceof AntiHero) {
+					for(int i = 0; i<4; i++){
+						Champion a = targets.get(i);
+						Stun.apply(a);
+					}
+				}
+			}
+		}
+		catch (Exception e){
+		throw e;}
 	}
 	
 	public int getCurrentHP() {
@@ -128,8 +164,19 @@ public abstract class Champion implements Damageable, Comparable {
 		return appliedEffects;
 	}
 
-	@Override
+	//Lama n-run hanefham bena3mel eh :3
 	public int compareTo(Object o) {
-		return 0;
+		try {
+			Champion c = (Champion) o;
+			if (this.getSpeed() < c.getSpeed()) {
+				return 1;
+			} else if (this.getSpeed() > c.getSpeed()) {
+				return -1;
+			}
+			return this.getName().compareTo(c.getName());
+		}
+		catch(Exception e){
+			throw e;
+		}
 	}
 }
