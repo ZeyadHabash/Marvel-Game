@@ -1,6 +1,10 @@
 package model.abilities;
 
-public abstract class Ability {
+import model.world.Damageable;
+
+import java.util.ArrayList;
+
+public abstract class Ability{
 	
 	private String name;
 	private int manaCost;
@@ -57,4 +61,8 @@ public abstract class Ability {
 		return castArea;
 	}
 
+	public void execute(ArrayList<Damageable> targets){
+	int i = 0;
+
+	}
 }
