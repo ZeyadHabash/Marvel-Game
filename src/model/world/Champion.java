@@ -3,8 +3,9 @@ package model.world;
 import exceptions.LeaderAbilityAlreadyUsedException;
 import exceptions.LeaderNotCurrentException;
 import model.abilities.Ability;
-import model.effects.Effect;
-import model.effects.Stun;
+import model.effects.*;
+import model.effects.EffectType;
+import model.effects.Embrace;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public abstract class Champion implements Damageable, Comparable {
 		abilities = new ArrayList<Ability>();
 		appliedEffects = new ArrayList<Effect>();
 	}
-	//add an exceptionS here matenseesh.
+	//add an exceptionS here matenseesh
 	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException {
 		try {
 			if (this instanceof Hero) {
