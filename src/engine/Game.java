@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import exceptions.ChampionDisarmedException;
 import exceptions.InvalidTargetException;
 import exceptions.NotEnoughResourcesException;
 import exceptions.UnallowedMovementException;
@@ -237,7 +238,7 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, InvalidTargetException {      //might have to check if the champion is attacking teammates
+	public void attack(Direction d) throws NotEnoughResourcesException, InvalidTargetException, ChampionDisarmedException {      //might have to check if the champion is attacking teammates
 		Champion c = getCurrentChampion();
 		int x = c.getLocation().x;
 		int y = c.getLocation().y;
