@@ -182,4 +182,5 @@ public abstract class Champion implements Damageable, Comparable {
 			throw e;
 		}
 	}
+
 }
