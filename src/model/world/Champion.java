@@ -2,6 +2,8 @@ package model.world;
 
 import model.abilities.Ability;
 import model.effects.Effect;
+import model.effects.EffectType;
+import model.effects.Embrace;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -42,13 +44,14 @@ public abstract class Champion implements Damageable, Comparable {
 			if (this instanceof Hero) {
 				for (int i = 0; i < 3; i++) {
 					Champion a = targets.get(i);
-					Disarm.remove(a);
-					Dodge.remove(a);
-					Root.remove(a);
-					Shock.remove(a);
-					Silence.remove(a);
-					Stun.remove(a);
-					Embrace.apply(a); //See how to make it last for 2 turns only
+					int j = 0;
+					while(a.getAppliedEffects().get(j)!=null){
+						String tempEffectType = String.valueOf(a.getAppliedEffects().get(j));
+						if (tempEffectType.equals("DEBUFF")){
+							getAppliedEffects().remove(j);
+						}
+					}
+
 				}
 			} else {
 				if (this instanceof Villain) {
