@@ -1,5 +1,9 @@
 package model.abilities;
 
+import model.world.Damageable;
+
+import java.util.ArrayList;
+
 public class HealingAbility extends Ability{
     private int healAmount;
 
@@ -14,5 +18,13 @@ public class HealingAbility extends Ability{
 
     public void setHealAmount(int healAmount) {
         this.healAmount = healAmount;
+    }
+
+    @Override
+    public void execute(ArrayList<Damageable> targets) {
+        for(int i=0; i < targets.size(); i++){
+            Damageable a = targets.get(i);
+            a.setCurrentHP(a.getCurrentHP() + this.healAmount);       //restores health points to the champion or cover
+        }
     }
 }
