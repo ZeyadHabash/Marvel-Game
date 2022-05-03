@@ -1,7 +1,11 @@
 package model.world;
 
+import exceptions.LeaderAbilityAlreadyUsedException;
+import exceptions.LeaderNotCurrentException;
 import model.abilities.Ability;
 import model.effects.*;
+import model.effects.EffectType;
+import model.effects.Embrace;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -37,18 +41,21 @@ public abstract class Champion implements Damageable, Comparable {
 		appliedEffects = new ArrayList<Effect>();
 	}
 	//add an exceptionS here matenseesh
-	public void useLeaderAbility(ArrayList<Champion> targets) {
+	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException {
 		try {
 			if (this instanceof Hero) {
 				for (int i = 0; i < 3; i++) {
 					Champion a = targets.get(i);
-					Disarm.remove(a);
-					Dodge.remove(a);
-					Root.remove(a);
-					Shock.remove(a);
-					Silence.remove(a);
-					Stun.remove(a);
-					Embrace.apply(a); //See how to make it last for 2 turns only
+
+					// wtf is this
+					for(int j=0;j<a.getAppliedEffects().size();j++){
+						Class tempEffectType = Class.forName(a.getAppliedEffects().get(j).getName()); // idk what this does look it up
+						if (tempEffectType.getMethod("getType").equals("DEBUFF")){ // this too
+							tempEffectType.getMethod("remove"); // same as above
+							getAppliedEffects().remove(j); // kill me
+						}
+					}
+
 				}
 			} else {
 				if (this instanceof Villain) {
@@ -63,13 +70,15 @@ public abstract class Champion implements Damageable, Comparable {
 				else if (this instanceof AntiHero) {
 					for(int i = 0; i<4; i++){
 						Champion a = targets.get(i);
-						Stun.apply(a);
+						Stun stun = new Stun(2);
+						stun.apply(a);
 					}
 				}
 			}
 		}
 		catch (Exception e){
-		throw e;}
+			throw e;
+		}
 	}
 	
 	public int getCurrentHP() {
