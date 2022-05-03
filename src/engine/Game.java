@@ -5,6 +5,10 @@ import java.awt.Point;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+
+import exceptions.InvalidTargetException;
+import exceptions.NotEnoughResourcesException;
+import exceptions.UnallowedMovementException;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
@@ -188,6 +192,97 @@ public class Game {
 		return null;
 	}
 
+	public Champion getCurrentChampion(){
+		return (Champion) turnOrder.peekMin();        //return the champion who's turn is taking place
+	}
+
+	public Player checkGameOver(){
+		int j=0;
+		for(int i = 0; i < firstPlayer.getTeam().size(); i++){
+			if (firstPlayer.getTeam().get(i).getCondition() == Condition.KNOCKEDOUT)
+				j++;                                      //j counts the no. of knockedout champions on a player's team
+		}
+		if (j == firstPlayer.getTeam().size())           //checks if all the champions on the team are knockedout (ie. dead)
+			return secondPlayer;
+		else{
+			j=0;                                         //resets j to use it as a counter for the second team
+			for(int i = 0; i < secondPlayer.getTeam().size(); i++){
+				if (secondPlayer.getTeam().get(i).getCondition() == Condition.KNOCKEDOUT)
+					j++;
+			}
+			if (j == secondPlayer.getTeam().size())      //same check as above
+				return firstPlayer;
+		}
+		return null;            //none of the players have lost yet
+	}
+
+	public void move(Direction d) throws UnallowedMovementException, NotEnoughResourcesException {    //exceptions not implemented yet
+		try{
+			Champion c = getCurrentChampion();
+			if(!c.getCondition().equals(Condition.ROOTED)){          //revisit; checks if the champion is rooted before allowing the movement but this might be handled in an exception which will be thrown
+				int x = c.getLocation().x;
+				int y = c.getLocation().y;
+				board[x][y] = null;
+				switch(d) {
+					case RIGHT: c.setLocation(new Point(x, y+1)); board[x][y+1] = c; break;
+					case LEFT: c.setLocation(new Point(x, y-1)); board[x][y-1] = c; break;
+					case UP: c.setLocation(new Point(x+1, y)); board[x+1][y] = c; break;
+					case DOWN: c.setLocation(new Point(x-1, y)); board[x-1][y] = c; break;
+				}
+				c.setCurrentActionPoints(c.getCurrentActionPoints()-1);
+			}
+		}
+		catch (Exception e){
+			throw e;
+		}
+	}
+
+	public void attack(Direction d) throws NotEnoughResourcesException, InvalidTargetException {      //might have to check if the champion is attacking teammates
+		Champion c = getCurrentChampion();
+		int x = c.getLocation().x;
+		int y = c.getLocation().y;
+		int r = c.getAttackRange();
+		Damageable target = null;
+		//looking for the nearest target in the direction d within the attack range of the champion
+		switch (d){
+			case RIGHT: for(int i = 0; i<r; i++){
+				if(board[x][y+1] instanceof Damageable) {
+					target = (Damageable) board[x][y + 1];
+					break;
+				}
+			};break;
+			case LEFT: for(int i = 0; i<r; i++){
+				if(board[x][y-1] instanceof Damageable) {
+					target = (Damageable) board[x][y - 1];
+					break;
+				}
+			};break;
+			case UP: for(int i = 0; i<r; i++){
+				if(board[x+1][y] instanceof Damageable) {
+					target = (Damageable) board[x+1][y];
+					break;
+				}
+			};break;
+			case DOWN: for(int i = 0; i<r; i++){
+				if(board[x-1][y] instanceof Damageable) {
+					target = (Damageable) board[x-1][y];
+					break;
+				}
+			};break;
+		}
+		c.setCurrentActionPoints(c.getCurrentActionPoints()-2);
+		if (target == null)
+			return;
+		target.setCurrentHP(target.getCurrentHP()-(int)(c.getAttackDamage()*damageMultiplier(c,target)));   //using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
+	}
+
+	public double damageMultiplier(Champion attacker, Damageable target){
+		if (target instanceof  Cover)
+			return 1;
+		if (attacker.getClass().equals(target.getClass()))
+			return 1;
+		return 1.5;
+	}
 
 	public Player getFirstPlayer() {
 		return firstPlayer;
