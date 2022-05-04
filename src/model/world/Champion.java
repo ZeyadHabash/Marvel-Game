@@ -1,9 +1,14 @@
 package model.world;
 
-import java.util.*;
-import model.abilities.*;
+import exceptions.LeaderAbilityAlreadyUsedException;
+import exceptions.LeaderNotCurrentException;
+import model.abilities.Ability;
 import model.effects.*;
+import model.effects.EffectType;
+import model.effects.Embrace;
+
 import java.awt.*;
+import java.util.ArrayList;
 
 public abstract class Champion implements Damageable, Comparable {
 	
@@ -35,14 +40,75 @@ public abstract class Champion implements Damageable, Comparable {
 		abilities = new ArrayList<Ability>();
 		appliedEffects = new ArrayList<Effect>();
 	}
+	//////////////////////////////////////////////////////////
+	//Catch the rest of the exceptions when they're actually implemented
+	///////////////////////////////////////////////////////
+	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException {
+		try {
+			// check if "this" would work this way
+			if (this instanceof Hero) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion a = targets.get(i);
+
+					/*
+
+
+
+					Revisit later when clone() is better understood
+
+
+
+
+					*/
+					// wtf is this
+					for(int j=0;j<a.getAppliedEffects().size();j++){
+						Class tempEffectType = Class.forName(a.getAppliedEffects().get(j).getName()); // idk what this does look it up
+						if (tempEffectType.getMethod("getType").equals("DEBUFF")){ // this too
+							tempEffectType.getMethod("remove"); // same as above
+							getAppliedEffects().remove(j); // kill me
+						}
+					}
+					// adding embrace effect
+					Embrace embrace = new Embrace(2);
+					embrace.apply(a);
+					a.getAppliedEffects().add(embrace);
+
+				}
+			}else if (this instanceof Villain) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion a = targets.get(i);
+					if (a.getCurrentHP() < 0.3 * a.getMaxHP()) {
+					a.setCurrentHP(0);
+					//
+					//a.setCondition(Condition.KNOCKEDOUT);
+					}
+				}
+			}
+			else if (this instanceof AntiHero) {
+				for(int i = 0; i<targets.size(); i++){
+					Champion a = targets.get(i);
+					Stun stun = new Stun(2);
+					stun.apply(a);
+				}
+			}
+		}
+		// catch the rest of the exceptions
+		catch (Exception e){
+			throw e;
+		}
+	}
 	
 	public int getCurrentHP() {
 		return currentHP;
 	}
 
 	public void setCurrentHP(int currentHP) {
-		if(currentHP<0)
-			this.currentHP =0;
+		if(currentHP<=0) {
+			this.currentHP = 0;
+			// Knocking out a champion when their hp reaches 0
+			// might need to remove later
+			this.condition = Condition.KNOCKEDOUT;
+		}
 		else if(currentHP > maxHP)
 			this.currentHP = maxHP;
 		else
@@ -128,8 +194,20 @@ public abstract class Champion implements Damageable, Comparable {
 		return appliedEffects;
 	}
 
-	@Override
+	//Lama n-run hanefham bena3mel eh :3
 	public int compareTo(Object o) {
-		return 0;
+		try {
+			Champion c = (Champion) o;
+			if (this.getSpeed() < c.getSpeed()) {
+				return 1;
+			} else if (this.getSpeed() > c.getSpeed()) {
+				return -1;
+			}
+			return this.getName().compareTo(c.getName());
+		}
+		catch(Exception e){
+			throw e;
+		}
 	}
+
 }

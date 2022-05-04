@@ -13,14 +13,12 @@ public abstract class Effect implements Cloneable {
 		this.type = type;
 	}
 
-	public void apply(Champion c){
-	}
-	public void remove(Champion c){
-	}
+	public abstract void apply(Champion c);
+	public abstract void remove(Champion c);
 
 	// not sure if this is correct, just testing stuff out
 	public Effect clone() throws CloneNotSupportedException{
-		Effect clone = null;
+		Effect clone;
 		try{
 			clone = (Effect) super.clone();
 			clone.duration = duration;
