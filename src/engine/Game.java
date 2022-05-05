@@ -1,13 +1,15 @@
 package engine;
 
+import java.awt.*;
+import java.awt.Point;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
 
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.*;
 
 public class Game {
 
@@ -199,7 +201,9 @@ public class Game {
 		return firstLeaderAbilityUsed;
 	}
 
-	public boolean isSecondLeaderAbilityUsed() {return secondLeaderAbilityUsed;	}
+	public boolean isSecondLeaderAbilityUsed() {
+		return secondLeaderAbilityUsed;
+	}
 
 	public Object[][] getBoard() {
 		return board;
