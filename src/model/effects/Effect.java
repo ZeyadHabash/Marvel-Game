@@ -6,6 +6,7 @@ public abstract class Effect implements Cloneable {
 	private String name;
 	private int duration;
 	private EffectType type;
+	private int appliedCounter;
 	
 	public Effect (String name, int duration, EffectType type) {
 		this.name = name;
@@ -38,4 +39,9 @@ public abstract class Effect implements Cloneable {
 
 	public EffectType getType() { return type; }
 
+	public int getAppliedCounter() { return appliedCounter; }
+
+	public void increaseAppliedCounter() {
+		this.appliedCounter ++;
+	}
 }
