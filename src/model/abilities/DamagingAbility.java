@@ -23,8 +23,8 @@ public class DamagingAbility extends Ability{
 
 	public void execute(ArrayList<Damageable> targets) {
 		for(int i=0; i < targets.size(); i++){
-			Damageable a = targets.get(i);
-			a.setCurrentHP(a.getCurrentHP() - this.damageAmount);       //deal the damage amount to the champion or cover
+			Damageable damageable = targets.get(i);
+			damageable.setCurrentHP(damageable.getCurrentHP() - this.damageAmount);	//deal the damage amount to the champion or cover
 		}
 	}
 }
