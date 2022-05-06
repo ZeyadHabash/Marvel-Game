@@ -1,5 +1,9 @@
 package model.abilities;
 
+import model.world.Damageable;
+
+import java.util.ArrayList;
+
 public abstract class Ability {
 	
 	private String name;
@@ -20,6 +24,7 @@ public abstract class Ability {
 		this.requiredActionPoints = required;
 	}
 
+	public abstract void execute(ArrayList<Damageable> targets);
 	public int getCurrentCooldown() {
 		return currentCooldown;
 	}

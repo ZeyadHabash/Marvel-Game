@@ -1,5 +1,9 @@
 package model.abilities;
 
+import model.world.Damageable;
+
+import java.util.ArrayList;
+
 public class DamagingAbility extends Ability{
 	
 	private int damageAmount;
@@ -16,5 +20,11 @@ public class DamagingAbility extends Ability{
 	public void setDamageAmount(int damageAmount) {
 		this.damageAmount = damageAmount;
 	}
-	
+
+	public void execute(ArrayList<Damageable> targets) {
+		for(int i=0; i < targets.size(); i++){
+			Damageable a = targets.get(i);
+			a.setCurrentHP(a.getCurrentHP() - this.damageAmount);       //deal the damage amount to the champion or cover
+		}
+	}
 }
