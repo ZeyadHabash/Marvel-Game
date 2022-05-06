@@ -25,6 +25,10 @@ public abstract class Champion implements Damageable, Comparable {
 	private ArrayList<Effect> appliedEffects;
 	private Condition condition;
 	private Point location;
+
+	// not in milestone, just helps
+	private boolean disarmed;
+	private boolean silenced;
 	
 	public Champion(String name, int maxHP, int mana, int maxActions, int speed, int attackRange, int attackDamage) {
 		this.condition = Condition.ACTIVE;
@@ -193,6 +197,12 @@ public abstract class Champion implements Damageable, Comparable {
 	public ArrayList<Effect> getAppliedEffects() {
 		return appliedEffects;
 	}
+
+	public boolean isDisarmed(){ return disarmed; }
+	public void setDisarmed(boolean disarmed){ this.disarmed = disarmed; }
+
+	public boolean isSilenced() { return silenced; }
+	public void setSilenced(boolean silenced) { this.silenced = silenced; }
 
 	//Lama n-run hanefham bena3mel eh :3
 	public int compareTo(Object o) {

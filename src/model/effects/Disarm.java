@@ -18,6 +18,7 @@ public class Disarm extends Effect {
 	// handle the "cant use normal attacks" part later
 	@Override
 	public void apply(Champion c) {
+		c.setDisarmed(true);
 		DamagingAbility punch = new DamagingAbility("Punch",0,1, 1, AreaOfEffect.SINGLETARGET,1,50);
 		c.getAbilities().add(punch);
 	}
@@ -25,6 +26,7 @@ public class Disarm extends Effect {
 	@Override
 	public void remove(Champion c) {
 		ArrayList<Ability> abilitiesList = c.getAbilities();
+		c.setDisarmed(false);
 		for(int i=0;i<abilitiesList.size();i++){
 			if(abilitiesList.get(i).getName().equals("Punch")){
 				abilitiesList.remove(i);
