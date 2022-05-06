@@ -222,7 +222,7 @@ public class Game {
 	}
 
 	// Helper method to get targeted team whether that be the friendly or the enemy team
-	private ArrayList<Damageable> getTargetedObjects(Champion c, Ability a){
+	public ArrayList<Damageable> getTargetedObjects(Champion c, Ability a){
 		boolean teamFlag = false;                            //flag raised if the champion is on the first player's team
 		for(int i =0; i< firstPlayer.getTeam().size(); i++){
 			if(firstPlayer.getTeam().get(i).equals(c)) {
