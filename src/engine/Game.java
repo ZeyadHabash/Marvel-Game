@@ -223,18 +223,10 @@ public class Game {
 
 	// Helper method to get targeted team whether that be the friendly or the enemy team
 	public ArrayList<Damageable> getTargetedObjects(Champion c, Ability a){
-		boolean teamFlag = false;                            //flag raised if the champion is on the first player's team
-		for(int i =0; i< firstPlayer.getTeam().size(); i++){
-			if(firstPlayer.getTeam().get(i).equals(c)) {
-				teamFlag = true;                             //teamFlag values: true if champion on 1st team, false if champion on 2nd team
-				break;          //im not sure if the break is in the right place but idt it matters since all the champions are unique
-			}
-		}
 		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
-		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();                  //includes covers + enemy champions
-
-		//truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
-		if (teamFlag) {
+		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
+		if(firstPlayer.getTeam().contains(c)) {
+			//truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
 			friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 			enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 		}
@@ -242,11 +234,12 @@ public class Game {
 			friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 			enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 		}
+
 		//check whether the ability is healing, damaging or cc
 		if(a instanceof HealingAbility || (a instanceof CrowdControlAbility && ((CrowdControlAbility) a).getEffect().getType().equals(EffectType.BUFF)))
 			return friendlyTeam;        //im not sure if the current champion should be excluded (as a target) in the case of a pos ability
-		else{
-			//iterates through the board looking for covers to add them to the enemyTeam
+		else if (a instanceof DamagingAbility) {
+			//iterates through the board looking for covers to add them to the enemyTeam in case of damaging ability
 			for(int i = 0; i < BOARDHEIGHT; i++){
 				for (int j = 0; j < BOARDWIDTH; j++){
 					if (board[i][j] != null && board[i][j] instanceof Cover)
@@ -255,6 +248,8 @@ public class Game {
 			}
 			return enemyTeam;
 		}
+		else                      //the returned team for negative CC abilities is the opposing champions (exc covers)
+			return enemyTeam;
 	}
 
 
