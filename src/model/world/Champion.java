@@ -79,7 +79,7 @@ public abstract class Champion implements Damageable, Comparable {
 					Champion a = targets.get(i);
 					if (a.getCurrentHP() < 0.3 * a.getMaxHP()) {
 					a.setCurrentHP(0);
-					//
+					// might have to add this again if we shouldn't handle it in setCurrentHP
 					//a.setCondition(Condition.KNOCKEDOUT);
 					}
 				}
