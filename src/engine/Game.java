@@ -406,6 +406,22 @@ public class Game {
 				// does no damage if the attacker and the target are from the same team
 				if((firstPlayer.getTeam().contains(champion) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(champion) && secondPlayer.getTeam().contains(target)))
 					return;
+				// does no damage if target dodges
+				if(target instanceof Champion && ((Champion)target).isDodging()){
+					// randomly obtain 0 or 1 (50% chance of each)
+					int dodgeChance = (int)(2*Math.random());
+					// if 1 don't deal damage
+					if(dodgeChance == 1)
+						return;
+				}
+				// does no damage if target is shielded
+				if(target instanceof Champion && ((Champion)target).isShielded()){
+					for (int i=0;i<((Champion)target).getAppliedEffects().size();i++)
+						if(((Champion)target).getAppliedEffects().get(i) instanceof Shield){
+							((Champion)target).getAppliedEffects().get(i).remove((Champion)target);
+							((Champion)target).getAppliedEffects().remove(i);
+						}
+				}
 				// does damage when target is an enemy or a cover
 				// using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
 				target.setCurrentHP(target.getCurrentHP() - (int) (champion.getAttackDamage() * damageMultiplier(champion, target)));
@@ -657,4 +673,5 @@ public class Game {
 	public static int getBoardwidth() {
 		return BOARDWIDTH;
 	}
+
 }
