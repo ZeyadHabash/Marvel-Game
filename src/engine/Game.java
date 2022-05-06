@@ -1,18 +1,14 @@
 package engine;
 
-import java.awt.*;
-import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-
 import exceptions.*;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
 
-import java.io.*;
-import java.util.regex.Matcher;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 public class Game {
 
@@ -531,8 +527,61 @@ public class Game {
 			throw e;
 		}
 	}
-
-
+	//Done twice for each team, need to know how to use another class's method hena
+	public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, NotEnoughResourcesException, AbilityUseException {
+		try {
+			Champion a = getCurrentChampion();
+			ArrayList<Champion> targets = new ArrayList<Champion>();
+			if (a.equals(getFirstPlayer().getLeader())) {
+				if (a instanceof Hero) {
+					targets.add(getFirstPlayer().getTeam().get(0));
+					targets.add(getFirstPlayer().getTeam().get(1));
+					targets.add(getFirstPlayer().getTeam().get(2));
+				} else if (a instanceof Villain) {
+					for (int i = 0; i < 3; i++) {
+						if (getSecondPlayer().getTeam().get(i).getCurrentHP() < (int)(0.3 * getSecondPlayer().getTeam().get(i).getMaxHP())) {
+							targets.add(getSecondPlayer().getTeam().get(i));
+						}
+					}
+				} else if (a instanceof AntiHero) {
+					for (int i = 0; i < 3; i++) {
+						if (getSecondPlayer().getTeam().get(i).equals(getSecondPlayer().getLeader())) {
+							targets.add(getSecondPlayer().getTeam().get(i));
+						}
+						if (getFirstPlayer().getTeam().get(i).equals(getFirstPlayer().getLeader())) {
+							targets.add(getFirstPlayer().getTeam().get(i));
+						}
+					}
+				}
+			}
+		else if (a.equals(getSecondPlayer().getLeader())) {
+				if (a instanceof Hero) {
+					targets.add(getSecondPlayer().getTeam().get(0));
+					targets.add(getSecondPlayer().getTeam().get(1));
+					targets.add(getSecondPlayer().getTeam().get(2));
+				} else if (a instanceof Villain) {
+					for (int i = 0; i < 3; i++) {
+						if (getFirstPlayer().getTeam().get(i).getCurrentHP() < getFirstPlayer().getTeam().get(i).getMaxHP()) {
+							targets.add(getFirstPlayer().getTeam().get(i));
+						}
+					}
+				} else if (a instanceof AntiHero) {
+					for (int i = 0; i < 3; i++) {
+						if (getFirstPlayer().getTeam().get(i).equals(getFirstPlayer().getLeader())) {
+							targets.add(getFirstPlayer().getTeam().get(i));
+						}
+						if (getSecondPlayer().getTeam().get(i).equals(getSecondPlayer().getLeader())) {
+							targets.add(getSecondPlayer().getTeam().get(i));
+						}
+					}
+				}
+			}
+		//**INPUT HERE THE METHOD THING**//
+		}
+		catch (Exception e) {
+			throw e;
+		}
+	}
 
 	private void prepareChampionTurns(){
 		ArrayList<Champion> list = availableChampions;
@@ -541,6 +590,7 @@ public class Game {
 				turnOrder.insert(list.get(i));
 		}
 	}
+
 
 
 	//////////////////////////////////////////////////////////////////////////////
