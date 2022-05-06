@@ -40,13 +40,26 @@ public abstract class Champion implements Damageable, Comparable {
 		abilities = new ArrayList<Ability>();
 		appliedEffects = new ArrayList<Effect>();
 	}
-	//add an exceptionS here matenseesh
+	//////////////////////////////////////////////////////////
+	//Catch the rest of the exceptions when they're actually implemented
+	///////////////////////////////////////////////////////
 	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException {
 		try {
+			// check if "this" would work this way
 			if (this instanceof Hero) {
-				for (int i = 0; i < 3; i++) {
+				for (int i = 0; i < targets.size(); i++) {
 					Champion a = targets.get(i);
 
+					/*
+
+
+
+					Revisit later when clone() is better understood
+
+
+
+
+					*/
 					// wtf is this
 					for(int j=0;j<a.getAppliedEffects().size();j++){
 						Class tempEffectType = Class.forName(a.getAppliedEffects().get(j).getName()); // idk what this does look it up
@@ -55,27 +68,31 @@ public abstract class Champion implements Damageable, Comparable {
 							getAppliedEffects().remove(j); // kill me
 						}
 					}
+					// adding embrace effect
+					Embrace embrace = new Embrace(2);
+					embrace.apply(a);
+					a.getAppliedEffects().add(embrace);
 
 				}
-			} else {
-				if (this instanceof Villain) {
-					for (int i = 0; i < 3; i++) {
-						Champion a = targets.get(i);
-						if (a.getCurrentHP() == 0.3 * a.getMaxHP()) {
-						a.setCurrentHP(0);
-						a.setCondition(Condition.KNOCKEDOUT);
-						}
-					}
-				}
-				else if (this instanceof AntiHero) {
-					for(int i = 0; i<4; i++){
-						Champion a = targets.get(i);
-						Stun stun = new Stun(2);
-						stun.apply(a);
+			}else if (this instanceof Villain) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion a = targets.get(i);
+					if (a.getCurrentHP() < 0.3 * a.getMaxHP()) {
+					a.setCurrentHP(0);
+					//
+					//a.setCondition(Condition.KNOCKEDOUT);
 					}
 				}
 			}
+			else if (this instanceof AntiHero) {
+				for(int i = 0; i<targets.size(); i++){
+					Champion a = targets.get(i);
+					Stun stun = new Stun(2);
+					stun.apply(a);
+				}
+			}
 		}
+		// catch the rest of the exceptions
 		catch (Exception e){
 			throw e;
 		}
@@ -86,8 +103,12 @@ public abstract class Champion implements Damageable, Comparable {
 	}
 
 	public void setCurrentHP(int currentHP) {
-		if(currentHP<0)
-			this.currentHP =0;
+		if(currentHP<=0) {
+			this.currentHP = 0;
+			// Knocking out a champion when their hp reaches 0
+			// might need to remove later
+			this.condition = Condition.KNOCKEDOUT;
+		}
 		else if(currentHP > maxHP)
 			this.currentHP = maxHP;
 		else
