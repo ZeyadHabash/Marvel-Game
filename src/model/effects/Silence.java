@@ -12,12 +12,14 @@ public class Silence  extends Effect{
 	// handle the "can't use abilities" part later
 	@Override
 	public void apply(Champion c) {
+		c.setSilenced(true);
 		c.setCurrentActionPoints(c.getCurrentActionPoints()+2);
 		c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()+2);
 	}
 
 	@Override
 	public void remove(Champion c) {
+		c.setSilenced(false);
 		c.setCurrentActionPoints(c.getCurrentActionPoints()-2);
 		c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()-2);
 	}
