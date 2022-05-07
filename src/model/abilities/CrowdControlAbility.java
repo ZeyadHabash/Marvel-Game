@@ -1,5 +1,6 @@
 package model.abilities;
 
+import exceptions.EffectNotAppliedException;
 import model.effects.Effect;
 import model.world.Champion;
 import model.world.Damageable;
@@ -20,7 +21,7 @@ public class CrowdControlAbility extends Ability{
     }
 
     @Override
-    public void execute(ArrayList<Damageable> targets) {
+    public void execute(ArrayList<Damageable> targets) throws EffectNotAppliedException, CloneNotSupportedException {
         for(int i=0; i < targets.size(); i++){
             Champion a = (Champion) targets.get(i);
             a.getAppliedEffects().add(this.effect);     //adds the ability's effect to the champion's appliedEffects array list

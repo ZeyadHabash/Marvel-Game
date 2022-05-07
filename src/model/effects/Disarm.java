@@ -29,7 +29,6 @@ public class Disarm extends Effect {
 
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
-
 		super.remove(c);
 		ArrayList<Ability> abilitiesList = c.getAbilities();
 		c.setDisarmed(false);

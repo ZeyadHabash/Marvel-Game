@@ -1,5 +1,6 @@
 package model.abilities;
 
+import exceptions.EffectNotAppliedException;
 import model.world.Damageable;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public abstract class Ability {
 		this.requiredActionPoints = required;
 	}
 
-	public abstract void execute(ArrayList<Damageable> targets);
+	public abstract void execute(ArrayList<Damageable> targets) throws CloneNotSupportedException, EffectNotAppliedException;
 	public int getCurrentCooldown() {
 		return currentCooldown;
 	}

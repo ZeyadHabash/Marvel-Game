@@ -1,5 +1,6 @@
 package model.effects;
 
+import exceptions.EffectNotAppliedException;
 import model.world.Champion;
 
 public class Embrace extends Effect{
@@ -8,7 +9,7 @@ public class Embrace extends Effect{
     }
 
     @Override
-    public void apply(Champion c) {
+    public void apply(Champion c) throws CloneNotSupportedException {
         // Permanent
         int newHP = c.getCurrentHP() + (int)(c.getMaxHP()*0.2);
         c.setCurrentHP(newHP);
@@ -17,15 +18,20 @@ public class Embrace extends Effect{
         c.setMana(newMana);
 
         // Temporary
-        int newSpeed = (int)(c.getSpeed()*1.2);
-        int newDamage = (int)(c.getAttackDamage()*1.2);
-        c.setSpeed(newSpeed);
-        c.setAttackDamage(newDamage);
+        try {
+            super.apply(c);
+        }catch(EffectNotAppliedException e) {
+            int newSpeed = (int)(c.getSpeed()*1.2);
+            int newDamage = (int)(c.getAttackDamage()*1.2);
+            c.setSpeed(newSpeed);
+            c.setAttackDamage(newDamage);
+        }
     }
 
     @Override
-    public void remove(Champion c) {
+    public void remove(Champion c) throws CloneNotSupportedException {
         // Remove Temporary buffs
+        super.remove(c);
         int newSpeed = (int)(c.getSpeed()/1.2);
         int newDamage = (int)(c.getAttackDamage()/1.2);
         c.setSpeed(newSpeed);
