@@ -345,7 +345,7 @@ public class Game {
 			}
 	}
 
-	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException {
+	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 
 		if(champion.isDisarmed())
@@ -610,8 +610,6 @@ public class Game {
 			}
 		}
 	}
-
-
 
 	private void prepareChampionTurns(){
 		ArrayList<Champion> list = firstPlayer.getTeam();

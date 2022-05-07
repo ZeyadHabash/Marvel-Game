@@ -1,5 +1,6 @@
 package model.effects;
 
+import exceptions.EffectNotAppliedException;
 import model.abilities.Ability;
 import model.abilities.AreaOfEffect;
 import model.abilities.DamagingAbility;
@@ -15,16 +16,21 @@ public class Disarm extends Effect {
 	}
 
 
-	// handle the "cant use normal attacks" part later
 	@Override
-	public void apply(Champion c) {
-		c.setDisarmed(true);
-		DamagingAbility punch = new DamagingAbility("Punch",0,1, 1, AreaOfEffect.SINGLETARGET,1,50);
-		c.getAbilities().add(punch);
+	public void apply(Champion c) throws CloneNotSupportedException {
+		try {
+			super.apply(c);
+		}catch(EffectNotAppliedException e) {
+			c.setDisarmed(true);
+			DamagingAbility punch = new DamagingAbility("Punch", 0, 1, 1, AreaOfEffect.SINGLETARGET, 1, 50);
+			c.getAbilities().add(punch);
+		}
 	}
 
 	@Override
-	public void remove(Champion c) {
+	public void remove(Champion c) throws CloneNotSupportedException {
+
+		super.remove(c);
 		ArrayList<Ability> abilitiesList = c.getAbilities();
 		c.setDisarmed(false);
 		for(int i=0;i<abilitiesList.size();i++){
