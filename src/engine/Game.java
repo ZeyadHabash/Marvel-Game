@@ -26,6 +26,7 @@ public class Game {
 	private PriorityQueue turnOrder; //contains available characters to pick from
 	private static final int BOARDHEIGHT = 5;
 	private static final int BOARDWIDTH = 5;
+	private int turnsPassed;
 
 	public Game(Player first, Player second) throws Exception {
 		this.firstPlayer = first;
@@ -34,6 +35,7 @@ public class Game {
 		availableChampions = new ArrayList<Champion>();
 		availableAbilities = new ArrayList<Ability>();
 		turnOrder = new PriorityQueue(6);
+		turnsPassed = 0;
 		placeChampions();
 		placeCovers();
 		prepareChampionTurns();
@@ -624,6 +626,41 @@ public class Game {
 		}
 	}
 
+	public void endTurn() throws CloneNotSupportedException {
+		do {
+			Champion removedChamp = (Champion) turnOrder.remove();           //removes the current champion
+			if(turnOrder.isEmpty()) {                                        //checks if the turn order queue is empty to reset it
+				prepareChampionTurns();
+			}
+		}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
+		turnsPassed++;
+		// decrease the currentCooldown of each ability in the current champion's abilities array list
+		Champion currChamp = getCurrentChampion();
+		for(int i =0; i< currChamp.getAbilities().size(); i++){
+			Ability a = currChamp.getAbilities().get(i);
+			a.setCurrentCooldown(a.getCurrentCooldown()-1);
+		}
+		// update the counters of applied effects & calls the remove method on the champion for any effect that's been applied for its entire duration
+		for(int i=0;i<firstPlayer.getTeam().size();i++) {                //iterates through the team's champions
+			if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !firstPlayer.getTeam().get(i).getAppliedEffects().isEmpty()){   //checks if the champion is alive + if it has any applied effects
+				for(int j =0; j<firstPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {        //iterates through the champion's applied effects list & increases the counter of how many turns have passed since the effect was applied
+					firstPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
+					if(firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())   //checks if the duration of the effect has ended & then removes it
+						firstPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(firstPlayer.getTeam().get(i));
+				}
+			}
+		}
+		for(int i=0;i<secondPlayer.getTeam().size();i++) {
+			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !secondPlayer.getTeam().get(i).getAppliedEffects().isEmpty())
+				for(int j =0; j<secondPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {
+					secondPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
+					if(secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())
+						secondPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(secondPlayer.getTeam().get(i));
+				}
+		}
+		// reset the champion's current action points
+		currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
+	}
 
 	//////////////////////////////////////////////////////////////////////////////
 
