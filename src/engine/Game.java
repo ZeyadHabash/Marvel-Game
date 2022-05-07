@@ -255,6 +255,8 @@ public class Game {
 	}
 
 
+
+
 	//////////////////////////////////////////////////////////////////////////////
 
 	// Required methods
@@ -439,9 +441,13 @@ public class Game {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
-		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+		else if (ability.getCurrentCooldown()>0) {
+			throw new AbilityUseException("Ability is on cool down");
+		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
-		else {
+		else if (ability.getManaCost()> champion.getMana()) {
+			throw new NotEnoughResourcesException("Not enough mana");
+		} else {
 			int x = champion.getLocation().x;
 			int y = champion.getLocation().y;
 			ArrayList<Damageable> targetedObjects = getTargetedObjects(champion, ability);      //list of valid objects to target, ie. friendly champions if positive ability or covers and enemy champions if neg one
@@ -529,9 +535,13 @@ public class Game {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
-		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+		else if (ability.getCurrentCooldown()>0) {
+			throw new AbilityUseException("Ability is on cool down");
+		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
-		else {
+		else if (ability.getManaCost()> champion.getMana()) {
+			throw new NotEnoughResourcesException("Not enough mana");
+		} else {
 			int x = champion.getLocation().x;
 			int y = champion.getLocation().y;
 			int r = ability.getCastRange();
@@ -583,9 +593,13 @@ public class Game {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
-		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+		else if (ability.getCurrentCooldown()>0) {
+			throw new AbilityUseException("Ability is on cool down");
+		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
-		else {
+		else if (ability.getManaCost()> champion.getMana()) {
+			throw new NotEnoughResourcesException("Not enough mana");
+		} else {
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
 			int direction = distanceCalculator(champion.getLocation(), x, y);
 			boolean sameTeam = board[x][y] instanceof Champion &&
@@ -624,6 +638,41 @@ public class Game {
 		}
 	}
 
+	public void endTurn() throws CloneNotSupportedException {
+		do {
+			Champion removedChamp = (Champion) turnOrder.remove();           //removes the current champion
+			if(turnOrder.isEmpty()) {                                        //checks if the turn order queue is empty to reset it
+				prepareChampionTurns();
+			}
+		}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
+		// decrease the currentCooldown of each ability in the current champion's abilities array list
+		Champion currChamp = getCurrentChampion();
+		for(int i =0; i< currChamp.getAbilities().size(); i++){
+			Ability a = currChamp.getAbilities().get(i);
+			a.setCurrentCooldown(a.getCurrentCooldown()-1);
+		}
+		// update the counters of applied effects & calls the remove method on the champion for any effect that's been applied for its entire duration
+		///might change the method so that it iterates through only the current champion's applied effects depending on the rules of the game
+		for(int i=0;i<firstPlayer.getTeam().size();i++) {                //iterates through the team's champions
+			if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !firstPlayer.getTeam().get(i).getAppliedEffects().isEmpty()){   //checks if the champion is alive + if it has any applied effects
+				for(int j =0; j<firstPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {        //iterates through the champion's applied effects list & increases the counter of how many turns have passed since the effect was applied
+					firstPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
+					if(firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())   //checks if the duration of the effect has ended & then removes it
+						firstPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(firstPlayer.getTeam().get(i));
+				}
+			}
+		}
+		for(int i=0;i<secondPlayer.getTeam().size();i++) {
+			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !secondPlayer.getTeam().get(i).getAppliedEffects().isEmpty())
+				for(int j =0; j<secondPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {
+					secondPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
+					if(secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())
+						secondPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(secondPlayer.getTeam().get(i));
+				}
+		}
+		// reset the champion's current action points
+		currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
+	}
 
 	//////////////////////////////////////////////////////////////////////////////
 
