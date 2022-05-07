@@ -26,7 +26,6 @@ public class Game {
 	private PriorityQueue turnOrder; //contains available characters to pick from
 	private static final int BOARDHEIGHT = 5;
 	private static final int BOARDWIDTH = 5;
-	private int turnsPassed;
 
 	public Game(Player first, Player second) throws Exception {
 		this.firstPlayer = first;
@@ -35,7 +34,6 @@ public class Game {
 		availableChampions = new ArrayList<Champion>();
 		availableAbilities = new ArrayList<Ability>();
 		turnOrder = new PriorityQueue(6);
-		turnsPassed = 0;
 		placeChampions();
 		placeCovers();
 		prepareChampionTurns();
@@ -202,9 +200,11 @@ public class Game {
 		return null;
 	}
 
-	// Helper method to remove a champion from board once they're killed
-	private void killChampion(Champion c){
-
+	// Helper method to remove a champion/cover from board once they're killed/destroyed
+	public void removeDamageable(Damageable direction){
+		int x = direction.getLocation().x;
+		int y = direction.getLocation().y;
+		board[x][y] = null;
 	}
 
 	// Helper method to calculate the damage multiplier of Champions when attacking
@@ -224,10 +224,10 @@ public class Game {
 	}
 
 	// Helper method to get targeted team whether that be the friendly or the enemy team
-	public ArrayList<Damageable> getTargetedObjects(Champion c, Ability a){
+	public ArrayList<Damageable> getTargetedObjects(Champion champion, Ability a){
 		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
 		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
-		if(firstPlayer.getTeam().contains(c)) {
+		if(firstPlayer.getTeam().contains(champion)) {
 			//truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
 			friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 			enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
@@ -286,26 +286,26 @@ public class Game {
 		return null;            //none of the players have lost yet
 	}
 
-	public void move(Direction d) throws UnallowedMovementException, NotEnoughResourcesException, ArrayIndexOutOfBoundsException {    //exceptions not implemented yet
-			Champion c = getCurrentChampion();
+	public void move(Direction direction) throws UnallowedMovementException, NotEnoughResourcesException, ArrayIndexOutOfBoundsException {    //exceptions not implemented yet
+			Champion champion = getCurrentChampion();
 			// trying a different take on exceptions, seems easier to understand and implement
-			if(c.getCurrentActionPoints() < 1)
+			if(champion.getCurrentActionPoints() < 1)
 				throw new NotEnoughResourcesException("Not enough action points");
-			else if(c.getCondition().equals(Condition.ROOTED))
+			else if(champion.getCondition().equals(Condition.ROOTED))
 				throw new UnallowedMovementException("Champion cannot move while rooted");
 			else {
-				int x = c.getLocation().x;
-				int y = c.getLocation().y;
+				int x = champion.getLocation().x;
+				int y = champion.getLocation().y;
 				// trying to avoid Array index out of bounds (player tries to move off board)
 				try {
 					// checks if desired cell is empty before moving
-					switch (d) {
+					switch (direction) {
 						case RIGHT:
 							if (board[x][y + 1] != null)
 								throw new UnallowedMovementException("Cannot move to an occupied cell");
 							else {
-								c.setLocation(new Point(x, y + 1));
-								board[x][y + 1] = c;
+								champion.setLocation(new Point(x, y + 1));
+								board[x][y + 1] = champion;
 								board[x][y] = null;
 							}
 							break;
@@ -313,8 +313,8 @@ public class Game {
 							if (board[x][y - 1] != null)
 								throw new UnallowedMovementException("Cannot move to an occupied cell");
 							else {
-								c.setLocation(new Point(x, y - 1));
-								board[x][y - 1] = c;
+								champion.setLocation(new Point(x, y - 1));
+								board[x][y - 1] = champion;
 								board[x][y] = null;
 							}
 							break;
@@ -322,8 +322,8 @@ public class Game {
 							if (board[x + 1][y] != null)
 								throw new UnallowedMovementException("Cannot move to an occupied cell");
 							else {
-								c.setLocation(new Point(x + 1, y));
-								board[x + 1][y] = c;
+								champion.setLocation(new Point(x + 1, y));
+								board[x + 1][y] = champion;
 								board[x][y] = null;
 							}
 							break;
@@ -332,33 +332,34 @@ public class Game {
 							if (board[x - 1][y] != null)
 								throw new UnallowedMovementException("Cannot move to an occupied cell");
 							else {
-								c.setLocation(new Point(x - 1, y));
-								board[x - 1][y] = c;
+								champion.setLocation(new Point(x - 1, y));
+								board[x - 1][y] = champion;
 								board[x][y] = null;
 							}
 							break;
 					}
-					c.setCurrentActionPoints(c.getCurrentActionPoints() - 1);
+					champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 1);
 				}catch(ArrayIndexOutOfBoundsException e) {
 					throw new UnallowedMovementException("Cannot move out of board bounds");
 				}
 			}
 	}
 
-	// Still need to check if champion is disarmed
-	public void attack(Direction d) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException {
-		Champion c = getCurrentChampion();
+	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
+		Champion champion = getCurrentChampion();
 
-		if (c.getCurrentActionPoints() < 1)
+		if(champion.isDisarmed())
+			throw new ChampionDisarmedException("Champion cannot attack while disarmed");
+		else if (champion.getCurrentActionPoints() < 1)
 			throw new NotEnoughResourcesException("Not enough action points");
 		else {
-			int x = c.getLocation().x;
-			int y = c.getLocation().y;
-			int r = c.getAttackRange();
+			int x = champion.getLocation().x;
+			int y = champion.getLocation().y;
+			int r = champion.getAttackRange();
 			Damageable target = null;
 			try {
-				//looking for the nearest target in the direction d within the attack range of the champion
-				switch (d) {
+				//looking for the nearest target in the direction direction within the attack range of the champion
+				switch (direction) {
 					case RIGHT:
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x][y + i] instanceof Damageable) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
@@ -396,18 +397,37 @@ public class Game {
 						break;
 				}
 			}catch(ArrayIndexOutOfBoundsException e){
-
+				// Don't think I'm supposed to do anything when this is caught
 			}finally{
-				c.setCurrentActionPoints(c.getCurrentActionPoints() - 2);
+				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 2);
+				// does no damage if attacking an empty cell
+				if (target == null)
+					return;
+				// does no damage if the attacker and the target are from the same team
+				if((firstPlayer.getTeam().contains(champion) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(champion) && secondPlayer.getTeam().contains(target)))
+					return;
+				// does no damage if target dodges
+				if(target instanceof Champion && ((Champion)target).isDodging()){
+					// randomly obtain 0 or 1 (50% chance of each)
+					int dodgeChance = (int)(2*Math.random());
+					// if 1 don't deal damage
+					if(dodgeChance == 1)
+						return;
+				}
+				// does no damage if target is shielded
+				if(target instanceof Champion && ((Champion)target).isShielded()){
+					for (int i=0;i<((Champion)target).getAppliedEffects().size();i++)
+						if(((Champion)target).getAppliedEffects().get(i) instanceof Shield){
+							((Champion)target).getAppliedEffects().get(i).remove((Champion)target);
+							((Champion)target).getAppliedEffects().remove(i);
+						}
+				}
+				// does damage when target is an enemy or a cover
+				// using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
+				target.setCurrentHP(target.getCurrentHP() - (int) (champion.getAttackDamage() * damageMultiplier(champion, target)));
+				if(target.getCurrentHP() <= 0)
+					removeDamageable(target);
 			}
-			// does no damage if attacking an empty cell
-			if (target == null)
-				return;
-			// does no damage if the attacker and the target are from the same team
-			if((firstPlayer.getTeam().contains(c) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(c) && secondPlayer.getTeam().contains(target)))
-				return;
-			// does damage when target is an enemy or a cover
-			target.setCurrentHP(target.getCurrentHP() - (int) (c.getAttackDamage() * damageMultiplier(c, target)));   //using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
 		}
 	}
 
@@ -415,172 +435,193 @@ public class Game {
 	// Cast ability methods
 
 	// A method for casting an ability that is not limited to a direction or a particular target
-	public void castAbility(Ability a) throws NotEnoughResourcesException, AbilityUseException {
-		try{
-			Champion c = getCurrentChampion();
-			int x = c.getLocation().x;
-			int y = c.getLocation().y;
-			ArrayList<Damageable> targetedObjects = getTargetedObjects(c,a);      //list of valid objects to target, ie. friendly champions if positive ability or covers and enemy champions if neg one
+	public void castAbility(Ability ability) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, IllegalStateException {
+		Champion champion = getCurrentChampion();
+		if(champion.isSilenced())
+			throw new AbilityUseException("Champion cannot cast abilities while silenced");
+		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+			throw new NotEnoughResourcesException("Not enough action points");
+		else {
+			int x = champion.getLocation().x;
+			int y = champion.getLocation().y;
+			ArrayList<Damageable> targetedObjects = getTargetedObjects(champion, ability);      //list of valid objects to target, ie. friendly champions if positive ability or covers and enemy champions if neg one
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
-			switch (a.getCastArea()){
-				case SELFTARGET: targets.add(c);break;
-				case TEAMTARGET:
-					//iterates through the board to look for any damageables
-					for (int i = 0; i < BOARDHEIGHT; i++){
-						for (int j = 0; j < BOARDWIDTH; j++){
-							if (board[i][j] != null && targetedObjects.contains((Damageable) board[i][j])){
-								int d = distanceCalculator(c.getLocation(), i,j);        //when a damageable is found the distance between it and the champion casting the ability is calculated
-								if(d<=a.getCastRange())         //if the damageable is within range & part of the targeted team, it is added to the list fo targets
-									targets.add((Damageable) board[i][j]);
+			try{
+				switch (ability.getCastArea()) {
+					case SELFTARGET:
+						targets.add(champion);
+						break;
+					case TEAMTARGET:
+						//iterates through the board to look for any damageables
+						for (int i = 0; i < ability.getCastRange(); i++) {
+							for (int j = 0; j < ability.getCastRange(); j++) {
+								try {
+									if (board[i][j] != null && !board[i][j].equals(champion) && targetedObjects.contains((Damageable) board[i][j])) {
+										int direction = distanceCalculator(champion.getLocation(), i, j);        //when a damageable is found the distance between it and the champion casting the ability is calculated
+										if (direction <= ability.getCastRange())         //if the damageable is within range & part of the targeted team, it is added to the list fo targets
+											targets.add((Damageable) board[i][j]);
+									}
+								}catch(ArrayIndexOutOfBoundsException e){
+									// just to let it keep looping after an exception
+								}
 							}
-						}
-					}; break;
+						};
+						break;
 					//not sure if there needs to be a check for the range here, seeing that the cells within range are pretty straightforward
-				    //also dk if there would be an error if the cells being checked don't exist aslan, i think ah bas don't have energy to try and handle that
-				case SURROUND: {            //akeed there's a more efficient way of tackling this but my pea sized brain simply can not
-					if(board[x+1][y]!= null && targetedObjects.contains((Damageable) board[x+1][y]))
-						targets.add((Damageable) board[x+1][y]);
-					if(board[x][y+1]!= null && targetedObjects.contains((Damageable) board[x][y+1]))
-						targets.add((Damageable) board[x][y+1]);
-					if(board[x-1][y]!= null && targetedObjects.contains((Damageable) board[x-1][y]))
-						targets.add((Damageable) board[x-1][y]);
-					if(board[x][y-1]!= null && targetedObjects.contains((Damageable) board[x][y-1]))
-						targets.add((Damageable) board[x][y-1]);
-					if(board[x+1][y+1]!= null && targetedObjects.contains((Damageable) board[x+1][y+1]))
-						targets.add((Damageable) board[x+1][y+1]);
-					if(board[x-1][y-1]!= null && targetedObjects.contains((Damageable) board[x-1][y-1]))
-						targets.add((Damageable) board[x-1][y-1]);
-					if(board[x+1][y-1]!= null && targetedObjects.contains((Damageable) board[x+1][y-1]))
-						targets.add((Damageable) board[x+1][y-1]);
-					if(board[x-1][y+1]!= null && targetedObjects.contains((Damageable) board[x-1][y+1]))
-						targets.add((Damageable) board[x-1][y+1]);
-				}; break;
-				default: break;   //throw new IllegalStateException("Unexpected value: " + a.getCastArea());    >this was the recommended line when adding the default stmt
+					//also dk if there would be an error if the cells being checked don't exist aslan, i think ah bas don't have energy to try and handle that
+					case SURROUND: {            //akeed there's a more efficient way of tackling this but my pea sized brain simply can not
+						try {
+							if (board[x + 1][y] != null && targetedObjects.contains((Damageable) board[x + 1][y]))
+								targets.add((Damageable) board[x + 1][y]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x][y + 1] != null && targetedObjects.contains((Damageable) board[x][y + 1]))
+								targets.add((Damageable) board[x][y + 1]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x - 1][y] != null && targetedObjects.contains((Damageable) board[x - 1][y]))
+								targets.add((Damageable) board[x - 1][y]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x][y - 1] != null && targetedObjects.contains((Damageable) board[x][y - 1]))
+								targets.add((Damageable) board[x][y - 1]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x + 1][y + 1] != null && targetedObjects.contains((Damageable) board[x + 1][y + 1]))
+								targets.add((Damageable) board[x + 1][y + 1]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x - 1][y - 1] != null && targetedObjects.contains((Damageable) board[x - 1][y - 1]))
+								targets.add((Damageable) board[x - 1][y - 1]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x + 1][y - 1] != null && targetedObjects.contains((Damageable) board[x + 1][y - 1]))
+								targets.add((Damageable) board[x + 1][y - 1]);
+						}catch(ArrayIndexOutOfBoundsException e){}
+						try {
+							if (board[x - 1][y + 1] != null && targetedObjects.contains((Damageable) board[x - 1][y + 1]))
+								targets.add((Damageable) board[x - 1][y + 1]);
+						}catch (ArrayIndexOutOfBoundsException e){}
+					};
+					break;
+					default:
+						throw new IllegalStateException("Unexpected value: " + ability.getCastArea());    //this was the recommended line when adding the default stmt
+				}
+			}catch(ArrayIndexOutOfBoundsException e){
+				// idk what to do here
+			}finally {
+				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - ability.getRequiredActionPoints());
+				champion.setMana(champion.getMana() - ability.getManaCost());
+				if (targets.isEmpty())
+					return;
+				ability.execute(targets); //list of targets is passed to the execution method in the ability class
+				if (ability instanceof DamagingAbility) {
+					for (int i = 0; i < targets.size(); i++)
+						if (targets.get(i).getCurrentHP() <= 0)
+							removeDamageable(targets.get(i));
+				}
 			}
-			c.setCurrentActionPoints(c.getCurrentActionPoints()-a.getRequiredActionPoints());
-			c.setMana(c.getMana()-a.getManaCost());
-			if(targets.isEmpty())
-				return;
-			a.execute(targets); //list of targets is passed to the execution method in the ability class
-		}
-		catch (Exception e){
-			throw e;
 		}
 	}
 
 	// A method for casting ability with DIRECTIONAL area of effect
-	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, AbilityUseException{
-		try{
-			Champion c = getCurrentChampion();
-			int x = c.getLocation().x;
-			int y = c.getLocation().y;
-			int r = a.getCastRange();
+	public void castAbility(Ability ability, Direction direction) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException{
+		Champion champion = getCurrentChampion();
+		if(champion.isSilenced())
+			throw new AbilityUseException("Champion cannot cast abilities while silenced");
+		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+			throw new NotEnoughResourcesException("Not enough action points");
+		else {
+			int x = champion.getLocation().x;
+			int y = champion.getLocation().y;
+			int r = ability.getCastRange();
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
-			int i = 1;
-			switch (d){                        //the amount of redundant lines in this part makes my brain hurt
-				case RIGHT:                    //the movement along the board can probably use a helper method(?) since we use the same logic a lot
-					while(i<=r){
-						if(board[x][y+i]!=null && getTargetedObjects(c, a).contains((Damageable) board[x][y+i]))
-							targets.add((Damageable) board[x][y + i]);
-						i++;
-					}; break;
-				case LEFT:
-					while(i<=r){
-						if(board[x][y-i]!=null && getTargetedObjects(c, a).contains((Damageable) board[x][y-i]))
-							targets.add((Damageable) board[x][y - i]);
-						i++;
-					}; break;
-				case UP:
-					while(i<=r){
-						if(board[x+i][y]!=null && getTargetedObjects(c, a).contains((Damageable) board[x+i][y]))
-							targets.add((Damageable) board[x + i][y]);
-						i++;
-					}; break;
-				case DOWN:
-					while(i<=r){
-						if(board[x-i][y]!=null && getTargetedObjects(c, a).contains((Damageable) board[x-i][y]))
-							targets.add((Damageable) board[x-i][y]);
-						i++;
-					}; break;
+			ArrayList<Damageable> targetedObjects = getTargetedObjects(champion, ability);
+			try{
+				switch (direction){                        //the amount of redundant lines in this part makes my brain hurt
+					case RIGHT:                    //the movement along the board can probably use a helper method(?) since we use the same logic a lot
+						for(int i=1;i<=r;i++){
+							if(board[x][y+i]!=null && targetedObjects.contains((Damageable) board[x][y+i]))
+								targets.add((Damageable) board[x][y + i]);
+						}; break;
+					case LEFT:
+						for(int i=1;i<=r;i++){
+							if(board[x][y-i]!=null && targetedObjects.contains((Damageable) board[x][y-i]))
+								targets.add((Damageable) board[x][y - i]);
+						}; break;
+					case UP:
+						for(int i=1;i<=r;i++){
+							if(board[x+i][y]!=null && targetedObjects.contains((Damageable) board[x+i][y]))
+								targets.add((Damageable) board[x + i][y]);
+						}; break;
+					case DOWN:
+						for(int i=1;i<=r;i++){
+							if(board[x-i][y]!=null && targetedObjects.contains((Damageable) board[x-i][y]))
+								targets.add((Damageable) board[x-i][y]);
+						}; break;
+				}
+			}catch(ArrayIndexOutOfBoundsException e){
+				// idk what to do here either
+			}finally {
+				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - ability.getRequiredActionPoints());
+				champion.setMana(champion.getMana() - ability.getManaCost());
+				if (targets.isEmpty())
+					return;
+				ability.execute(targets);
+				if (ability instanceof DamagingAbility) {
+					for (int i = 0; i < targets.size(); i++)
+						if (targets.get(i).getCurrentHP() <= 0)
+							removeDamageable(targets.get(i));
+				}
 			}
-			c.setCurrentActionPoints(c.getCurrentActionPoints()-a.getRequiredActionPoints());
-			c.setMana(c.getMana()-a.getManaCost());
-			if(targets.isEmpty())
-				return;
-			a.execute(targets);
 		}
-		catch (Exception e){
-			throw e;
-		}
-
 	}
 
 	// A method for casting an ability with SINGLETARGET area of effect
-	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, AbilityUseException{
-		try{
-			Champion c = getCurrentChampion();
-			c.setCurrentActionPoints(c.getCurrentActionPoints()-a.getRequiredActionPoints());
-			c.setMana(c.getMana()-a.getManaCost());
+	// this one does not use up action points if the target is invalid (according to milestone description)
+	public void castAbility(Ability ability, int x, int y) throws NotEnoughResourcesException, AbilityUseException, InvalidTargetException{
+		Champion champion = getCurrentChampion();
+		if(champion.isSilenced())
+			throw new AbilityUseException("Champion cannot cast abilities while silenced");
+		else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
+			throw new NotEnoughResourcesException("Not enough action points");
+		else {
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
-			int d = distanceCalculator(c.getLocation(), x,y);
+			int direction = distanceCalculator(champion.getLocation(), x, y);
+			boolean sameTeam = board[x][y] instanceof Champion &&
+					((firstPlayer.getTeam().contains((Champion)board[x][y]) && firstPlayer.getTeam().contains(getCurrentChampion())) ||
+					(secondPlayer.getTeam().contains((Champion)board[x][y]) && secondPlayer.getTeam().contains(getCurrentChampion())));
 			//check that the cell is within the ability's castRange & the cell isn't empty & the object is actually targeted
-			if(d <= a.getCastRange() && board[x][y] != null)    //dk if a check should be added to make sure the target is on the right team based on the ability's type
+			if(board[x][y] == null)
+				throw new InvalidTargetException("Cannot target empty cell");
+			else if(ability.getCastArea() == AreaOfEffect.SINGLETARGET && sameTeam )
+				throw new InvalidTargetException("Cannot cast this ability on an allied champion");
+			else if(ability instanceof CrowdControlAbility && board[x][y] instanceof Cover)
+				throw new InvalidTargetException("Cannot cast this ability on a cover");
+			else if(direction > ability.getCastRange())
+				throw new AbilityUseException("Target out of range");
+			else{    //dk if a check should be added to make sure the target is on the right team based on the ability's type
 				targets.add((Damageable) board[x][y]);
-			else
-				return;
-		}
-		catch (Exception e){
-			throw e;
+				champion.setCurrentActionPoints(champion.getCurrentActionPoints()-ability.getRequiredActionPoints());
+				champion.setMana(champion.getMana()-ability.getManaCost());
+				ability.execute(targets);
+				if(targets.get(0).getCurrentHP() == 0)
+					removeDamageable(targets.get(0));
+			}
 		}
 	}
-
-
 
 	private void prepareChampionTurns(){
-		for(int i=0;i<firstPlayer.getTeam().size();i++) {
-			if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(firstPlayer.getTeam().get(i));
+		ArrayList<Champion> list = firstPlayer.getTeam();
+		for(int i=0;i<list.size();i++) {
+			if(list.get(i).getCondition() != Condition.KNOCKEDOUT)
+				turnOrder.insert(list.get(i));
 		}
-		for(int i=0;i<secondPlayer.getTeam().size();i++) {
-			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(secondPlayer.getTeam().get(i));
+		list = secondPlayer.getTeam();
+		for(int i=0;i<list.size();i++) {
+			if(list.get(i).getCondition() != Condition.KNOCKEDOUT)
+				turnOrder.insert(list.get(i));
 		}
-	}
-
-	public void endTurn(){
-		do {
-			Champion removedChamp = (Champion) turnOrder.remove();           //removes the current champion
-			if(turnOrder.isEmpty()) {                                        //checks if the turn order queue is empty to reset it
-				prepareChampionTurns();
-			}
-		}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-		turnsPassed++;
-		// decrease the currentCooldown of each ability in the current champion's abilities array list
-		Champion currChamp = getCurrentChampion();
-		for(int i =0; i< currChamp.getAbilities().size(); i++){
-			Ability a = currChamp.getAbilities().get(i);
-			a.setCurrentCooldown(a.getCurrentCooldown()-1);
-		}
-		// update the counters of applied effects & calls the remove method on the champion for any effect that's been applied for its entire duration
-		for(int i=0;i<firstPlayer.getTeam().size();i++) {                //iterates through the team's champions
-			if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !firstPlayer.getTeam().get(i).getAppliedEffects().isEmpty()){   //checks if the champion is alive + if it has any applied effects
-				for(int j =0; j<firstPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {        //iterates through the champion's applied effects list & increases the counter of how many turns have passed since the effect was applied
-					firstPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
-					if(firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())   //checks if the duration of the effect has ended & then removes it
-						firstPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(firstPlayer.getTeam().get(i));
-				}
-			}
-		}
-		for(int i=0;i<secondPlayer.getTeam().size();i++) {
-			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !secondPlayer.getTeam().get(i).getAppliedEffects().isEmpty())
-				for(int j =0; j<secondPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {
-					secondPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
-					if(secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())
-						secondPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(secondPlayer.getTeam().get(i));
-				}
-		}
-		// reset the champion's current action points
-		currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
 	}
 
 
@@ -630,4 +671,5 @@ public class Game {
 	public static int getBoardwidth() {
 		return BOARDWIDTH;
 	}
+
 }
