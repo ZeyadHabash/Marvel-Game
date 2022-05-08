@@ -30,7 +30,7 @@ public class DamagingAbility extends Ability{
 				for (int j=0;j<((Champion)targets.get(i)).getAppliedEffects().size();j++)
 					if(((Champion)targets.get(i)).getAppliedEffects().get(j) instanceof Shield){
 						((Champion)targets.get(i)).getAppliedEffects().get(j).remove((Champion)targets.get(i));
-						((Champion)targets.get(i)).getAppliedEffects().remove(j);
+						break;
 					}
 			}else
 				damageable.setCurrentHP(damageable.getCurrentHP() - this.damageAmount);	//deal the damage amount to the champion or cover

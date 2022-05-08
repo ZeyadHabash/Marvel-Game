@@ -1,6 +1,5 @@
 package model.abilities;
 
-import exceptions.EffectNotAppliedException;
 import model.world.Damageable;
 
 import java.util.ArrayList;

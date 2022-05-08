@@ -14,26 +14,28 @@ public class PowerUp extends Effect {
 	}
 
 	@Override
-	public void apply(Champion c) {
+	public void apply(Champion c) throws CloneNotSupportedException {
+		super.apply(c);
 		ArrayList<Ability> abilityList = c.getAbilities();
 		for(int i=0;i<abilityList.size();i++){
 			Ability currAbility = abilityList.get(i);
 			if(currAbility instanceof DamagingAbility)
-				((DamagingAbility) currAbility).setDamageAmount((int)(((DamagingAbility) currAbility).getDamageAmount()*1.2));
+				((DamagingAbility) currAbility).setDamageAmount((int) Math.round(((DamagingAbility) currAbility).getDamageAmount()*1.2));
 			else if(currAbility instanceof HealingAbility)
-				((HealingAbility) currAbility).setHealAmount((int)(((HealingAbility)currAbility).getHealAmount()*1.2));
+				((HealingAbility) currAbility).setHealAmount((int) Math.round(((HealingAbility)currAbility).getHealAmount()*1.2));
 		}
 	}
 
 	@Override
-	public void remove(Champion c) {
+	public void remove(Champion c) throws CloneNotSupportedException {
+		super.remove(c);
 		ArrayList<Ability> abilityList = c.getAbilities();
 		for(int i=0;i<abilityList.size();i++){
 			Ability currAbility = abilityList.get(i);
 			if(currAbility instanceof DamagingAbility)
-				((DamagingAbility) currAbility).setDamageAmount((int)(((DamagingAbility) currAbility).getDamageAmount()/1.2));
+				((DamagingAbility) currAbility).setDamageAmount((int) Math.round(((DamagingAbility) currAbility).getDamageAmount()/1.2));
 			else if(currAbility instanceof HealingAbility)
-				((HealingAbility) currAbility).setHealAmount((int)(((HealingAbility)currAbility).getHealAmount()/1.2));
+				((HealingAbility) currAbility).setHealAmount((int) Math.round(((HealingAbility)currAbility).getHealAmount()/1.2));
 		}
 	}
 

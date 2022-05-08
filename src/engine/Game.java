@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Random;
 
 import exceptions.*;
 import model.abilities.*;
@@ -411,9 +412,10 @@ public class Game {
 				// does no damage if target dodges
 				if(target instanceof Champion && ((Champion)target).isDodging()){
 					// randomly obtain 0 or 1 (50% chance of each)
-					int dodgeChance = (int)(2*Math.random());
+					Random rd = new Random();
+					boolean dodgeChance = rd.nextBoolean();
 					// if 1 don't deal damage
-					if(dodgeChance == 1)
+					if(dodgeChance)
 						return;
 				}
 				// does no damage if target is shielded
@@ -437,7 +439,7 @@ public class Game {
 	// Cast ability methods
 
 	// A method for casting an ability that is not limited to a direction or a particular target
-	public void castAbility(Ability ability) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, IllegalStateException, CloneNotSupportedException, EffectNotAppliedException {
+	public void castAbility(Ability ability) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, IllegalStateException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
@@ -531,7 +533,7 @@ public class Game {
 	}
 
 	// A method for casting ability with DIRECTIONAL area of effect
-	public void castAbility(Ability ability, Direction direction) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, CloneNotSupportedException, EffectNotAppliedException {
+	public void castAbility(Ability ability, Direction direction) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
@@ -589,7 +591,7 @@ public class Game {
 
 	// A method for casting an ability with SINGLETARGET area of effect
 	// this one does not use up action points if the target is invalid (according to milestone description)
-	public void castAbility(Ability ability, int x, int y) throws AbilityUseException, InvalidTargetException, CloneNotSupportedException, EffectNotAppliedException, NotEnoughResourcesException {
+	public void castAbility(Ability ability, int x, int y) throws AbilityUseException, InvalidTargetException, CloneNotSupportedException, NotEnoughResourcesException {
 		Champion champion = getCurrentChampion();
 		if(champion.isSilenced())
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");

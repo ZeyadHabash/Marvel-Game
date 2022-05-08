@@ -1,6 +1,5 @@
 package model.abilities;
 
-import exceptions.EffectNotAppliedException;
 import model.effects.Effect;
 import model.world.Champion;
 import model.world.Damageable;
