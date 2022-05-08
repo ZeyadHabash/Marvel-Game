@@ -50,7 +50,7 @@ public abstract class Champion implements Damageable, Comparable {
 	//////////////////////////////////////////////////////////
 	//Catch the rest of the exceptions when they're actually implemented
 	///////////////////////////////////////////////////////
-	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException {
+	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
 		try {
 			// check if "this" would work this way
 			if (this instanceof Hero) {

@@ -9,14 +9,22 @@ public class Stun extends Effect {
     }
 
     @Override
-    public void apply(Champion c) {
+    public void apply(Champion c) throws CloneNotSupportedException {
+        super.apply(c);
+        for(int i=0;i<c.getAppliedEffects().size();i++)
+            if(c.getAppliedEffects().get(i).getName().equals(this.getName()))
+                return;
         if(c.getCondition() != Condition.KNOCKEDOUT)
             c.setCondition(Condition.INACTIVE);
     }
 
     // need to handle if there's a root/stun with longer duration later
     @Override
-    public void remove(Champion c) {
+    public void remove(Champion c) throws CloneNotSupportedException {
+        super.remove(c);
+        for(int i=0;i<c.getAppliedEffects().size();i++)
+            if(c.getAppliedEffects().get(i).getName().equals(this.getName()))
+                return;
         if(c.getCondition() != Condition.KNOCKEDOUT)
             c.setCondition(Condition.ACTIVE);
     }
