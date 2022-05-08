@@ -24,6 +24,7 @@ public class DamagingAbility extends Ability{
 	}
 
 	public void execute(ArrayList<Damageable> targets) throws CloneNotSupportedException {
+		this.setCurrentCooldown(this.getBaseCooldown());
 		for(int i=0; i < targets.size(); i++){
 			Damageable damageable = targets.get(i);
 			if(targets.get(i) instanceof Champion && ((Champion)targets.get(i)).isShielded()){
