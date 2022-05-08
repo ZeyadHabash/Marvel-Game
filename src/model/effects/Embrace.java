@@ -8,7 +8,7 @@ public class Embrace extends Effect{
     }
 
     @Override
-    public void apply(Champion c) {
+    public void apply(Champion c) throws CloneNotSupportedException {
         // Permanent
         int newHP = c.getCurrentHP() + (int)(c.getMaxHP()*0.2);
         c.setCurrentHP(newHP);
@@ -17,17 +17,19 @@ public class Embrace extends Effect{
         c.setMana(newMana);
 
         // Temporary
-        int newSpeed = (int)(c.getSpeed()*1.2);
-        int newDamage = (int)(c.getAttackDamage()*1.2);
+        super.apply(c);
+        int newSpeed = (int) Math.round(c.getSpeed()*1.2);
+        int newDamage = (int) Math.round(c.getAttackDamage()*1.2);
         c.setSpeed(newSpeed);
         c.setAttackDamage(newDamage);
     }
 
     @Override
-    public void remove(Champion c) {
+    public void remove(Champion c) throws CloneNotSupportedException {
         // Remove Temporary buffs
-        int newSpeed = (int)(c.getSpeed()/1.2);
-        int newDamage = (int)(c.getAttackDamage()/1.2);
+        super.remove(c);
+        int newSpeed = (int) Math.round(c.getSpeed()/1.2);
+        int newDamage = (int) Math.round(c.getAttackDamage()/1.2);
         c.setSpeed(newSpeed);
         c.setAttackDamage(newDamage);
     }

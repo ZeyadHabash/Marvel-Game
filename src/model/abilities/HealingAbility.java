@@ -22,6 +22,7 @@ public class HealingAbility extends Ability{
 
     @Override
     public void execute(ArrayList<Damageable> targets) {
+        this.setCurrentCooldown(this.getBaseCooldown());
         for(int i=0; i < targets.size(); i++){
             Damageable a = targets.get(i);
             a.setCurrentHP(a.getCurrentHP() + this.healAmount);       //restores health points to the champion or cover
