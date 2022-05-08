@@ -71,6 +71,10 @@ public abstract class Effect implements Cloneable {
 
 	public int getAppliedCounter() { return appliedCounter; }
 
+	public void setAppliedCounter(int appliedCounter) {
+		this.appliedCounter = appliedCounter;
+	}
+
 	public void increaseAppliedCounter() {
 		this.appliedCounter++;
 	}
