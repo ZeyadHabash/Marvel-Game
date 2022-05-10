@@ -4,6 +4,7 @@ import exceptions.LeaderAbilityAlreadyUsedException;
 import exceptions.LeaderNotCurrentException;
 import model.abilities.Ability;
 import model.effects.Effect;
+import model.effects.EffectType;
 import model.effects.Embrace;
 import model.effects.Stun;
 
@@ -37,10 +38,10 @@ public abstract class Champion implements Damageable, Comparable {
 		this.condition = Condition.ACTIVE;
 		this.name = name;
 		this.maxHP = maxHP;
-		this.currentHP = maxHP;  //starts with the maximum value and decreases with each attack made on the champ
+		this.currentHP = maxHP;  //starts with the maximum value and decreases with each attack made on the champion
 		this.mana = mana;
 		this.maxActionPointsPerTurn = maxActions;
-		this.currentActionPoints = maxActions;  //starts with the maximum value and decreases with each action the champ makes
+		this.currentActionPoints = maxActions;  //starts with the maximum value and decreases with each action the champion makes
 		this.speed = speed;
 		this.attackRange = attackRange;
 		this.attackDamage = attackDamage;
@@ -50,44 +51,40 @@ public abstract class Champion implements Damageable, Comparable {
 	//////////////////////////////////////////////////////////
 	//Catch the rest of the exceptions when they're actually implemented
 	//////////////////////////////////////////////////////////
-		public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
-			try {
-				Champion champ = this;
-				// check if "this" would work this way
-				if (champ instanceof Hero) {
-					for (int i = 0; i < targets.size(); i++) {
-						Champion a = targets.get(i);
-						for (int j = 0; j < a.getAppliedEffects().size(); j++) {
-							if (a.getAppliedEffects().get(j).getType().equals("Debuff")) {
-								getAppliedEffects().remove(j);
-							}
+		public void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException {
+			Champion champion = this;
+			// check if "this" would work this way
+			if (champion instanceof Hero) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion target = targets.get(i);
+					for (int j = 0; j < target.getAppliedEffects().size(); j++) {
+						// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
+						if (target.getAppliedEffects().get(j).getType().equals(EffectType.DEBUFF)) {
+							getAppliedEffects().remove(j);
 						}
-						// adding embrace effect
-						Embrace embrace = new Embrace(2);
-						embrace.apply(a);
-						a.getAppliedEffects().add(embrace);
 					}
+					// adding embrace effect
+					Embrace embrace = new Embrace(2);
+					embrace.apply(target);
+					target.getAppliedEffects().add(embrace);
+				}
 
-				} else if (champ instanceof Villain) {
-					for (int i = 0; i < targets.size(); i++) {
-						Champion a = targets.get(i);
-						if (a.getCurrentHP() < (int) 0.3 * a.getMaxHP()) {
-							a.setCurrentHP(0);
-						}
-					}
-				} else if (champ instanceof AntiHero) {
-					for (int i = 0; i < targets.size(); i++) {
-						Champion a = targets.get(i);
-						Stun stun = new Stun(2);
-						stun.apply(a);
+			} else if (champion instanceof Villain) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion target = targets.get(i);
+					if (target.getCurrentHP() < (int) (0.3 * target.getMaxHP())) {
+						target.setCurrentHP(0);
 					}
 				}
-			}
-			// catch the rest of the exceptions
-			catch (Exception e) {
-				throw e;
+			} else if (champion instanceof AntiHero) {
+				for (int i = 0; i < targets.size(); i++) {
+					Champion target = targets.get(i);
+					Stun stun = new Stun(2);
+					stun.apply(target);
+				}
 			}
 		}
+
 	
 	public int getCurrentHP() {
 		return currentHP;
