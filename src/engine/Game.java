@@ -202,9 +202,9 @@ public class Game {
 	}
 
 	// Helper method to remove a champion/cover from board once they're killed/destroyed
-	public void removeDamageable(Damageable direction){
-		int x = direction.getLocation().x;
-		int y = direction.getLocation().y;
+	public void removeDamageable(Damageable damageable){
+		int x = damageable.getLocation().x;
+		int y = damageable.getLocation().y;
 		board[x][y] = null;
 	}
 
@@ -212,6 +212,7 @@ public class Game {
 	private double damageMultiplier(Champion attacker, Damageable target){
 		if (target instanceof  Cover)
 			return 1;
+		// maybe have to do individual hero/villain/antihero checks? idk
 		if (attacker.getClass().equals(target.getClass()))
 			return 1;
 		return 1.5;
@@ -228,15 +229,27 @@ public class Game {
 	public ArrayList<Damageable> getTargetedObjects(Champion champion, Ability a){
 		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
 		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
+		Player currPlayer;
+		Player enemyPlayer;
 		if(firstPlayer.getTeam().contains(champion)) {
-			//truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
-			friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
-			enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
+			currPlayer = firstPlayer;
+			enemyPlayer = secondPlayer;
+			// truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
+			// friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
+			// enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 		}
 		else{
-			friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
-			enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
+			currPlayer = firstPlayer;
+			enemyPlayer = secondPlayer;
+			// friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
+			// enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 		}
+		for(int i=0;i<currPlayer.getTeam().size();i++)
+			if(currPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
+				friendlyTeam.add(currPlayer.getTeam().get(i));
+		for(int i=0;i<enemyPlayer.getTeam().size();i++)
+			if(enemyPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
+				enemyTeam.add(enemyPlayer.getTeam().get(i));
 
 		//check whether the ability is healing, damaging or cc
 		if(a instanceof HealingAbility || (a instanceof CrowdControlAbility && ((CrowdControlAbility) a).getEffect().getType().equals(EffectType.BUFF)))
@@ -245,7 +258,7 @@ public class Game {
 			//iterates through the board looking for covers to add them to the enemyTeam in case of damaging ability
 			for(int i = 0; i < BOARDHEIGHT; i++){
 				for (int j = 0; j < BOARDWIDTH; j++){
-					if (board[i][j] != null && board[i][j] instanceof Cover)
+					if (board[i][j] instanceof Cover)
 						enemyTeam.add((Damageable)board[i][j]);
 				}
 			}
@@ -361,7 +374,7 @@ public class Game {
 			int r = champion.getAttackRange();
 			Damageable target = null;
 			try {
-				//looking for the nearest target in the direction direction within the attack range of the champion
+				//looking for the nearest target in the direction within the attack range of the champion
 				switch (direction) {
 					case RIGHT:
 						for (int i = 1; i < r + 1; i++) {
@@ -370,7 +383,6 @@ public class Game {
 								break;
 							}
 						}
-						;
 						break;
 					case LEFT:
 						for (int i = 1; i < r + 1; i++) {
@@ -379,7 +391,6 @@ public class Game {
 								break;
 							}
 						}
-						;
 						break;
 					case UP:
 						for (int i = 1; i < r + 1; i++) {
@@ -388,7 +399,6 @@ public class Game {
 								break;
 							}
 						}
-						;
 						break;
 					case DOWN:
 						for (int i = 1; i < r + 1; i++) {
@@ -411,10 +421,10 @@ public class Game {
 					return;
 				// does no damage if target dodges
 				if(target instanceof Champion && ((Champion)target).isDodging()){
-					// randomly obtain 0 or 1 (50% chance of each)
+					// randomly obtain True or False (50% chance of each)
 					Random rd = new Random();
 					boolean dodgeChance = rd.nextBoolean();
-					// if 1 don't deal damage
+					// if True don't deal damage
 					if(dodgeChance)
 						return;
 				}
@@ -423,7 +433,7 @@ public class Game {
 					for (int i=0;i<((Champion)target).getAppliedEffects().size();i++)
 						if(((Champion)target).getAppliedEffects().get(i) instanceof Shield){
 							((Champion)target).getAppliedEffects().get(i).remove((Champion)target);
-							((Champion)target).getAppliedEffects().remove(i);
+							return;
 						}
 				}
 				// does damage when target is an enemy or a cover
@@ -469,53 +479,53 @@ public class Game {
 										if (direction <= ability.getCastRange())         //if the damageable is within range & part of the targeted team, it is added to the list fo targets
 											targets.add((Damageable) board[i][j]);
 									}
-								}catch(ArrayIndexOutOfBoundsException e){
+								}catch(ArrayIndexOutOfBoundsException ignored){
 									// just to let it keep looping after an exception
 								}
 							}
 						};
 						break;
 					//not sure if there needs to be a check for the range here, seeing that the cells within range are pretty straightforward
-					//also dk if there would be an error if the cells being checked don't exist aslan, i think ah bas don't have energy to try and handle that
+					//also dk if there would be an error if the cells being checked don't exist aslan, I think ah bas don't have energy to try and handle that
 					case SURROUND: {            //akeed there's a more efficient way of tackling this but my pea sized brain simply can not
 						try {
 							if (board[x + 1][y] != null && targetedObjects.contains((Damageable) board[x + 1][y]))
 								targets.add((Damageable) board[x + 1][y]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x][y + 1] != null && targetedObjects.contains((Damageable) board[x][y + 1]))
 								targets.add((Damageable) board[x][y + 1]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x - 1][y] != null && targetedObjects.contains((Damageable) board[x - 1][y]))
 								targets.add((Damageable) board[x - 1][y]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x][y - 1] != null && targetedObjects.contains((Damageable) board[x][y - 1]))
 								targets.add((Damageable) board[x][y - 1]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x + 1][y + 1] != null && targetedObjects.contains((Damageable) board[x + 1][y + 1]))
 								targets.add((Damageable) board[x + 1][y + 1]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x - 1][y - 1] != null && targetedObjects.contains((Damageable) board[x - 1][y - 1]))
 								targets.add((Damageable) board[x - 1][y - 1]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x + 1][y - 1] != null && targetedObjects.contains((Damageable) board[x + 1][y - 1]))
 								targets.add((Damageable) board[x + 1][y - 1]);
-						}catch(ArrayIndexOutOfBoundsException e){}
+						}catch(ArrayIndexOutOfBoundsException ignored){}
 						try {
 							if (board[x - 1][y + 1] != null && targetedObjects.contains((Damageable) board[x - 1][y + 1]))
 								targets.add((Damageable) board[x - 1][y + 1]);
-						}catch (ArrayIndexOutOfBoundsException e){}
+						}catch (ArrayIndexOutOfBoundsException ignored){}
 					};
 					break;
 					default:
 						throw new IllegalStateException("Unexpected value: " + ability.getCastArea());    //this was the recommended line when adding the default stmt
 				}
-			}catch(ArrayIndexOutOfBoundsException e){
+			}catch(ArrayIndexOutOfBoundsException ignored){
 				// idk what to do here
 			}finally {
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - ability.getRequiredActionPoints());
@@ -621,8 +631,9 @@ public class Game {
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints()-ability.getRequiredActionPoints());
 				champion.setMana(champion.getMana()-ability.getManaCost());
 				ability.execute(targets);
-				if(targets.get(0).getCurrentHP() == 0)
-					removeDamageable(targets.get(0));
+				for(int i=0;i<targets.size();i++)
+					if(targets.get(i).getCurrentHP() <= 0)
+						removeDamageable(targets.get(i));
 			}
 		}
 	}
@@ -632,7 +643,7 @@ public class Game {
 		Champion champion = getCurrentChampion();
 		Player currPlayer;
 		Player enemyPlayer;
-		ArrayList<Champion> allyTeam;
+		ArrayList<Champion> friendlyTeam;
 		ArrayList<Champion> enemyTeam;
 		if(champion.equals(firstPlayer.getLeader())) {
 			currPlayer = firstPlayer;
@@ -649,7 +660,7 @@ public class Game {
 		else
 			throw new LeaderNotCurrentException("Can only cast leader ability with team leader");
 
-		allyTeam = currPlayer.getTeam();
+		friendlyTeam = currPlayer.getTeam();
 		enemyTeam = enemyPlayer.getTeam();
 
 		if(champion.isSilenced())
@@ -657,15 +668,14 @@ public class Game {
 		else {
 			ArrayList<Champion> targets = new ArrayList<Champion>();
 				if (champion instanceof Hero) {
-					for (int i = 0; i < allyTeam.size(); i++) {
-						if(allyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT)
-							targets.add(allyTeam.get(i));
+					for (int i = 0; i < friendlyTeam.size(); i++) {
+						if(friendlyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT)
+							targets.add(friendlyTeam.get(i));
 					}
 				} else if (champion instanceof Villain) {
 					for (int i = 0; i < enemyTeam.size(); i++) {
 						if(enemyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT && enemyTeam.get(i).getCurrentHP() < (int)(0.3*enemyTeam.get(i).getMaxHP())) {
 							targets.add(enemyTeam.get(i));
-							// might have to check if shielded first if shields affect leader abilities
 							removeDamageable(enemyTeam.get(i));
 						}
 					}
@@ -675,8 +685,8 @@ public class Game {
 							targets.add(enemyTeam.get(i));
 						}
 					}
-					for (int i = 0; i < allyTeam.size(); i++) {
-						if (allyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !allyTeam.get(i).equals(enemyPlayer.getLeader())) {
+					for (int i = 0; i < friendlyTeam.size(); i++) {
+						if (friendlyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !friendlyTeam.get(i).equals(enemyPlayer.getLeader())) {
 							targets.add(enemyTeam.get(i));
 						}
 					}
@@ -703,8 +713,8 @@ public class Game {
 		}
 
 	public void endTurn() throws CloneNotSupportedException {
-		Player winner;
-		if (checkGameOver() == null){
+		Player winner = checkGameOver();
+		if (winner == null){
 			do {
 				turnOrder.remove();		//removes the current champion
 				if(turnOrder.isEmpty()) {		//checks if the turn order queue is empty to reset it
@@ -737,18 +747,14 @@ public class Game {
 					}
 			}*/
 			//updating the effect counter for the current champion only
-			if (!currChamp.getAppliedEffects().isEmpty()){
-				for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
-					currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
-					if(currChamp.getAppliedEffects().get(i).getAppliedCounter() > currChamp.getAppliedEffects().get(i).getDuration())
-						currChamp.getAppliedEffects().get(i).remove(currChamp);
-				}
+			for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
+				currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
+				if(currChamp.getAppliedEffects().get(i).getAppliedCounter() > currChamp.getAppliedEffects().get(i).getDuration())
+					currChamp.getAppliedEffects().get(i).remove(currChamp);
 			}
 			// reset the champion's current action points
 			currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
 		}
-		else
-			winner = checkGameOver();
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
