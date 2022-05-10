@@ -627,25 +627,87 @@ public class Game {
 		}
 	}
 
-	private void prepareChampionTurns(){
-		ArrayList<Champion> list = firstPlayer.getTeam();
-		for(int i=0;i<list.size();i++) {
-			if(list.get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(list.get(i));
+
+	public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, AbilityUseException, CloneNotSupportedException {
+		Champion champion = getCurrentChampion();
+		Player currPlayer;
+		Player enemyPlayer;
+		ArrayList<Champion> allyTeam;
+		ArrayList<Champion> enemyTeam;
+		if(champion.equals(firstPlayer.getLeader())) {
+			currPlayer = firstPlayer;
+			enemyPlayer = secondPlayer;
+			if(firstLeaderAbilityUsed)
+				throw new LeaderAbilityAlreadyUsedException("Player 1 has already used their leader ability");
 		}
-		list = secondPlayer.getTeam();
-		for(int i=0;i<list.size();i++) {
-			if(list.get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(list.get(i));
+		else if(champion.equals(secondPlayer.getLeader())) {
+			currPlayer = secondPlayer;
+			enemyPlayer = firstPlayer;
+			if(secondLeaderAbilityUsed)
+				throw new LeaderAbilityAlreadyUsedException("Player 2 has already used their leader ability");
 		}
-	}
+		else
+			throw new LeaderNotCurrentException("Can only cast leader ability with team leader");
+
+		allyTeam = currPlayer.getTeam();
+		enemyTeam = enemyPlayer.getTeam();
+
+		if(champion.isSilenced())
+			throw new AbilityUseException("Champion cannot cast abilities while silenced");
+		else {
+			ArrayList<Champion> targets = new ArrayList<Champion>();
+				if (champion instanceof Hero) {
+					for (int i = 0; i < allyTeam.size(); i++) {
+						if(allyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT)
+							targets.add(allyTeam.get(i));
+					}
+				} else if (champion instanceof Villain) {
+					for (int i = 0; i < enemyTeam.size(); i++) {
+						if(enemyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT && enemyTeam.get(i).getCurrentHP() < (int)(0.3*enemyTeam.get(i).getMaxHP())) {
+							targets.add(enemyTeam.get(i));
+							// might have to check if shielded first if shields affect leader abilities
+							removeDamageable(enemyTeam.get(i));
+						}
+					}
+				} else if (champion instanceof AntiHero) {
+					for (int i = 0; i < enemyTeam.size(); i++) {
+						if (enemyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !enemyTeam.get(i).equals(enemyPlayer.getLeader())) {
+							targets.add(enemyTeam.get(i));
+						}
+					}
+					for (int i = 0; i < allyTeam.size(); i++) {
+						if (allyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !allyTeam.get(i).equals(enemyPlayer.getLeader())) {
+							targets.add(enemyTeam.get(i));
+						}
+					}
+				}
+				champion.useLeaderAbility(targets);
+				if(currPlayer == firstPlayer)
+					firstLeaderAbilityUsed = true;
+				else
+					secondLeaderAbilityUsed = true;
+			}
+		}
+
+		private void prepareChampionTurns () {
+			ArrayList<Champion> list = firstPlayer.getTeam();
+			for (int i = 0; i < list.size(); i++) {
+				if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
+					turnOrder.insert(list.get(i));
+			}
+			list = secondPlayer.getTeam();
+			for (int i = 0; i < list.size(); i++) {
+				if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
+					turnOrder.insert(list.get(i));
+			}
+		}
 
 	public void endTurn() throws CloneNotSupportedException {
 		Player winner;
 		if (checkGameOver() == null){
 			do {
-				Champion removedChamp = (Champion) turnOrder.remove();           //removes the current champion
-				if(turnOrder.isEmpty()) {                                        //checks if the turn order queue is empty to reset it
+				turnOrder.remove();		//removes the current champion
+				if(turnOrder.isEmpty()) {		//checks if the turn order queue is empty to reset it
 					prepareChampionTurns();
 				}
 			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion

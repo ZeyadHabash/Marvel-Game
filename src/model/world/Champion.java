@@ -51,39 +51,38 @@ public abstract class Champion implements Damageable, Comparable {
 	//////////////////////////////////////////////////////////
 	//Catch the rest of the exceptions when they're actually implemented
 	//////////////////////////////////////////////////////////
-		public void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException {
-			Champion champion = this;
-			// check if "this" would work this way
-			if (champion instanceof Hero) {
-				for (int i = 0; i < targets.size(); i++) {
-					Champion target = targets.get(i);
-					for (int j = 0; j < target.getAppliedEffects().size(); j++) {
-						// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
-						if (target.getAppliedEffects().get(j).getType().equals(EffectType.DEBUFF)) {
-							getAppliedEffects().remove(j);
-						}
-					}
-					// adding embrace effect
-					Embrace embrace = new Embrace(2);
-					embrace.apply(target);
-					target.getAppliedEffects().add(embrace);
-				}
+	public void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException {
+		Champion champion = this;
 
-			} else if (champion instanceof Villain) {
-				for (int i = 0; i < targets.size(); i++) {
-					Champion target = targets.get(i);
-					if (target.getCurrentHP() < (int) (0.3 * target.getMaxHP())) {
-						target.setCurrentHP(0);
+		if (champion instanceof Hero) {
+			for (int i = 0; i < targets.size(); i++) {
+				Champion target = targets.get(i);
+				for (int j = 0; j < target.getAppliedEffects().size(); j++) {
+					// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
+					if (target.getAppliedEffects().get(j).getType().equals(EffectType.DEBUFF)) {
+						getAppliedEffects().remove(j);
 					}
 				}
-			} else if (champion instanceof AntiHero) {
-				for (int i = 0; i < targets.size(); i++) {
-					Champion target = targets.get(i);
-					Stun stun = new Stun(2);
-					stun.apply(target);
+				// adding embrace effect
+				Embrace embrace = new Embrace(2);
+				embrace.apply(target);
+				target.getAppliedEffects().add(embrace);
+			}
+		} else if (champion instanceof Villain) {
+			for (int i = 0; i < targets.size(); i++) {
+				Champion target = targets.get(i);
+				if (target.getCurrentHP() < (int) (0.3 * target.getMaxHP())) {
+					target.setCurrentHP(0);
 				}
 			}
+		} else if (champion instanceof AntiHero) {
+			for (int i = 0; i < targets.size(); i++) {
+				Champion target = targets.get(i);
+				Stun stun = new Stun(2);
+				stun.apply(target);
+			}
 		}
+	}
 
 	
 	public int getCurrentHP() {
