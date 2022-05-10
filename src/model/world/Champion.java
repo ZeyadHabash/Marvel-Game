@@ -49,50 +49,45 @@ public abstract class Champion implements Damageable, Comparable {
 	}
 	//////////////////////////////////////////////////////////
 	//Catch the rest of the exceptions when they're actually implemented
-	///////////////////////////////////////////////////////
-	public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
-		try {
-			// check if "this" would work this way
-			if (this instanceof Hero) {
-				for (int i = 0; i < targets.size(); i++) {
-					Champion a = targets.get(i);
-					// wtf is this
-					for(int j=0;j<a.getAppliedEffects().size();j++){
-						Class tempEffectType = Class.forName(a.getAppliedEffects().get(j).getName()); // idk what this does look it up
-						if (tempEffectType.getMethod("getType").equals("DEBUFF")){ // this too
-							tempEffectType.getMethod("remove"); // same as above
-							getAppliedEffects().remove(j); // kill me
+	//////////////////////////////////////////////////////////
+		public void useLeaderAbility(ArrayList<Champion> targets) throws ClassNotFoundException, NoSuchMethodException, LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
+			try {
+				Champion champ = this;
+				// check if "this" would work this way
+				if (champ instanceof Hero) {
+					for (int i = 0; i < targets.size(); i++) {
+						Champion a = targets.get(i);
+						for (int j = 0; j < a.getAppliedEffects().size(); j++) {
+							if (a.getAppliedEffects().get(j).getType().equals("Debuff")) {
+								getAppliedEffects().remove(j);
+							}
+						}
+						// adding embrace effect
+						Embrace embrace = new Embrace(2);
+						embrace.apply(a);
+						a.getAppliedEffects().add(embrace);
+					}
+
+				} else if (champ instanceof Villain) {
+					for (int i = 0; i < targets.size(); i++) {
+						Champion a = targets.get(i);
+						if (a.getCurrentHP() < (int) 0.3 * a.getMaxHP()) {
+							a.setCurrentHP(0);
 						}
 					}
-					// adding embrace effect
-					Embrace embrace = new Embrace(2);
-					embrace.apply(a);
-					a.getAppliedEffects().add(embrace);
-
-
-				}
-			}else if (this instanceof Villain) {
-				for (int i = 0; i < targets.size(); i++) {
-					Champion a = targets.get(i);
-					if (a.getCurrentHP() < 0.3 * a.getMaxHP()) {
-					a.setCurrentHP(0);
-					a.setCondition(Condition.KNOCKEDOUT); //deh fe3lan okayy
+				} else if (champ instanceof AntiHero) {
+					for (int i = 0; i < targets.size(); i++) {
+						Champion a = targets.get(i);
+						Stun stun = new Stun(2);
+						stun.apply(a);
 					}
 				}
 			}
-			else if (this instanceof AntiHero) {
-				for(int i = 0; i<targets.size(); i++){
-					Champion a = targets.get(i);
-					Stun stun = new Stun(2);
-					stun.apply(a);
-				}
+			// catch the rest of the exceptions
+			catch (Exception e) {
+				throw e;
 			}
 		}
-		// catch the rest of the exceptions
-		catch (Exception e){
-			throw e;
-		}
-	}
 	
 	public int getCurrentHP() {
 		return currentHP;
