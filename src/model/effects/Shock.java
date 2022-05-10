@@ -10,18 +10,18 @@ public class Shock extends Effect{
 
     @Override
     public void apply(Champion c) throws CloneNotSupportedException {
-        super.apply(c);
-        c.setSpeed((int) Math.round(c.getSpeed()/1.1));
-        c.setAttackDamage((int) Math.round(c.getAttackDamage()/1.1));
+        // round if more errors, remove round from other classes if less errors
+        c.setSpeed((int) (c.getSpeed()/1.1));
+        c.setAttackDamage((int) (c.getAttackDamage()/1.1));
         c.setCurrentActionPoints(c.getCurrentActionPoints()-1);
         c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()-1);
     }
 
     @Override
     public void remove(Champion c) throws CloneNotSupportedException {
-        super.remove(c);
-        c.setSpeed((int) Math.round(c.getSpeed()*1.1));
-        c.setAttackDamage((int) Math.round(c.getAttackDamage()*1.1));
+        // might have to find an alternative to rounding because gives wrong results
+        c.setSpeed((int) (c.getSpeed()*1.1));
+        c.setAttackDamage((int) (c.getAttackDamage()*1.1));
         c.setCurrentActionPoints(c.getCurrentActionPoints()+1);
         c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()+1);
     }

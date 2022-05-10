@@ -18,11 +18,14 @@ public abstract class Effect implements Cloneable {
 	}
 
 
-	public void apply(Champion champion) throws CloneNotSupportedException{
+	public abstract void apply(Champion champion) throws CloneNotSupportedException;
+		/*
 		Effect effect = this.clone();
 		champion.getAppliedEffects().add(effect);
-	}
-	public void remove(Champion champion) throws CloneNotSupportedException {
+		*/
+
+	public abstract void remove(Champion champion) throws CloneNotSupportedException;
+		/*
 		Effect effect = this.clone();
 		ArrayList<Effect> champEffects = champion.getAppliedEffects();
 
@@ -32,7 +35,7 @@ public abstract class Effect implements Cloneable {
 				return;
 			}
 		}
-	}
+		 */
 
 	public Effect clone() throws CloneNotSupportedException{
 		Effect clone;

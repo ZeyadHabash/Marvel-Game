@@ -12,18 +12,16 @@ public class Dodge extends Effect{
     // handle 50% dodge chance part later
     @Override
     public void apply(Champion c) throws CloneNotSupportedException {
-        super.apply(c);
         c.setDodging(true);
         int currSpeed = c.getSpeed();
-        int newSpeed = (int) Math.round(currSpeed * 1.05);
+        int newSpeed = (int) (currSpeed * 1.05);
         c.setSpeed(newSpeed);
     }
 
     @Override
     public void remove(Champion c) throws CloneNotSupportedException {
-        super.remove(c);
         int currSpeed = c.getSpeed();
-        int newSpeed = (int) Math.round(currSpeed / 1.05);
+        int newSpeed = (int) (currSpeed / 1.05);
         c.setSpeed(newSpeed);
         for(int i=0;i<c.getAppliedEffects().size();i++)
             if(c.getAppliedEffects().get(i).getName().equals(this.getName()))

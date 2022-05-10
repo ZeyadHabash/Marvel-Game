@@ -11,16 +11,14 @@ public class Root extends Effect{
 
 	@Override
 	public void apply(Champion c) throws CloneNotSupportedException {
-		super.apply(c);
 		if(c.getCondition() == Condition.ACTIVE)
 			c.setCondition(Condition.ROOTED);
 	}
 
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
-		super.remove(c);
 		for(int i=0;i<c.getAppliedEffects().size();i++)
-			if(c.getAppliedEffects().get(i).getName().equals(this.getName()))
+			if(c.getAppliedEffects().get(i) instanceof Root)
 				return;
 		if(c.getCondition() == Condition.ROOTED)
 			c.setCondition(Condition.ACTIVE);

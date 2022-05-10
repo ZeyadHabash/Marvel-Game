@@ -27,6 +27,7 @@ public abstract class Champion implements Damageable, Comparable {
 	private Condition condition;
 	private Point location;
 
+
 	// not in milestone, just helps
 	private boolean disarmed;
 	private boolean silenced;
@@ -48,41 +49,9 @@ public abstract class Champion implements Damageable, Comparable {
 		abilities = new ArrayList<Ability>();
 		appliedEffects = new ArrayList<Effect>();
 	}
-	//////////////////////////////////////////////////////////
-	//Catch the rest of the exceptions when they're actually implemented
-	//////////////////////////////////////////////////////////
-	public void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException {
-		Champion champion = this;
 
-		if (champion instanceof Hero) {
-			for (int i = 0; i < targets.size(); i++) {
-				Champion target = targets.get(i);
-				for (int j = 0; j < target.getAppliedEffects().size(); j++) {
-					// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
-					if (target.getAppliedEffects().get(j).getType().equals(EffectType.DEBUFF)) {
-						getAppliedEffects().remove(j);
-					}
-				}
-				// adding embrace effect
-				Embrace embrace = new Embrace(2);
-				embrace.apply(target);
-				target.getAppliedEffects().add(embrace);
-			}
-		} else if (champion instanceof Villain) {
-			for (int i = 0; i < targets.size(); i++) {
-				Champion target = targets.get(i);
-				if (target.getCurrentHP() < (int) (0.3 * target.getMaxHP())) {
-					target.setCurrentHP(0);
-				}
-			}
-		} else if (champion instanceof AntiHero) {
-			for (int i = 0; i < targets.size(); i++) {
-				Champion target = targets.get(i);
-				Stun stun = new Stun(2);
-				stun.apply(target);
-			}
-		}
-	}
+
+	public abstract void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException;
 
 	
 	public int getCurrentHP() {
@@ -181,6 +150,7 @@ public abstract class Champion implements Damageable, Comparable {
 		return appliedEffects;
 	}
 
+
 	public boolean isDisarmed(){ return disarmed; }
 	public void setDisarmed(boolean disarmed){ this.disarmed = disarmed; }
 
@@ -192,6 +162,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public boolean isDodging() { return dodging; }
 	public void setDodging(boolean dodging) { this.dodging = dodging; }
+
+
 
 	//Lama n-run hanefham bena3mel eh :3
 	public int compareTo(Object o) {

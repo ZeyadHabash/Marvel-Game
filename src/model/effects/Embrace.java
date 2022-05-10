@@ -17,9 +17,8 @@ public class Embrace extends Effect{
         c.setMana(newMana);
 
         // Temporary
-        super.apply(c);
-        int newSpeed = (int) Math.round(c.getSpeed()*1.2);
-        int newDamage = (int) Math.round(c.getAttackDamage()*1.2);
+        int newSpeed = (int) (c.getSpeed()*1.2);
+        int newDamage = (int) (c.getAttackDamage()*1.2);
         c.setSpeed(newSpeed);
         c.setAttackDamage(newDamage);
     }
@@ -27,9 +26,8 @@ public class Embrace extends Effect{
     @Override
     public void remove(Champion c) throws CloneNotSupportedException {
         // Remove Temporary buffs
-        super.remove(c);
-        int newSpeed = (int) Math.round(c.getSpeed()/1.2);
-        int newDamage = (int) Math.round(c.getAttackDamage()/1.2);
+        int newSpeed = (int) (c.getSpeed()/1.2);
+        int newDamage = (int) (c.getAttackDamage()/1.2);
         c.setSpeed(newSpeed);
         c.setAttackDamage(newDamage);
     }

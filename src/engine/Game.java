@@ -203,9 +203,40 @@ public class Game {
 
 	// Helper method to remove a champion/cover from board once they're killed/destroyed
 	public void removeDamageable(Damageable damageable){
+		// removes dead object from board
 		int x = damageable.getLocation().x;
 		int y = damageable.getLocation().y;
 		board[x][y] = null;
+		// removes dead champion from team
+		if (damageable instanceof Champion){
+			if(firstPlayer.getTeam().contains(damageable)) {
+				for (int i = 0; i < firstPlayer.getTeam().size(); i++) {
+					if (firstPlayer.getTeam().get(i).equals(damageable)) {
+						firstPlayer.getTeam().remove(i);
+						break;
+					}
+				}
+			}
+			else {
+				for (int i = 0; i < secondPlayer.getTeam().size(); i++) {
+					if (secondPlayer.getTeam().get(i).equals(damageable)) {
+						secondPlayer.getTeam().remove(i);
+						break;
+					}
+				}
+			}
+		}
+		/*ArrayList<Champion> temp = new ArrayList<Champion>();
+		if(damageable instanceof Champion){
+			for(int i=0;i<turnOrder.size();i++){
+				if(turnOrder.peekMin().equals(damageable))
+					turnOrder.remove();
+				else
+					temp.add((Champion)turnOrder.remove());
+			}
+			for(int i=0;i<temp.size();i++)
+				turnOrder.insert(temp.get(i));
+		}*/
 	}
 
 	// Helper method to calculate the damage multiplier of Champions when attacking
@@ -229,28 +260,28 @@ public class Game {
 	public ArrayList<Damageable> getTargetedObjects(Champion champion, Ability a){
 		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
 		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
-		Player currPlayer;
-		Player enemyPlayer;
+		//Player currPlayer;
+		//Player enemyPlayer;
 		if(firstPlayer.getTeam().contains(champion)) {
-			currPlayer = firstPlayer;
-			enemyPlayer = secondPlayer;
+			//currPlayer = firstPlayer;
+			//enemyPlayer = secondPlayer;
 			// truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
-			// friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
-			// enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
+			 friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
+			 enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 		}
 		else{
-			currPlayer = firstPlayer;
-			enemyPlayer = secondPlayer;
-			// friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
-			// enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
+			//currPlayer = firstPlayer;
+			//enemyPlayer = secondPlayer;
+			 friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
+			 enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 		}
-		for(int i=0;i<currPlayer.getTeam().size();i++)
+		/*for(int i=0;i<currPlayer.getTeam().size();i++)
 			if(currPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
 				friendlyTeam.add(currPlayer.getTeam().get(i));
 		for(int i=0;i<enemyPlayer.getTeam().size();i++)
 			if(enemyPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
 				enemyTeam.add(enemyPlayer.getTeam().get(i));
-
+		*/
 		//check whether the ability is healing, damaging or cc
 		if(a instanceof HealingAbility || (a instanceof CrowdControlAbility && ((CrowdControlAbility) a).getEffect().getType().equals(EffectType.BUFF)))
 			return friendlyTeam;        //im not sure if the current champion should be excluded (as a target) in the case of a pos ability
@@ -361,10 +392,17 @@ public class Game {
 			}
 	}
 
+	// has big problem, doesnt do damage
 	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 
-		if(champion.isDisarmed())
+		boolean disarmed = false;
+		// check if champion is disarmed
+		for(int i=0;i<champion.getAppliedEffects().size();i++)
+			if(champion.getAppliedEffects().get(i) instanceof Disarm)
+				disarmed = true;
+
+		if(disarmed)
 			throw new ChampionDisarmedException("Champion cannot attack while disarmed");
 		else if (champion.getCurrentActionPoints() < 1)
 			throw new NotEnoughResourcesException("Not enough action points");
@@ -420,21 +458,23 @@ public class Game {
 				if((firstPlayer.getTeam().contains(champion) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(champion) && secondPlayer.getTeam().contains(target)))
 					return;
 				// does no damage if target dodges
-				if(target instanceof Champion && ((Champion)target).isDodging()){
-					// randomly obtain True or False (50% chance of each)
-					Random rd = new Random();
-					boolean dodgeChance = rd.nextBoolean();
-					// if True don't deal damage
-					if(dodgeChance)
-						return;
-				}
-				// does no damage if target is shielded
-				if(target instanceof Champion && ((Champion)target).isShielded()){
-					for (int i=0;i<((Champion)target).getAppliedEffects().size();i++)
-						if(((Champion)target).getAppliedEffects().get(i) instanceof Shield){
+				if(target instanceof Champion){
+					for(int i=0;i<((Champion) target).getAppliedEffects().size();i++) {
+						if(((Champion) target).getAppliedEffects().get(i) instanceof Dodge) {
+							// randomly obtain True or False (50% chance of each)
+							Random rd = new Random();
+							boolean dodgeChance = rd.nextBoolean();
+							// if True don't deal damage
+							if (dodgeChance)
+								return;
+						}
+						// does no damage if target is shielded
+						else if(((Champion) target).getAppliedEffects().get(i) instanceof Shield){
 							((Champion)target).getAppliedEffects().get(i).remove((Champion)target);
+							((Champion)target).getAppliedEffects().remove(i);
 							return;
 						}
+					}
 				}
 				// does damage when target is an enemy or a cover
 				// using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
@@ -451,13 +491,18 @@ public class Game {
 	// A method for casting an ability that is not limited to a direction or a particular target
 	public void castAbility(Ability ability) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, IllegalStateException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
-		if(champion.isSilenced())
+		boolean silenced = false;
+		// check if champion is disarmed
+		for(int i=0;i<champion.getAppliedEffects().size();i++)
+			if(champion.getAppliedEffects().get(i) instanceof Silence)
+				silenced = true;
+		if(silenced)
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
 		else if (ability.getCurrentCooldown()>0) {
-			throw new AbilityUseException("Ability is on cool down");
+			throw new AbilityUseException("Ability is on cooldown");
 		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
-		else if (ability.getManaCost()> champion.getMana()) {
+		else if (champion.getMana() < ability.getManaCost()) {
 			throw new NotEnoughResourcesException("Not enough mana");
 		} else {
 			int x = champion.getLocation().x;
@@ -471,10 +516,10 @@ public class Game {
 						break;
 					case TEAMTARGET:
 						//iterates through the board to look for any damageables
-						for (int i = 0; i < ability.getCastRange(); i++) {
-							for (int j = 0; j < ability.getCastRange(); j++) {
+						for (int i = 0; i < BOARDHEIGHT; i++) {
+							for (int j = 0; j < BOARDWIDTH; j++) {
 								try {
-									if (board[i][j] != null && !board[i][j].equals(champion) && targetedObjects.contains((Damageable) board[i][j])) {
+									if (board[i][j] != null && board[i][j] instanceof Champion  && targetedObjects.contains((Damageable) board[i][j])) {
 										int direction = distanceCalculator(champion.getLocation(), i, j);        //when a damageable is found the distance between it and the champion casting the ability is calculated
 										if (direction <= ability.getCastRange())         //if the damageable is within range & part of the targeted team, it is added to the list fo targets
 											targets.add((Damageable) board[i][j]);
@@ -545,10 +590,15 @@ public class Game {
 	// A method for casting ability with DIRECTIONAL area of effect
 	public void castAbility(Ability ability, Direction direction) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
-		if(champion.isSilenced())
+		boolean silenced = false;
+		// check if champion is disarmed
+		for(int i=0;i<champion.getAppliedEffects().size();i++)
+			if(champion.getAppliedEffects().get(i) instanceof Silence)
+				silenced = true;
+		if(silenced)
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
 		else if (ability.getCurrentCooldown()>0) {
-			throw new AbilityUseException("Ability is on cool down");
+			throw new AbilityUseException("Ability is on cooldown");
 		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
 		else if (ability.getManaCost()> champion.getMana()) {
@@ -603,10 +653,15 @@ public class Game {
 	// this one does not use up action points if the target is invalid (according to milestone description)
 	public void castAbility(Ability ability, int x, int y) throws AbilityUseException, InvalidTargetException, CloneNotSupportedException, NotEnoughResourcesException {
 		Champion champion = getCurrentChampion();
-		if(champion.isSilenced())
+		boolean silenced = false;
+		// check if champion is disarmed
+		for(int i=0;i<champion.getAppliedEffects().size();i++)
+			if(champion.getAppliedEffects().get(i) instanceof Silence)
+				silenced = true;
+		if(silenced)
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
 		else if (ability.getCurrentCooldown()>0) {
-			throw new AbilityUseException("Ability is on cool down");
+			throw new AbilityUseException("Ability is on cooldown");
 		} else if (champion.getCurrentActionPoints() < ability.getRequiredActionPoints())
 			throw new NotEnoughResourcesException("Not enough action points");
 		else if (ability.getManaCost()> champion.getMana()) {
@@ -620,7 +675,9 @@ public class Game {
 			//check that the cell is within the ability's castRange & the cell isn't empty & the object is actually targeted
 			if(board[x][y] == null)
 				throw new InvalidTargetException("Cannot target empty cell");
-			else if(ability.getCastArea() == AreaOfEffect.SINGLETARGET && sameTeam )
+			else if((ability instanceof HealingAbility || (ability instanceof CrowdControlAbility && ((CrowdControlAbility)ability).getEffect().getType().equals(EffectType.BUFF))) && !sameTeam)
+				throw new InvalidTargetException("Can only cast this ability on an allied champion");
+			else if((ability instanceof DamagingAbility || (ability instanceof CrowdControlAbility && ((CrowdControlAbility)ability).getEffect().getType().equals(EffectType.DEBUFF))) && sameTeam)
 				throw new InvalidTargetException("Cannot cast this ability on an allied champion");
 			else if(ability instanceof CrowdControlAbility && board[x][y] instanceof Cover)
 				throw new InvalidTargetException("Cannot cast this ability on a cover");
@@ -631,9 +688,11 @@ public class Game {
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints()-ability.getRequiredActionPoints());
 				champion.setMana(champion.getMana()-ability.getManaCost());
 				ability.execute(targets);
-				for(int i=0;i<targets.size();i++)
-					if(targets.get(i).getCurrentHP() <= 0)
-						removeDamageable(targets.get(i));
+				if(ability instanceof DamagingAbility) {
+					for (int i = 0; i < targets.size(); i++)
+						if (targets.get(i).getCurrentHP() <= 0)
+							removeDamageable(targets.get(i));
+				}
 			}
 		}
 	}
@@ -720,13 +779,23 @@ public class Game {
 				if(turnOrder.isEmpty()) {		//checks if the turn order queue is empty to reset it
 					prepareChampionTurns();
 				}
+				// moved this here bec it needs to update effects/ability cooldown of stunned champions too
+				Champion currChamp = getCurrentChampion();
+				// reset the champion's current action points
+				currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
+				// decrease the currentCooldown of each ability in the current champion's abilities array list
+				for(int i =0; i< currChamp.getAbilities().size(); i++){
+					Ability a = currChamp.getAbilities().get(i);
+					a.setCurrentCooldown(a.getCurrentCooldown()-1);
+				}
+				//updating the effect counter for the current champion only
+				for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
+					currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
+					if(currChamp.getAppliedEffects().get(i).getAppliedCounter() >= currChamp.getAppliedEffects().get(i).getDuration())
+						currChamp.getAppliedEffects().get(i).remove(currChamp);
+				}
 			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-			// decrease the currentCooldown of each ability in the current champion's abilities array list
-			Champion currChamp = getCurrentChampion();
-			for(int i =0; i< currChamp.getAbilities().size(); i++){
-				Ability a = currChamp.getAbilities().get(i);
-				a.setCurrentCooldown(a.getCurrentCooldown()-1);
-			}
+
 			// update the counters of applied effects & calls the remove method on the champion for any effect that's been applied for its entire duration
 			///might change the method so that it iterates through only the current champion's applied effects depending on the rules of the game
 			/*for(int i=0;i<firstPlayer.getTeam().size();i++) {                //iterates through the team's champions
@@ -746,14 +815,6 @@ public class Game {
 							secondPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(secondPlayer.getTeam().get(i));
 					}
 			}*/
-			//updating the effect counter for the current champion only
-			for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
-				currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
-				if(currChamp.getAppliedEffects().get(i).getAppliedCounter() > currChamp.getAppliedEffects().get(i).getDuration())
-					currChamp.getAppliedEffects().get(i).remove(currChamp);
-			}
-			// reset the champion's current action points
-			currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
 		}
 	}
 

@@ -24,16 +24,20 @@ public class DamagingAbility extends Ability{
 	}
 
 	public void execute(ArrayList<Damageable> targets) throws CloneNotSupportedException {
+		boolean shield = false;
 		this.setCurrentCooldown(this.getBaseCooldown());
 		for(int i=0; i < targets.size(); i++){
 			Damageable damageable = targets.get(i);
-			if(damageable instanceof Champion && ((Champion)damageable).isShielded()){
-				for (int j=0;j<((Champion)damageable).getAppliedEffects().size();j++)
-					if(((Champion)damageable).getAppliedEffects().get(j) instanceof Shield){
-						((Champion)damageable).getAppliedEffects().get(j).remove((Champion)targets.get(i));
+			if(damageable instanceof Champion) {
+				for (int j = 0; j < ((Champion) damageable).getAppliedEffects().size(); j++)
+					if (((Champion) damageable).getAppliedEffects().get(j) instanceof Shield) {
+						((Champion) damageable).getAppliedEffects().get(j).remove((Champion) targets.get(i));
+						((Champion) damageable).getAppliedEffects().remove(j);
+						shield = true;
 						break;
 					}
-			}else
+			}
+			if(!shield)
 				damageable.setCurrentHP(damageable.getCurrentHP() - this.damageAmount);	//deal the damage amount to the champion or cover
 		}
 	}

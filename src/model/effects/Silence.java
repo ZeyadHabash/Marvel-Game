@@ -12,7 +12,6 @@ public class Silence  extends Effect{
 	// handle the "can't use abilities" part later
 	@Override
 	public void apply(Champion c) throws CloneNotSupportedException {
-		super.apply(c);
 		c.setSilenced(true);
 		c.setCurrentActionPoints(c.getCurrentActionPoints()+2);
 		c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()+2);
@@ -20,7 +19,6 @@ public class Silence  extends Effect{
 
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
-		super.remove(c);
 		c.setCurrentActionPoints(c.getCurrentActionPoints()-2);
 		c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()-2);
 		for(int i=0;i<c.getAppliedEffects().size();i++)
