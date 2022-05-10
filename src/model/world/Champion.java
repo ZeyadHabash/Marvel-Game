@@ -3,9 +3,9 @@ package model.world;
 import exceptions.LeaderAbilityAlreadyUsedException;
 import exceptions.LeaderNotCurrentException;
 import model.abilities.Ability;
-import model.effects.*;
-import model.effects.EffectType;
+import model.effects.Effect;
 import model.effects.Embrace;
+import model.effects.Stun;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -56,17 +56,6 @@ public abstract class Champion implements Damageable, Comparable {
 			if (this instanceof Hero) {
 				for (int i = 0; i < targets.size(); i++) {
 					Champion a = targets.get(i);
-
-					/*
-
-
-
-					Revisit later when clone() is better understood
-
-
-
-
-					*/
 					// wtf is this
 					for(int j=0;j<a.getAppliedEffects().size();j++){
 						Class tempEffectType = Class.forName(a.getAppliedEffects().get(j).getName()); // idk what this does look it up
@@ -80,14 +69,14 @@ public abstract class Champion implements Damageable, Comparable {
 					embrace.apply(a);
 					a.getAppliedEffects().add(embrace);
 
+
 				}
 			}else if (this instanceof Villain) {
 				for (int i = 0; i < targets.size(); i++) {
 					Champion a = targets.get(i);
 					if (a.getCurrentHP() < 0.3 * a.getMaxHP()) {
 					a.setCurrentHP(0);
-					//
-					//a.setCondition(Condition.KNOCKEDOUT);
+					a.setCondition(Condition.KNOCKEDOUT); //deh fe3lan okayy
 					}
 				}
 			}
