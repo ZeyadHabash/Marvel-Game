@@ -1,19 +1,15 @@
 package engine;
 
-import java.awt.*;
-import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Random;
-
 import exceptions.*;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
 
-import java.io.*;
-import java.util.regex.Matcher;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Game {
 
@@ -745,8 +741,8 @@ public class Game {
 						}
 					}
 					for (int i = 0; i < friendlyTeam.size(); i++) {
-						if (friendlyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !friendlyTeam.get(i).equals(enemyPlayer.getLeader())) {
-							targets.add(enemyTeam.get(i));
+						if (friendlyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !friendlyTeam.get(i).equals(currPlayer.getLeader())) {
+							targets.add(friendlyTeam.get(i));
 						}
 					}
 				}
