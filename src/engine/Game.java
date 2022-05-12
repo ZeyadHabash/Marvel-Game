@@ -789,9 +789,11 @@ public class Game {
 				}
 				//updating the effect counter for the current champion only
 				for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
-					currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
-					if(currChamp.getAppliedEffects().get(i).getAppliedCounter() >= currChamp.getAppliedEffects().get(i).getDuration())
+					currChamp.getAppliedEffects().get(i).setDuration(currChamp.getAppliedEffects().get(i).getDuration() - 1);
+					if(currChamp.getAppliedEffects().get(i).getDuration() <= 0){
 						currChamp.getAppliedEffects().get(i).remove(currChamp);
+						currChamp.getAppliedEffects().remove(i);
+					}
 				}
 			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
 
