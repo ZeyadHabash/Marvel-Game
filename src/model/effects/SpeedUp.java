@@ -22,7 +22,7 @@ public class SpeedUp extends Effect{
 		c.setMaxActionPointsPerTurn(c.getMaxActionPointsPerTurn()-1);
 	}
 
-	public SpeedUp clone() throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException{
 		SpeedUp clone = null;
 		try{
 			clone = (SpeedUp) super.clone();

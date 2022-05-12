@@ -488,7 +488,7 @@ public class Game {
 	public void castAbility(Ability ability) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, IllegalStateException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 		boolean silenced = false;
-		// check if champion is disarmed
+		// check if champion is silenced
 		for(int i=0;i<champion.getAppliedEffects().size();i++)
 			if(champion.getAppliedEffects().get(i) instanceof Silence)
 				silenced = true;
@@ -569,11 +569,9 @@ public class Game {
 			}catch(ArrayIndexOutOfBoundsException ignored){
 				// idk what to do here
 			}finally {
+				ability.execute(targets); //list of targets is passed to the execution method in the ability class
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - ability.getRequiredActionPoints());
 				champion.setMana(champion.getMana() - ability.getManaCost());
-				if (targets.isEmpty())
-					return;
-				ability.execute(targets); //list of targets is passed to the execution method in the ability class
 				if (ability instanceof DamagingAbility) {
 					for (int i = 0; i < targets.size(); i++)
 						if (targets.get(i).getCurrentHP() <= 0)
@@ -587,7 +585,7 @@ public class Game {
 	public void castAbility(Ability ability, Direction direction) throws NotEnoughResourcesException, AbilityUseException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 		boolean silenced = false;
-		// check if champion is disarmed
+		// check if champion is silenced
 		for(int i=0;i<champion.getAppliedEffects().size();i++)
 			if(champion.getAppliedEffects().get(i) instanceof Silence)
 				silenced = true;
@@ -631,11 +629,9 @@ public class Game {
 			}catch(ArrayIndexOutOfBoundsException e){
 				// idk what to do here either
 			}finally {
+				ability.execute(targets);
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - ability.getRequiredActionPoints());
 				champion.setMana(champion.getMana() - ability.getManaCost());
-				if (targets.isEmpty())
-					return;
-				ability.execute(targets);
 				if (ability instanceof DamagingAbility) {
 					for (int i = 0; i < targets.size(); i++)
 						if (targets.get(i).getCurrentHP() <= 0)
@@ -650,7 +646,7 @@ public class Game {
 	public void castAbility(Ability ability, int x, int y) throws AbilityUseException, InvalidTargetException, CloneNotSupportedException, NotEnoughResourcesException {
 		Champion champion = getCurrentChampion();
 		boolean silenced = false;
-		// check if champion is disarmed
+		// check if champion is silenced
 		for(int i=0;i<champion.getAppliedEffects().size();i++)
 			if(champion.getAppliedEffects().get(i) instanceof Silence)
 				silenced = true;
@@ -696,6 +692,13 @@ public class Game {
 
 	public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, AbilityUseException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
+
+		boolean silenced = false;
+		// check if champion is silenced
+		for(int i=0;i<champion.getAppliedEffects().size();i++)
+			if(champion.getAppliedEffects().get(i) instanceof Silence)
+				silenced = true;
+
 		Player currPlayer;
 		Player enemyPlayer;
 		ArrayList<Champion> friendlyTeam;
@@ -718,7 +721,7 @@ public class Game {
 		friendlyTeam = currPlayer.getTeam();
 		enemyTeam = enemyPlayer.getTeam();
 
-		if(champion.isSilenced())
+		if(silenced)
 			throw new AbilityUseException("Champion cannot cast abilities while silenced");
 		else {
 			ArrayList<Champion> targets = new ArrayList<Champion>();

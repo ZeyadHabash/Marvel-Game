@@ -2,8 +2,6 @@ package model.effects;
 
 import model.world.Champion;
 
-import java.util.ArrayList;
-
 public abstract class Effect implements Cloneable {
 	private String name;
 	private int duration;
@@ -37,7 +35,8 @@ public abstract class Effect implements Cloneable {
 		}
 		 */
 
-	public Effect clone() throws CloneNotSupportedException{
+	@Override
+	public Object clone() throws CloneNotSupportedException{
 		Effect clone;
 		try{
 			clone = (Effect) super.clone();

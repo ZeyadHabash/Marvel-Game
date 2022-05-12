@@ -16,13 +16,6 @@ public class Disarm extends Effect {
 
 	@Override
 	public void apply(Champion c) throws CloneNotSupportedException {
-		//
-		//
-		//
-		// honestly dont know how to handle this
-		for(int i=0;i<c.getAppliedEffects().size();i++)
-			if(c.getAppliedEffects().get(i) instanceof Disarm)
-				return;
 
 		DamagingAbility punch = new DamagingAbility("Punch", 0, 1, 1, AreaOfEffect.SINGLETARGET, 1, 50);
 		c.getAbilities().add(punch);
@@ -31,10 +24,6 @@ public class Disarm extends Effect {
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
 		ArrayList<Ability> abilitiesList = c.getAbilities();
-
-		for(int i=0;i<c.getAppliedEffects().size();i++)
-			if(c.getAppliedEffects().get(i) instanceof Disarm)
-				return;
 
 		for(int i=0;i<abilitiesList.size();i++){
 			if(abilitiesList.get(i).getName().equals("Punch")){
@@ -45,8 +34,8 @@ public class Disarm extends Effect {
 	}
 
 	@Override
-	public Disarm clone() throws CloneNotSupportedException{
-		Disarm clone = null;
+	public Object clone() throws CloneNotSupportedException{
+		Disarm clone;
 		try{
 			clone = (Disarm) super.clone();
 		}catch (CloneNotSupportedException cns){
