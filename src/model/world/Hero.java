@@ -17,11 +17,13 @@ public class Hero extends Champion{
 		Hero champion = this;
 		for (int i = 0; i < targets.size(); i++) {
 			Champion target = targets.get(i);
-			for (int j = 0;j<target.getAppliedEffects().size();j++) {
+			for (int j = 0; j < target.getAppliedEffects().size(); j++) {
 				// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
-				if (target.getAppliedEffects().get(j).getType() == EffectType.DEBUFF) {
-					getAppliedEffects().get(j).remove(target);
-					getAppliedEffects().remove(j);
+				Effect effect = target.getAppliedEffects().get(j);
+				if (effect.getType() == EffectType.DEBUFF) {
+					effect.remove(target);
+					target.getAppliedEffects().remove(effect);
+					j--;
 				}
 			}
 			// adding embrace effect

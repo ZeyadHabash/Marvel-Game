@@ -10,11 +10,11 @@ public class Villain extends Champion {
 
 	@Override
 	public void useLeaderAbility(ArrayList<Champion> targets) throws CloneNotSupportedException {
-		Villain champion = this;
 		for (int i = 0; i < targets.size(); i++) {
 			Champion target = targets.get(i);
-			if (target.getCurrentHP() < (int) (0.3 * target.getMaxHP())) {
+			if (target.getCurrentHP() < (0.3 * target.getMaxHP())) {
 				target.setCurrentHP(0);
+				target.setCondition(Condition.KNOCKEDOUT);
 			}
 		}
 	}
