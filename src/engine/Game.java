@@ -1,19 +1,15 @@
 package engine;
 
-import java.awt.*;
-import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Random;
-
 import exceptions.*;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
 
-import java.io.*;
-import java.util.regex.Matcher;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Game {
 
@@ -417,7 +413,7 @@ public class Game {
 					case RIGHT:
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x][y + i] instanceof Damageable) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
-								target = (Damageable) board[x][y + 1];
+								target = (Damageable) board[x][y + i];
 								break;
 							}
 						}
@@ -425,7 +421,7 @@ public class Game {
 					case LEFT:
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x][y - i] instanceof Damageable) {
-								target = (Damageable) board[x][y - 1];
+								target = (Damageable) board[x][y - i];
 								break;
 							}
 						}
@@ -433,7 +429,7 @@ public class Game {
 					case UP:
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x + i][y] instanceof Damageable) {
-								target = (Damageable) board[x + 1][y];
+								target = (Damageable) board[x + i][y];
 								break;
 							}
 						}
@@ -441,7 +437,7 @@ public class Game {
 					case DOWN:
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x - i][y] instanceof Damageable) {
-								target = (Damageable) board[x - 1][y];
+								target = (Damageable) board[x - i][y];
 								break;
 							}
 						}
