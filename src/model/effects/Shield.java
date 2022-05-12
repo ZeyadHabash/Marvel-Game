@@ -12,7 +12,6 @@ public class Shield extends Effect{
 	// handle the blocking of next attack later
 	@Override
 	public void apply(Champion c) throws CloneNotSupportedException {
-		c.setShielded(true);
 		c.setSpeed((int) (c.getSpeed()*1.02));
 	}
 
@@ -22,10 +21,9 @@ public class Shield extends Effect{
 		for(int i=0;i<c.getAppliedEffects().size();i++)
 			if(c.getAppliedEffects().get(i).getName().equals(this.getName()))
 				return;
-		c.setShielded(false);
 	}
 
-	public Shield clone() throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException{
 		Shield clone = null;
 		try{
 			clone = (Shield) super.clone();

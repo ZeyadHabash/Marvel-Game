@@ -18,13 +18,13 @@ public class Root extends Effect{
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
 		for(int i=0;i<c.getAppliedEffects().size();i++)
-			if(c.getAppliedEffects().get(i) instanceof Root)
+			if(c.getAppliedEffects().get(i) instanceof Root && c.getAppliedEffects().get(i).getAppliedCounter()<c.getAppliedEffects().get(i).getDuration())
 				return;
 		if(c.getCondition() == Condition.ROOTED)
 			c.setCondition(Condition.ACTIVE);
 	}
 
-	public Root clone() throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException{
 		Root clone = null;
 		try{
 			clone = (Root) super.clone();

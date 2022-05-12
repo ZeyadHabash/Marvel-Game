@@ -32,7 +32,7 @@ public class Embrace extends Effect{
         c.setAttackDamage(newDamage);
     }
 
-    public Embrace clone() throws CloneNotSupportedException{
+    public Object clone() throws CloneNotSupportedException{
         Embrace clone = null;
         try{
             clone = (Embrace) super.clone();

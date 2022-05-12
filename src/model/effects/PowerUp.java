@@ -37,7 +37,7 @@ public class PowerUp extends Effect {
 		}
 	}
 
-	public PowerUp clone() throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException{
 		PowerUp clone = null;
 		try{
 			clone = (PowerUp) super.clone();

@@ -18,10 +18,10 @@ public class Stun extends Effect {
     @Override
     public void remove(Champion c) throws CloneNotSupportedException {
         for(int i=0;i<c.getAppliedEffects().size();i++)
-            if(c.getAppliedEffects().get(i) instanceof Stun)
+            if(c.getAppliedEffects().get(i) instanceof Stun && c.getAppliedEffects().get(i).getAppliedCounter()<c.getAppliedEffects().get(i).getDuration())
                 return;
         for(int i=0;i<c.getAppliedEffects().size();i++)
-            if(c.getAppliedEffects().get(i) instanceof Root) {
+            if(c.getAppliedEffects().get(i) instanceof Root && c.getAppliedEffects().get(i).getAppliedCounter()<c.getAppliedEffects().get(i).getDuration()) {
                 c.setCondition(Condition.ROOTED);
                 return;
             }
@@ -29,7 +29,7 @@ public class Stun extends Effect {
             c.setCondition(Condition.ACTIVE);
     }
 
-    public Stun clone() throws CloneNotSupportedException{
+    public Object clone() throws CloneNotSupportedException{
         Stun clone = null;
         try{
             clone = (Stun) super.clone();
