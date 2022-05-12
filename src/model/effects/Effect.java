@@ -7,7 +7,6 @@ public abstract class Effect implements Cloneable {
 	private int duration;
 	private EffectType type;
 
-	private int appliedCounter;
 
 	public Effect (String name, int duration, EffectType type) {
 		this.name = name;
@@ -17,29 +16,15 @@ public abstract class Effect implements Cloneable {
 
 
 	public abstract void apply(Champion champion) throws CloneNotSupportedException;
-		/*
-		Effect effect = this.clone();
-		champion.getAppliedEffects().add(effect);
-		*/
-
 	public abstract void remove(Champion champion) throws CloneNotSupportedException;
-		/*
-		Effect effect = this.clone();
-		ArrayList<Effect> champEffects = champion.getAppliedEffects();
 
-		for(int i=0;i<champEffects.size();i++){
-			if(champEffects.get(i).getName().equals(effect.getName())) {
-				champEffects.remove(i);
-				return;
-			}
-		}
-		 */
 
 	@Override
 	public Object clone() throws CloneNotSupportedException{
 		Effect clone;
 		try{
 			clone = (Effect) super.clone();
+
 			clone.duration = duration;
 			clone.name = name;
 			clone.type = type;
@@ -57,14 +42,7 @@ public abstract class Effect implements Cloneable {
 
 	public EffectType getType() { return type; }
 
-	public int getAppliedCounter() { return appliedCounter; }
 
-	public void setAppliedCounter(int appliedCounter) {
-		this.appliedCounter = appliedCounter;
-	}
 
-	public void increaseAppliedCounter() {
-		this.appliedCounter++;
-	}
 
 }

@@ -411,6 +411,7 @@ public class Game {
 				//looking for the nearest target in the direction within the attack range of the champion
 				switch (direction) {
 					case RIGHT:
+
 						for (int i = 1; i < r + 1; i++) {
 							if (board[x][y + i] instanceof Damageable) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
 								target = (Damageable) board[x][y + i];
@@ -456,7 +457,7 @@ public class Game {
 				// does no damage if target dodges
 				if(target instanceof Champion){
 					for(int i=0;i<((Champion) target).getAppliedEffects().size();i++) {
-						if(((Champion) target).getAppliedEffects().get(i) instanceof Dodge) {
+						if (((Champion) target).getAppliedEffects().get(i) instanceof Dodge) {
 							// randomly obtain True or False (50% chance of each)
 							Random rd = new Random();
 							boolean dodgeChance = rd.nextBoolean();
@@ -464,8 +465,10 @@ public class Game {
 							if (dodgeChance)
 								return;
 						}
+					}
+					for(int i=0;i<((Champion) target).getAppliedEffects().size();i++) {
 						// does no damage if target is shielded
-						else if(((Champion) target).getAppliedEffects().get(i) instanceof Shield){
+						if(((Champion) target).getAppliedEffects().get(i) instanceof Shield){
 							((Champion)target).getAppliedEffects().get(i).remove((Champion)target);
 							((Champion)target).getAppliedEffects().remove(i);
 							return;
@@ -789,9 +792,11 @@ public class Game {
 				}
 				//updating the effect counter for the current champion only
 				for(int i =0; i< currChamp.getAppliedEffects().size(); i++){
-					currChamp.getAppliedEffects().get(i).increaseAppliedCounter();
-					if(currChamp.getAppliedEffects().get(i).getAppliedCounter() >= currChamp.getAppliedEffects().get(i).getDuration())
+					currChamp.getAppliedEffects().get(i).setDuration(currChamp.getAppliedEffects().get(i).getDuration() - 1);
+					if(currChamp.getAppliedEffects().get(i).getDuration() <= 0){
 						currChamp.getAppliedEffects().get(i).remove(currChamp);
+						currChamp.getAppliedEffects().remove(i);
+					}
 				}
 			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
 
