@@ -18,7 +18,7 @@ public class Root extends Effect{
 	@Override
 	public void remove(Champion c) throws CloneNotSupportedException {
 		for(int i=0;i<c.getAppliedEffects().size();i++)
-			if(c.getAppliedEffects().get(i) instanceof Root && c.getAppliedEffects().get(i).getDuration()<=c.getAppliedEffects().get(i).getDuration())
+			if(c.getAppliedEffects().get(i) instanceof Root && c.getAppliedEffects().get(i).getDuration()>0)
 				return;
 		if(c.getCondition() == Condition.ROOTED)
 			c.setCondition(Condition.ACTIVE);
