@@ -696,12 +696,6 @@ public class Game {
 	public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, AbilityUseException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 
-		boolean silenced = false;
-		// check if champion is silenced
-		for(int i=0;i<champion.getAppliedEffects().size();i++)
-			if(champion.getAppliedEffects().get(i) instanceof Silence)
-				silenced = true;
-
 		Player currPlayer;
 		Player enemyPlayer;
 		ArrayList<Champion> friendlyTeam;
@@ -724,40 +718,37 @@ public class Game {
 		friendlyTeam = currPlayer.getTeam();
 		enemyTeam = enemyPlayer.getTeam();
 
-		if(silenced)
-			throw new AbilityUseException("Champion cannot cast abilities while silenced");
-		else {
-			ArrayList<Champion> targets = new ArrayList<Champion>();
-				if (champion instanceof Hero) {
-					for (int i = 0; i < friendlyTeam.size(); i++) {
-						if(friendlyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT)
-							targets.add(friendlyTeam.get(i));
-					}
-				} else if (champion instanceof Villain) {
-					for (int i = 0; i < enemyTeam.size(); i++) {
-						if(enemyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT && enemyTeam.get(i).getCurrentHP() < (int)(0.3*enemyTeam.get(i).getMaxHP())) {
-							targets.add(enemyTeam.get(i));
-							removeDamageable(enemyTeam.get(i));
-						}
-					}
-				} else if (champion instanceof AntiHero) {
-					for (int i = 0; i < enemyTeam.size(); i++) {
-						if (enemyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !enemyTeam.get(i).equals(enemyPlayer.getLeader())) {
-							targets.add(enemyTeam.get(i));
-						}
-					}
-					for (int i = 0; i < friendlyTeam.size(); i++) {
-						if (friendlyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !friendlyTeam.get(i).equals(currPlayer.getLeader())) {
-							targets.add(friendlyTeam.get(i));
-						}
+
+		ArrayList<Champion> targets = new ArrayList<Champion>();
+			if (champion instanceof Hero) {
+				for (int i = 0; i < friendlyTeam.size(); i++) {
+					if(friendlyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT)
+						targets.add(friendlyTeam.get(i));
+				}
+			} else if (champion instanceof Villain) {
+				for (int i = 0; i < enemyTeam.size(); i++) {
+					if(enemyTeam.get(i).getCondition()!=Condition.KNOCKEDOUT && enemyTeam.get(i).getCurrentHP() < (int)(0.3*enemyTeam.get(i).getMaxHP())) {
+						targets.add(enemyTeam.get(i));
+						removeDamageable(enemyTeam.get(i));
 					}
 				}
-				champion.useLeaderAbility(targets);
-				if(currPlayer == firstPlayer)
-					firstLeaderAbilityUsed = true;
-				else
-					secondLeaderAbilityUsed = true;
+			} else if (champion instanceof AntiHero) {
+				for (int i = 0; i < enemyTeam.size(); i++) {
+					if (enemyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !enemyTeam.get(i).equals(enemyPlayer.getLeader())) {
+						targets.add(enemyTeam.get(i));
+					}
+				}
+				for (int i = 0; i < friendlyTeam.size(); i++) {
+					if (friendlyTeam.get(i).getCondition() != Condition.KNOCKEDOUT && !friendlyTeam.get(i).equals(currPlayer.getLeader())) {
+						targets.add(friendlyTeam.get(i));
+					}
+				}
 			}
+			champion.useLeaderAbility(targets);
+			if(currPlayer == firstPlayer)
+				firstLeaderAbilityUsed = true;
+			else
+				secondLeaderAbilityUsed = true;
 		}
 
 		private void prepareChampionTurns () {
@@ -799,26 +790,6 @@ public class Game {
 					}
 				}
 			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-
-			// update the counters of applied effects & calls the remove method on the champion for any effect that's been applied for its entire duration
-			///might change the method so that it iterates through only the current champion's applied effects depending on the rules of the game
-			/*for(int i=0;i<firstPlayer.getTeam().size();i++) {                //iterates through the team's champions
-				if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !firstPlayer.getTeam().get(i).getAppliedEffects().isEmpty()){   //checks if the champion is alive + if it has any applied effects
-					for(int j =0; j<firstPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {        //iterates through the champion's applied effects list & increases the counter of how many turns have passed since the effect was applied
-						firstPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
-						if(firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>firstPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())   //checks if the duration of the effect has ended & then removes it
-							firstPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(firstPlayer.getTeam().get(i));
-					}
-				}
-			}
-			for(int i=0;i<secondPlayer.getTeam().size();i++) {
-				if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && !secondPlayer.getTeam().get(i).getAppliedEffects().isEmpty())
-					for(int j =0; j<secondPlayer.getTeam().get(i).getAppliedEffects().size(); j++) {
-						secondPlayer.getTeam().get(i).getAppliedEffects().get(i).increaseAppliedCounter();
-						if(secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getAppliedCounter()>secondPlayer.getTeam().get(i).getAppliedEffects().get(i).getDuration())
-							secondPlayer.getTeam().get(i).getAppliedEffects().get(i).remove(secondPlayer.getTeam().get(i));
-					}
-			}*/
 		}
 	}
 
