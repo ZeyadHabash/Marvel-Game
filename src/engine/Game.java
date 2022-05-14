@@ -221,25 +221,14 @@ public class Game {
 					}
 				}
 			}
+
 		}
-		/*ArrayList<Champion> temp = new ArrayList<Champion>();
-		if(damageable instanceof Champion){
-			for(int i=0;i<turnOrder.size();i++){
-				if(turnOrder.peekMin().equals(damageable))
-					turnOrder.remove();
-				else
-					temp.add((Champion)turnOrder.remove());
-			}
-			for(int i=0;i<temp.size();i++)
-				turnOrder.insert(temp.get(i));
-		}*/
 	}
 
 	// Helper method to calculate the damage multiplier of Champions when attacking
 	private double damageMultiplier(Champion attacker, Damageable target){
 		if (target instanceof  Cover)
 			return 1;
-		// maybe have to do individual hero/villain/antihero checks? idk
 		if (attacker.getClass().equals(target.getClass()))
 			return 1;
 		return 1.5;
@@ -256,33 +245,21 @@ public class Game {
 	public ArrayList<Damageable> getTargetedObjects(Champion champion, Ability a){
 		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
 		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
-		//Player currPlayer;
-		//Player enemyPlayer;
 		if(firstPlayer.getTeam().contains(champion)) {
-			//currPlayer = firstPlayer;
-			//enemyPlayer = secondPlayer;
 			// truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
 			 friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 			 enemyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 		}
 		else{
-			//currPlayer = firstPlayer;
-			//enemyPlayer = secondPlayer;
 			 friendlyTeam = (ArrayList<Damageable>)secondPlayer.getTeam().clone();
 			 enemyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
 		}
-		/*for(int i=0;i<currPlayer.getTeam().size();i++)
-			if(currPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				friendlyTeam.add(currPlayer.getTeam().get(i));
-		for(int i=0;i<enemyPlayer.getTeam().size();i++)
-			if(enemyPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				enemyTeam.add(enemyPlayer.getTeam().get(i));
-		*/
-		//check whether the ability is healing, damaging or cc
+
+		// check whether the ability is healing, damaging or cc
 		if(a instanceof HealingAbility || (a instanceof CrowdControlAbility && ((CrowdControlAbility) a).getEffect().getType().equals(EffectType.BUFF)))
-			return friendlyTeam;        //im not sure if the current champion should be excluded (as a target) in the case of a pos ability
+			return friendlyTeam;        // im not sure if the current champion should be excluded (as a target) in the case of a pos ability
 		else if (a instanceof DamagingAbility) {
-			//iterates through the board looking for covers to add them to the enemyTeam in case of damaging ability
+			//  through the board looking for covers to add them to the enemyTeam in case of damaging ability
 			for(int i = 0; i < BOARDHEIGHT; i++){
 				for (int j = 0; j < BOARDWIDTH; j++){
 					if (board[i][j] instanceof Cover)
@@ -291,7 +268,7 @@ public class Game {
 			}
 			return enemyTeam;
 		}
-		else                      //the returned team for negative CC abilities is the opposing champions (exc covers)
+		else	// the returned team for negative CC abilities is the opposing champions (exc covers)
 			return enemyTeam;
 	}
 
@@ -306,26 +283,14 @@ public class Game {
 
 
 	public Champion getCurrentChampion(){
-		return (Champion) turnOrder.peekMin();        //return the champion whose turn is taking place
+		return (Champion) turnOrder.peekMin();        // return the champion whose turn is taking place
 	}
 
 	public Player checkGameOver(){
-		int j=0;
-		for(int i = 0; i < firstPlayer.getTeam().size(); i++){
-			if (firstPlayer.getTeam().get(i).getCondition() == Condition.KNOCKEDOUT)
-				j++;                                      //j counts the no. of knockedout champions on a player's team
-		}
-		if (j == firstPlayer.getTeam().size())           //checks if all the champions on the team are knockedout (ie. dead)
+		if(firstPlayer.getTeam().size()==0)
 			return secondPlayer;
-		else{
-			j=0;                                         //resets j to use it as a counter for the second team
-			for(int i = 0; i < secondPlayer.getTeam().size(); i++){
-				if (secondPlayer.getTeam().get(i).getCondition() == Condition.KNOCKEDOUT)
-					j++;
-			}
-			if (j == secondPlayer.getTeam().size())      //same check as above
-				return firstPlayer;
-		}
+		if(secondPlayer.getTeam().size() == 0)
+			return firstPlayer;
 		return null;            //none of the players have lost yet
 	}
 
