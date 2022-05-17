@@ -204,24 +204,12 @@ public class Game {
 		int y = damageable.getLocation().y;
 		board[x][y] = null;
 		// removes dead champion from team
-		if (damageable instanceof Champion){
-			if(firstPlayer.getTeam().contains(damageable)) {
-				for (int i = 0; i < firstPlayer.getTeam().size(); i++) {
-					if (firstPlayer.getTeam().get(i).equals(damageable)) {
-						firstPlayer.getTeam().remove(i);
-						break;
-					}
-				}
-			}
-			else {
-				for (int i = 0; i < secondPlayer.getTeam().size(); i++) {
-					if (secondPlayer.getTeam().get(i).equals(damageable)) {
-						secondPlayer.getTeam().remove(i);
-						break;
-					}
-				}
-			}
-			// Do I add a method to the priority queue that removes a specific element? will I just leave its location empty? not sure how to do this tbh
+		if (damageable instanceof Champion) {
+			turnOrder.remove(damageable);
+			if (firstPlayer.getTeam().contains(damageable))
+				firstPlayer.getTeam().remove(damageable);
+			else
+				secondPlayer.getTeam().remove(damageable);
 		}
 	}
 
@@ -441,8 +429,9 @@ public class Game {
 				// does damage when target is an enemy or a cover
 				// using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
 				target.setCurrentHP(target.getCurrentHP() - (int) (champion.getAttackDamage() * damageMultiplier(champion, target)));
-				if(target.getCurrentHP() <= 0)
+				if(target.getCurrentHP() <= 0) {
 					removeDamageable(target);
+				}
 			}
 		}
 	}
@@ -478,19 +467,9 @@ public class Game {
 						break;
 					case TEAMTARGET:
 						// iterates through the board to look for any damageables
-
-						// debugging
-						System.out.println("Targeted Objects: " + targetedObjects);
-
 						for (int i = 0; i < BOARDHEIGHT; i++) {
 							for (int j = 0; j < BOARDWIDTH; j++) {
 								try {
-
-									// debugging
-									if (board[i][j] != null)
-									System.out.println(board[i][j] + " is targeted?: " + targetedObjects.contains((Damageable) board[i][j]) + " Location: " + ((Damageable) board[i][j]).getLocation());
-
-
 									if (board[i][j] != null && board[i][j] instanceof Champion  && targetedObjects.contains((Damageable) board[i][j])) {
 										int distance = distanceCalculator(champion.getLocation(), i, j); // when a damageable is found the distance between it and the champion casting the ability is calculated
 										if (distance <= ability.getCastRange())         // if the damageable is within range & part of the targeted team, it is added to the list fo targets
@@ -511,11 +490,6 @@ public class Game {
                             if(!targets.contains(c) && targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
                                 targets.add(c);
                         }
-
-						// debugging
-						System.out.println("Targets: " + targets);
-
-
 						break;
 					//not sure if there needs to be a check for the range here, seeing that the cells within range are pretty straightforward
 					//also dk if there would be an error if the cells being checked don't exist aslan, I think ah bas don't have energy to try and handle that

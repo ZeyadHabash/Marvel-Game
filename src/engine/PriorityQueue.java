@@ -26,6 +26,18 @@ public class PriorityQueue {
       nItems--;
       return elements[nItems];
    }
+   public Comparable remove(Object o){
+      PriorityQueue tempQ = new PriorityQueue(this.size());
+      Comparable tempObj = null;
+      while(!this.isEmpty()){
+         tempObj = this.remove();
+         if(!tempObj.equals(o))
+            tempQ.insert(tempObj);
+      }
+      while(!tempQ.isEmpty())
+         insert(tempQ.remove());
+      return tempObj;
+   }
     
    public boolean isEmpty() {
       return (nItems == 0);
