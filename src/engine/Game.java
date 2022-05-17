@@ -221,7 +221,7 @@ public class Game {
 					}
 				}
 			}
-
+			// Do I add a method to the priority queue that removes a specific element? will I just leave its location empty? not sure how to do this tbh
 		}
 	}
 
@@ -236,15 +236,15 @@ public class Game {
 
 	// Helper method to get the distance between two points using the Manhattan distance calculation
 	private int distanceCalculator(Point p1, int x, int y){
-		int dx = ((int) p1.getX()) - x;
-		int dy = ((int) p1.getY()) - y;
+		int dx = p1.x - x;
+		int dy = p1.y - y;
 		return (Math.abs(dx) + Math.abs(dy));
 	}
 
 	// Helper method to get targeted team whether that be the friendly or the enemy team
 	public ArrayList<Damageable> getTargetedObjects(Champion champion, Ability a){
-		ArrayList<Damageable> friendlyTeam = new ArrayList<Damageable>();
-		ArrayList<Damageable> enemyTeam = new ArrayList<Damageable>();
+		ArrayList<Damageable> friendlyTeam;
+		ArrayList<Damageable> enemyTeam;
 		if(firstPlayer.getTeam().contains(champion)) {
 			// truly do not know if the syntax of populating the friendlyTeam and enemyTeam array lists is correct? no errors but very sus
 			 friendlyTeam = (ArrayList<Damageable>)firstPlayer.getTeam().clone();
@@ -257,7 +257,7 @@ public class Game {
 
 		// check whether the ability is healing, damaging or cc
 		if(a instanceof HealingAbility || (a instanceof CrowdControlAbility && ((CrowdControlAbility) a).getEffect().getType().equals(EffectType.BUFF)))
-			return friendlyTeam;        // im not sure if the current champion should be excluded (as a target) in the case of a pos ability
+			return friendlyTeam;
 		else if (a instanceof DamagingAbility) {
 			//  through the board looking for covers to add them to the enemyTeam in case of damaging ability
 			for(int i = 0; i < BOARDHEIGHT; i++){
@@ -266,10 +266,9 @@ public class Game {
 						enemyTeam.add((Damageable)board[i][j]);
 				}
 			}
-			return enemyTeam;
 		}
-		else	// the returned team for negative CC abilities is the opposing champions (exc covers)
-			return enemyTeam;
+		// Doesnt add the covers if its a debuff cc ability
+		return enemyTeam;
 	}
 
 
@@ -353,7 +352,6 @@ public class Game {
 			}
 	}
 
-	// has big problem, doesnt do damage
 	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 
@@ -409,7 +407,7 @@ public class Game {
 						}
 						break;
 				}
-			}catch(ArrayIndexOutOfBoundsException e){
+			}catch(ArrayIndexOutOfBoundsException ignored){
 				// Don't think I'm supposed to do anything when this is caught
 			}finally{
 				champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 2);
@@ -479,20 +477,45 @@ public class Game {
 						targets.add(champion);
 						break;
 					case TEAMTARGET:
-						//iterates through the board to look for any damageables
+						// iterates through the board to look for any damageables
+
+						// debugging
+						System.out.println("Targeted Objects: " + targetedObjects);
+
 						for (int i = 0; i < BOARDHEIGHT; i++) {
 							for (int j = 0; j < BOARDWIDTH; j++) {
 								try {
+
+									// debugging
+									if (board[i][j] != null)
+									System.out.println(board[i][j] + " is targeted?: " + targetedObjects.contains((Damageable) board[i][j]) + " Location: " + ((Damageable) board[i][j]).getLocation());
+
+
 									if (board[i][j] != null && board[i][j] instanceof Champion  && targetedObjects.contains((Damageable) board[i][j])) {
-										int direction = distanceCalculator(champion.getLocation(), i, j);        //when a damageable is found the distance between it and the champion casting the ability is calculated
-										if (direction <= ability.getCastRange())         //if the damageable is within range & part of the targeted team, it is added to the list fo targets
+										int distance = distanceCalculator(champion.getLocation(), i, j); // when a damageable is found the distance between it and the champion casting the ability is calculated
+										if (distance <= ability.getCastRange())         // if the damageable is within range & part of the targeted team, it is added to the list fo targets
 											targets.add((Damageable) board[i][j]);
 									}
 								}catch(ArrayIndexOutOfBoundsException ignored){
 									// just to let it keep looping after an exception
 								}
 							}
-						};
+						}
+
+                        // the fact that this works is so stupid
+                        for(Champion c : firstPlayer.getTeam()){
+                            if(!targets.contains(c) && targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
+                                targets.add(c);
+                        }
+                        for(Champion c : secondPlayer.getTeam()){
+                            if(!targets.contains(c) && targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
+                                targets.add(c);
+                        }
+
+						// debugging
+						System.out.println("Targets: " + targets);
+
+
 						break;
 					//not sure if there needs to be a check for the range here, seeing that the cells within range are pretty straightforward
 					//also dk if there would be an error if the cells being checked don't exist aslan, I think ah bas don't have energy to try and handle that
@@ -628,7 +651,7 @@ public class Game {
 			throw new NotEnoughResourcesException("Not enough mana");
 		} else {
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
-			int direction = distanceCalculator(champion.getLocation(), x, y);
+			int distance = distanceCalculator(champion.getLocation(), x, y);
 			boolean sameTeam = board[x][y] instanceof Champion &&
 					((firstPlayer.getTeam().contains((Champion)board[x][y]) && firstPlayer.getTeam().contains(getCurrentChampion())) ||
 					(secondPlayer.getTeam().contains((Champion)board[x][y]) && secondPlayer.getTeam().contains(getCurrentChampion())));
@@ -641,7 +664,7 @@ public class Game {
 				throw new InvalidTargetException("Cannot cast this ability on an allied champion");
 			else if(ability instanceof CrowdControlAbility && board[x][y] instanceof Cover)
 				throw new InvalidTargetException("Cannot cast this ability on a cover");
-			else if(direction > ability.getCastRange())
+			else if(distance > ability.getCastRange())
 				throw new AbilityUseException("Target out of range");
 			else{    //dk if a check should be added to make sure the target is on the right team based on the ability's type
 				targets.add((Damageable) board[x][y]);
@@ -717,6 +740,8 @@ public class Game {
 		}
 
 		private void prepareChampionTurns () {
+			for (int i=0;i<turnOrder.size();i++)
+				turnOrder.remove();
 			ArrayList<Champion> list = firstPlayer.getTeam();
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
