@@ -342,6 +342,12 @@ public class Game {
 
 	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
+		Player enemyPlayer;
+
+		if(firstPlayer.getTeam().contains(champion))
+			enemyPlayer = secondPlayer;
+		else
+			enemyPlayer = firstPlayer;
 
 		boolean disarmed = false;
 		// check if champion is disarmed
@@ -364,7 +370,7 @@ public class Game {
 					case RIGHT:
 
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y + i] instanceof Damageable) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
+							if (board[x][y + i] instanceof Damageable && (board[x][y + i] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x][y + i]))) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
 								target = (Damageable) board[x][y + i];
 								break;
 							}
@@ -372,7 +378,7 @@ public class Game {
 						break;
 					case LEFT:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y - i] instanceof Damageable) {
+							if (board[x][y - i] instanceof Damageable && (board[x][y - i] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x][y - i]))) {
 								target = (Damageable) board[x][y - i];
 								break;
 							}
@@ -380,7 +386,7 @@ public class Game {
 						break;
 					case UP:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x + i][y] instanceof Damageable) {
+							if (board[x + i][y] instanceof Damageable && (board[x+i][y] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x+i][y]))) {
 								target = (Damageable) board[x + i][y];
 								break;
 							}
@@ -388,7 +394,7 @@ public class Game {
 						break;
 					case DOWN:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x - i][y] instanceof Damageable) {
+							if (board[x - i][y] instanceof Damageable && (board[x-i][y] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x-i][y]))) {
 								target = (Damageable) board[x - i][y];
 								break;
 							}
@@ -730,6 +736,8 @@ public class Game {
 
 	public void endTurn() throws CloneNotSupportedException {
 		Player winner = checkGameOver();
+		Champion currChamp;
+		Condition currChampCondition;
 		if (winner == null){
 			do {
 				turnOrder.remove();		//removes the current champion
@@ -737,7 +745,8 @@ public class Game {
 					prepareChampionTurns();
 				}
 				// moved this here bec it needs to update effects/ability cooldown of stunned champions too
-				Champion currChamp = getCurrentChampion();
+				currChamp = getCurrentChampion();
+				currChampCondition = currChamp.getCondition();
 				// reset the champion's current action points
 				currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
 				// decrease the currentCooldown of each ability in the current champion's abilities array list
@@ -751,9 +760,10 @@ public class Game {
 					if(currChamp.getAppliedEffects().get(i).getDuration() <= 0){
 						currChamp.getAppliedEffects().get(i).remove(currChamp);
 						currChamp.getAppliedEffects().remove(i);
+						i--;
 					}
 				}
-			}while (((Champion)turnOrder.peekMin()).getCondition().equals(Condition.INACTIVE) || ((Champion)turnOrder.peekMin()).getCondition().equals(Condition.KNOCKEDOUT));              //checks whether the current champion is inactive to remove it until it reaches an active champion
+			}while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
 		}
 	}
 
