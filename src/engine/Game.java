@@ -464,41 +464,24 @@ public class Game {
 		} else {
 			int x = champion.getLocation().x;
 			int y = champion.getLocation().y;
-			ArrayList<Damageable> targetedObjects = getTargetedObjects(champion, ability);      //list of valid objects to target, ie. friendly champions if positive ability or covers and enemy champions if neg one
+			ArrayList<Damageable> targetedObjects = getTargetedObjects(champion, ability);  //list of valid objects to target, ie. friendly champions if positive ability or covers and enemy champions if neg one
 			ArrayList<Damageable> targets = new ArrayList<Damageable>();
 			try{
 				switch (ability.getCastArea()) {
 					case SELFTARGET:
-						targets.add(champion);
+							targets.add(champion);
 						break;
 					case TEAMTARGET:
-						// iterates through the board to look for any damageables
-						for (int i = 0; i < BOARDHEIGHT; i++) {
-							for (int j = 0; j < BOARDWIDTH; j++) {
-								try {
-									if (board[i][j] != null && board[i][j] instanceof Champion  && targetedObjects.contains((Damageable) board[i][j])) {
-										int distance = distanceCalculator(champion.getLocation(), i, j); // when a damageable is found the distance between it and the champion casting the ability is calculated
-										if (distance <= ability.getCastRange())         // if the damageable is within range & part of the targeted team, it is added to the list fo targets
-											targets.add((Damageable) board[i][j]);
-									}
-								}catch(ArrayIndexOutOfBoundsException ignored){
-									// just to let it keep looping after an exception
-								}
-							}
-						}
-
-                        // the fact that this works is so stupid
+						// removed prev logic here bec it was redundant with the way they expect it to work in tests (also it included covers which is nono)
                         for(Champion c : firstPlayer.getTeam()){
-                            if(!targets.contains(c) && targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
+                            if(targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
                                 targets.add(c);
                         }
                         for(Champion c : secondPlayer.getTeam()){
-                            if(!targets.contains(c) && targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
+                            if(targetedObjects.contains((Damageable) c) && distanceCalculator(champion.getLocation(),c.getLocation().x,c.getLocation().y) <= ability.getCastRange())
                                 targets.add(c);
                         }
 						break;
-					//not sure if there needs to be a check for the range here, seeing that the cells within range are pretty straightforward
-					//also dk if there would be an error if the cells being checked don't exist aslan, I think ah bas don't have energy to try and handle that
 					case SURROUND: {            //akeed there's a more efficient way of tackling this but my pea sized brain simply can not
 						try {
 							if (board[x + 1][y] != null && targetedObjects.contains((Damageable) board[x + 1][y]))
@@ -719,20 +702,20 @@ public class Game {
 				secondLeaderAbilityUsed = true;
 		}
 
-		private void prepareChampionTurns () {
-			for (int i=0;i<turnOrder.size();i++)
-				turnOrder.remove();
-			ArrayList<Champion> list = firstPlayer.getTeam();
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-					turnOrder.insert(list.get(i));
-			}
-			list = secondPlayer.getTeam();
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-					turnOrder.insert(list.get(i));
-			}
-		}
+    private void prepareChampionTurns () {
+        for (int i=0;i<turnOrder.size();i++)
+            turnOrder.remove();
+        ArrayList<Champion> list = firstPlayer.getTeam();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
+                turnOrder.insert(list.get(i));
+        }
+        list = secondPlayer.getTeam();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
+                turnOrder.insert(list.get(i));
+        }
+    }
 
 	public void endTurn() throws CloneNotSupportedException {
 		Player winner = checkGameOver();
@@ -749,7 +732,7 @@ public class Game {
 				currChampCondition = currChamp.getCondition();
 				// reset the champion's current action points
 				currChamp.setCurrentActionPoints(currChamp.getMaxActionPointsPerTurn());
-				// decrease the currentCooldown of each ability in the current champion's abilities array list
+				// decrease the current Cooldown of each ability in the current champion's abilities array list
 				for(int i =0; i< currChamp.getAbilities().size(); i++){
 					Ability a = currChamp.getAbilities().get(i);
 					a.setCurrentCooldown(a.getCurrentCooldown()-1);
