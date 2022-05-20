@@ -747,6 +747,13 @@ public class Game {
 					}
 				}
 			}while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
+			// reordering pq incase speeds change
+			PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
+			while(!turnOrder.isEmpty()){
+				tempQ.insert(turnOrder.remove());
+			}
+			while(!tempQ.isEmpty())
+				turnOrder.insert(tempQ.remove());
 		}
 	}
 
