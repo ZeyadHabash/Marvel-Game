@@ -343,11 +343,16 @@ public class Game {
 	public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
 		Champion champion = getCurrentChampion();
 		Player enemyPlayer;
+        Player currPlayer;
 
-		if(firstPlayer.getTeam().contains(champion))
-			enemyPlayer = secondPlayer;
-		else
-			enemyPlayer = firstPlayer;
+		if(firstPlayer.getTeam().contains(champion)) {
+            enemyPlayer = secondPlayer;
+            currPlayer = firstPlayer;
+        }
+		else {
+            enemyPlayer = firstPlayer;
+            currPlayer = secondPlayer;
+        }
 
 		boolean disarmed = false;
 		// check if champion is disarmed
@@ -357,7 +362,7 @@ public class Game {
 
 		if(disarmed)
 			throw new ChampionDisarmedException("Champion cannot attack while disarmed");
-		else if (champion.getCurrentActionPoints() < 1)
+		else if (champion.getCurrentActionPoints() < 2)
 			throw new NotEnoughResourcesException("Not enough action points");
 		else {
 			int x = champion.getLocation().x;
@@ -370,7 +375,7 @@ public class Game {
 					case RIGHT:
 
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y + i] instanceof Damageable && (board[x][y + i] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x][y + i]))) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
+							if (board[x][y + i] instanceof Damageable && !currPlayer.getTeam().contains(board[x][y+i])) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
 								target = (Damageable) board[x][y + i];
 								break;
 							}
@@ -378,7 +383,7 @@ public class Game {
 						break;
 					case LEFT:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y - i] instanceof Damageable && (board[x][y - i] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x][y - i]))) {
+							if (board[x][y - i] instanceof Damageable && !currPlayer.getTeam().contains(board[x][y-i])) {
 								target = (Damageable) board[x][y - i];
 								break;
 							}
@@ -386,7 +391,7 @@ public class Game {
 						break;
 					case UP:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x + i][y] instanceof Damageable && (board[x+i][y] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x+i][y]))) {
+							if (board[x + i][y] instanceof Damageable && !currPlayer.getTeam().contains(board[x + i][y])) {
 								target = (Damageable) board[x + i][y];
 								break;
 							}
@@ -394,7 +399,7 @@ public class Game {
 						break;
 					case DOWN:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x - i][y] instanceof Damageable && (board[x-i][y] instanceof Cover || enemyPlayer.getTeam().contains((Champion) board[x-i][y]))) {
+							if (board[x - i][y] instanceof Damageable && !currPlayer.getTeam().contains(board[x - i][y])) {
 								target = (Damageable) board[x - i][y];
 								break;
 							}
@@ -727,6 +732,11 @@ public class Game {
 				if(turnOrder.isEmpty()) {		//checks if the turn order queue is empty to reset it
 					prepareChampionTurns();
 				}
+                PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
+                while(!turnOrder.isEmpty())
+                    tempQ.insert(turnOrder.remove());
+                while(!tempQ.isEmpty())
+                    turnOrder.insert(tempQ.remove());
 				// moved this here bec it needs to update effects/ability cooldown of stunned champions too
 				currChamp = getCurrentChampion();
 				currChampCondition = currChamp.getCondition();
@@ -748,12 +758,7 @@ public class Game {
 				}
 			}while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
 			// reordering pq incase speeds change
-			PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
-			while(!turnOrder.isEmpty()){
-				tempQ.insert(turnOrder.remove());
-			}
-			while(!tempQ.isEmpty())
-				turnOrder.insert(tempQ.remove());
+
 		}
 	}
 
