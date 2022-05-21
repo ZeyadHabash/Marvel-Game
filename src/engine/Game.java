@@ -375,7 +375,7 @@ public class Game {
 					case RIGHT:
 
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y + i] instanceof Damageable && !currPlayer.getTeam().contains(board[x][y+i])) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
+							if (board[x][y + i] instanceof Damageable && (enemyPlayer.getTeam().contains(board[x][y+i]) || board[x][y+i] instanceof Cover)) {             //moving down the board in this direction to find a damageable object, stops when the range has been reached
 								target = (Damageable) board[x][y + i];
 								break;
 							}
@@ -383,7 +383,7 @@ public class Game {
 						break;
 					case LEFT:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x][y - i] instanceof Damageable && !currPlayer.getTeam().contains(board[x][y-i])) {
+							if (board[x][y - i] instanceof Damageable && (enemyPlayer.getTeam().contains(board[x][y-i]) || board[x][y-i] instanceof Cover)) {
 								target = (Damageable) board[x][y - i];
 								break;
 							}
@@ -391,7 +391,7 @@ public class Game {
 						break;
 					case UP:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x + i][y] instanceof Damageable && !currPlayer.getTeam().contains(board[x + i][y])) {
+							if (board[x + i][y] instanceof Damageable && (enemyPlayer.getTeam().contains(board[x+i][y]) || board[x+i][y] instanceof Cover)) {
 								target = (Damageable) board[x + i][y];
 								break;
 							}
@@ -399,7 +399,7 @@ public class Game {
 						break;
 					case DOWN:
 						for (int i = 1; i < r + 1; i++) {
-							if (board[x - i][y] instanceof Damageable && !currPlayer.getTeam().contains(board[x - i][y])) {
+							if (board[x - i][y] instanceof Damageable && (enemyPlayer.getTeam().contains(board[x-i][y]) || board[x-i][y] instanceof Cover)) {
 								target = (Damageable) board[x - i][y];
 								break;
 							}
