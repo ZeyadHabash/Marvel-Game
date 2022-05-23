@@ -808,4 +808,5 @@ public class Game {
 	public static int getBoardwidth() {
 		return BOARDWIDTH;
 	}
+	// testing this
 }
