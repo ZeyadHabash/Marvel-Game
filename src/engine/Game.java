@@ -8,6 +8,7 @@ import model.world.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,7 +25,7 @@ public class Game {
 	private static final int BOARDHEIGHT = 5;
 	private static final int BOARDWIDTH = 5;
 
-	public Game(Player first, Player second) throws Exception {
+	public Game(Player first, Player second) throws IOException {
 		this.firstPlayer = first;
 		this.secondPlayer = second;
 		board = new Object[BOARDHEIGHT][BOARDWIDTH];
@@ -60,7 +61,7 @@ public class Game {
 		}
 	}
 
-	public static void loadAbilities(String filePath) throws Exception {
+	public static void loadAbilities(String filePath) throws IOException {
 		BufferedReader br= new BufferedReader(new FileReader(filePath));
 		String row;
 		while ((row=br.readLine())!=null) {
@@ -123,7 +124,7 @@ public class Game {
 		}
 	}
 
-	public static void loadChampions(String filePath) throws  Exception {
+	public static void loadChampions(String filePath) throws  IOException {
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		String row;
 		while ((row = br.readLine()) != null) {
@@ -732,6 +733,7 @@ public class Game {
 				if(turnOrder.isEmpty()) {		//checks if the turn order queue is empty to reset it
 					prepareChampionTurns();
 				}
+				// reordering pq incase speeds change (might have to remove in quiz?)
                 PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
                 while(!turnOrder.isEmpty())
                     tempQ.insert(turnOrder.remove());
@@ -757,7 +759,7 @@ public class Game {
 					}
 				}
 			}while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-			// reordering pq incase speeds change
+
 
 		}
 	}
@@ -808,5 +810,4 @@ public class Game {
 	public static int getBoardwidth() {
 		return BOARDWIDTH;
 	}
-	// testing this
 }
