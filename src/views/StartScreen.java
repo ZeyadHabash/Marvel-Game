@@ -12,22 +12,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+
 import java.io.IOException;
 
-import views.TeamSelect;
 import engine.Player;
 import engine.Game;
-
-import static engine.Game.loadChampions;
-import static engine.Game.loadAbilities;
 
 
 public class StartScreen extends Application implements EventHandler<ActionEvent> {
 
-    // stuff on screen
-    Label enterP1Name;
+    // TODO check the difference between Text and Label
+
+    Text enterP1Name;
     TextField player1Name;
-    Label enterP2Name;
+    Text enterP2Name;
     TextField player2Name;
     Button confirm;
     Game newGame;
@@ -36,15 +34,15 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
 
     public Stage mainWindow;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         try {
-            loadChampions("Champions.csv");
-            loadAbilities("Abilities.csv");
+            Game.loadChampions("Champions.csv");
+            Game.loadAbilities("Abilities.csv");
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
             primaryStage.setScene(scene(width = 900, height = 600));
@@ -56,9 +54,9 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
 
     public Scene scene(double width, double height) {
 
-        enterP1Name = new Label("Enter Player 1 name");
+        enterP1Name = new Text("Enter Player 1 name");
         player1Name = new TextField();
-        enterP2Name = new Label("Enter Player 2 name");
+        enterP2Name = new Text("Enter Player 2 name");
         player2Name = new TextField();
         confirm = new Button("Confirm");
         confirm.setOnAction(this);
@@ -75,7 +73,7 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
         if (event.getSource() == confirm) {
             System.out.println("starting game");
             newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
-            mainWindow.setScene(TeamSelect.scene(width, height));
+            mainWindow.setScene(new TeamSelect().scene(width, height, newGame));
         }
     }
 }
