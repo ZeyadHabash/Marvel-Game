@@ -43,7 +43,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         // champion info layout
         Label hoveredChampionInfoLabel = new Label();
         Label selectedChampionInfoLabel = new Label();
-        championInfo.getChildren().addAll(hoveredChampionInfoLabel, selectedChampionInfoLabel); // TODO figure out how to set their locations properly
+        championInfo.getChildren().addAll(selectedChampionInfoLabel, hoveredChampionInfoLabel); // TODO figure out how to set their locations properly
 
         // first player layout
         Text firstPlayerName = new Text(game.getFirstPlayer().getName());
@@ -82,7 +82,16 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             champions.get(i).setOnMouseExited(e -> hoveredChampionInfoLabel.setText(""));
             champions.get(i).setOnMouseClicked(e -> {
                 currentlySelectedChampion = thisChamp;
-                selectedChampionInfoLabel.setText(currentlySelectedChampion.getName());
+                String currentChampAbilities = "";
+                for (Ability a : currentlySelectedChampion.getAbilities()) {
+                    // TODO add the rest of the ability details
+                    currentChampAbilities += ("\n" + a.getName());
+                }
+                selectedChampionInfoLabel.setText(currentlySelectedChampion.getName() +
+                        "\n Max HP: " + currentlySelectedChampion.getMaxHP() + "\n Mana: " + currentlySelectedChampion.getMana() +
+                        "\n Max Action Points Per Turn: " + currentlySelectedChampion.getMaxActionPointsPerTurn() +
+                        "\n Attack Damage: " + currentlySelectedChampion.getAttackDamage() + "      Attack Range: " + currentlySelectedChampion.getAttackRange()
+                        + "\n Speed: " + currentlySelectedChampion.getSpeed() + "\n Abilities: " + currentChampAbilities);
             });
             if (i % 5 == 0)
                 j = 0;
