@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -13,6 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import views.TeamSelect;
 import engine.Player;
 import engine.Game;
 import static engine.Game.loadChampions;
@@ -22,12 +24,16 @@ import static engine.Game.loadAbilities;
 public class StartScreen extends Application implements EventHandler<ActionEvent> {
 
     // stuff on screen
-    Text enterP1Name;
+    Label enterP1Name;
     TextField player1Name;
-    Text enterP2Name;
+    Label enterP2Name;
     TextField player2Name;
     Button confirm;
     Game newGame;
+    double width;
+    double height;
+
+    public Stage mainWindow;
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -35,12 +41,17 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+        mainWindow = primaryStage;
         primaryStage.setTitle("marvel");
+        primaryStage.setScene(scene(width = 900, height = 600));
+        primaryStage.show();
+    }
 
-        enterP1Name = new Text("Enter Player 1 name");
+    public Scene scene(double width, double height){
+
+        enterP1Name = new Label("Enter Player 1 name");
         player1Name = new TextField();
-        enterP2Name = new Text("Enter Player 2 name");
+        enterP2Name = new Label("Enter Player 2 name");
         player2Name = new TextField();
         confirm = new Button("Confirm");
         confirm.setOnAction(this);
@@ -49,9 +60,7 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
         layout.getChildren().addAll(enterP1Name, player1Name, enterP2Name, player2Name, confirm);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        Scene scene = new Scene(layout, 900, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        return new Scene(layout, width, height);
     }
 
     @Override
@@ -62,6 +71,7 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
                 newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
                 loadChampions("Champions.csv");
                 loadAbilities("Abilities.csv");
+                mainWindow.setScene(TeamSelect.scene(width,height));
             } catch (IOException e) {
                 AlertBox.display(e.getLocalizedMessage(), "Please make sure the file is in the game directory and try again");
             }
