@@ -41,8 +41,8 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
     @Override
     public void start(Stage primaryStage) {
         try {
-            Game.loadChampions("Champions.csv");
             Game.loadAbilities("Abilities.csv");
+            Game.loadChampions("Champions.csv");
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
             primaryStage.setScene(scene(width = 900, height = 600));
