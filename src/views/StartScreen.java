@@ -32,7 +32,7 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
     double width;
     double height;
 
-    public Stage mainWindow;
+    public static Stage mainWindow;
 
     public static void main(String[] args) {
         launch(args);
@@ -45,7 +45,8 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
             Game.loadChampions("Champions.csv");
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
-            primaryStage.setScene(scene(width = 900, height = 600));
+            primaryStage.setScene(scene(width = 800, height = 600));
+            primaryStage.setMaximized(false); // use this to test fullscreen
             primaryStage.show();
         } catch (IOException e) {
             AlertBox.display(e.getLocalizedMessage(), "Please make sure the file is in the game directory and try running the game again");
