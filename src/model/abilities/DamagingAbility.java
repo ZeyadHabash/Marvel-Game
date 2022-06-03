@@ -21,6 +21,8 @@ public class DamagingAbility extends Ability{
 
 	public void setDamageAmount(int damageAmount) {
 		this.damageAmount = damageAmount;
+		if(listener != null)
+			listener.onAbilityDetailsUpdated(this);
 	}
 
 	public void execute(ArrayList<Damageable> targets) throws CloneNotSupportedException {

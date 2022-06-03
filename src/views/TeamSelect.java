@@ -33,29 +33,29 @@ import java.util.ArrayList;
 
 public class TeamSelect implements EventHandler<ActionEvent> {
 
-    ArrayList<Label> champions;
-    ArrayList<Champion> selectedChampions = new ArrayList<Champion>();
-    Champion currentlySelectedChampion = null;
-    Button firstPlayerConfirmPick;
-    Button secondPlayerConfirmPick;
-    Label firstPlayerTeam;
-    Label secondPlayerTeam;
-    double width;
-    double height;
-    VBox firstPlayerInfo;
-    VBox secondPlayerInfo;
-    VBox championInfo;
-    HBox currentlySelecting;
-    GridPane championSelect;
-    boolean leaderSelectPhase = false;
-    Label currentlyPickingText;
-    Text firstPlayerName;
-    Text secondPlayerName;
-    Label currentPlayer;
-    ArrayList<Label> abilityInfo;
+    private ArrayList<Label> champions;
+    private ArrayList<Champion> selectedChampions = new ArrayList<Champion>();
+    private Champion currentlySelectedChampion = null;
+    private Button firstPlayerConfirmPick;
+    private Button secondPlayerConfirmPick;
+    private Label firstPlayerTeam;
+    private Label secondPlayerTeam;
+    private double width;
+    private double height;
+    private VBox firstPlayerInfo;
+    private VBox secondPlayerInfo;
+    private VBox championInfo;
+    private HBox currentlySelecting;
+    private GridPane championSelect;
+    private boolean leaderSelectPhase = false;
+    private Label currentlyPickingText;
+    private Text firstPlayerName;
+    private Text secondPlayerName;
+    private Label currentPlayer;
+    private ArrayList<Label> abilityInfo;
 
-    Player player1;
-    Player player2;
+    private Player player1;
+    private Player player2;
 
     public Scene scene(double width, double height, Player player1, Player player2) {
         this.width = width;
@@ -240,6 +240,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                     currentlySelectedChampion = null;
                     firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
                     secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
+                    currentPlayer.setText(secondPlayerName.getText());
                 } else
                     AlertBox.display("Champion not in your team", "Please select a champion from your team as a leader");
             } else if (event.getSource() == secondPlayerConfirmPick) {
@@ -249,7 +250,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                     firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
                     secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
                     Game newGame = new Game(player1, player2);
-                    StartScreen.mainWindow.setScene(new GameBoard().scene(width,height,newGame));
+                    StartScreen.mainWindow.setScene(new GameBoard().scene(width, height, newGame));
                 } else
                     AlertBox.display("Champion not in your team", "Please select a champion from your team as a leader");
             }

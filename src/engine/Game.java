@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Game {
+public class Game implements PriorityQueueListener{
 
     private Player firstPlayer;
     private Player secondPlayer;
@@ -24,6 +24,8 @@ public class Game {
     private PriorityQueue turnOrder; //contains available characters to pick from
     private static final int BOARDHEIGHT = 5;
     private static final int BOARDWIDTH = 5;
+
+    private GameListener listener;
 
     public Game(Player first, Player second) {
         this.firstPlayer = first;
@@ -227,11 +229,22 @@ public class Game {
         // removes dead champion from team
         if (damageable instanceof Champion) {
             turnOrder.remove(damageable);
-            if (firstPlayer.getTeam().contains(damageable))
+            if (firstPlayer.getTeam().contains(damageable)) {
                 firstPlayer.getTeam().remove(damageable);
-            else
+                // listening for team updates
+                if (listener != null)
+                    listener.onPlayerTeamUpdated(firstPlayer);
+            }
+            else {
                 secondPlayer.getTeam().remove(damageable);
+                // listening for team updates
+                if (listener != null)
+                    listener.onPlayerTeamUpdated(secondPlayer);
+            }
         }
+        // letting the view know that an object was removed from the board so board can be updated
+        if (listener != null)
+            listener.onBoardUpdated(board);
     }
 
     // Helper method to calculate the damage multiplier of Champions when attacking
@@ -352,6 +365,9 @@ public class Game {
                         break;
                 }
                 champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 1);
+                // board updates if a champion moves
+                if (listener != null)
+                    listener.onBoardUpdated(board);
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new UnallowedMovementException("Cannot move out of board bounds");
             }
@@ -790,10 +806,9 @@ public class Game {
                         i--;
                     }
                 }
-            } while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-
-
-        }
+            } while (currChampCondition.equals(Condition.INACTIVE));  //checks whether the current champion is inactive to remove it until it reaches an active champion
+        } else if (listener != null)
+            listener.onGameOver(winner);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -842,4 +857,15 @@ public class Game {
     public static int getBoardwidth() {
         return BOARDWIDTH;
     }
+
+    public void setListener(GameListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onTurnOrderUpdated() {
+        if(listener != null)
+            listener.onTurnOrderUpdated(turnOrder);
+    }
+
 }

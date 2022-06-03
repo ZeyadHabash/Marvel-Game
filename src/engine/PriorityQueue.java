@@ -6,6 +6,8 @@ public class PriorityQueue {
    private int nItems;
    private int maxSize;
 
+   private PriorityQueueListener listener;
+
    public PriorityQueue(int size){
       maxSize = size;
       elements = new Comparable[maxSize];
@@ -24,6 +26,8 @@ public class PriorityQueue {
     
    public Comparable remove() {
       nItems--;
+      if(listener != null)
+         listener.onTurnOrderUpdated();
       return elements[nItems];
    }
    public Comparable remove(Object o){
@@ -36,6 +40,8 @@ public class PriorityQueue {
       }
       while(!tempQ.isEmpty())
          insert(tempQ.remove());
+      if(listener != null)
+         listener.onTurnOrderUpdated();
       return tempObj;
    }
     
@@ -62,5 +68,9 @@ public class PriorityQueue {
       }
       r+= "]";
       return r;
+   }
+
+   public void setListener(PriorityQueueListener listener) {
+      this.listener = listener;
    }
 }

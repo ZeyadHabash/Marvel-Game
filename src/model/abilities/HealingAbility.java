@@ -18,6 +18,8 @@ public class HealingAbility extends Ability{
 
     public void setHealAmount(int healAmount) {
         this.healAmount = healAmount;
+        if(listener != null)
+            listener.onAbilityDetailsUpdated(this);
     }
 
     @Override

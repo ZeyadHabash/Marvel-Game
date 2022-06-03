@@ -19,18 +19,18 @@ import engine.Player;
 import engine.Game;
 
 
-public class StartScreen extends Application{
+public class StartScreen extends Application {
 
     // TODO check the difference between Text and Label
 
-    Text enterP1Name;
-    TextField player1Name;
-    Text enterP2Name;
-    TextField player2Name;
-    Button confirm;
-    Game newGame;
-    double width;
-    double height;
+    private Text enterP1Name;
+    private TextField player1Name;
+    private Text enterP2Name;
+    private TextField player2Name;
+    private Button confirm;
+    private Game newGame;
+    private double width;
+    private double height;
 
     public static Stage mainWindow;
 
@@ -57,9 +57,9 @@ public class StartScreen extends Application{
     public Scene scene(double width, double height) {
 
         enterP1Name = new Text("Enter Player 1 name");
-        player1Name = new TextField();
+        player1Name = new TextField("Player 1");
         enterP2Name = new Text("Enter Player 2 name");
-        player2Name = new TextField();
+        player2Name = new TextField("Player 2");
         confirm = new Button("Confirm");
         confirm.setOnAction(e -> {
             System.out.println("starting game");
