@@ -19,7 +19,7 @@ import engine.Player;
 import engine.Game;
 
 
-public class StartScreen extends Application implements EventHandler<ActionEvent> {
+public class StartScreen extends Application{
 
     // TODO check the difference between Text and Label
 
@@ -46,7 +46,8 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
             primaryStage.setScene(scene(width = 800, height = 600));
-            primaryStage.setMaximized(false); // use this to test fullscreen
+            primaryStage.setMaximized(false); // use this to test maximized
+            primaryStage.setFullScreen(false); // use to test fullscreen
             primaryStage.show();
         } catch (IOException e) {
             AlertBox.display(e.getLocalizedMessage(), "Please make sure the file is in the game directory and try running the game again");
@@ -60,21 +61,16 @@ public class StartScreen extends Application implements EventHandler<ActionEvent
         enterP2Name = new Text("Enter Player 2 name");
         player2Name = new TextField();
         confirm = new Button("Confirm");
-        confirm.setOnAction(this);
+        confirm.setOnAction(e -> {
+            System.out.println("starting game");
+            //newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
+            mainWindow.setScene(new TeamSelect().scene(width, height, new Player(player1Name.getText()), new Player(player2Name.getText())));
+        });
 
         VBox layout = new VBox(50);
         layout.getChildren().addAll(enterP1Name, player1Name, enterP2Name, player2Name, confirm);
         layout.setAlignment(Pos.TOP_CENTER);
 
         return new Scene(layout, width, height);
-    }
-
-    @Override
-    public void handle(ActionEvent event) {
-        if (event.getSource() == confirm) {
-            System.out.println("starting game");
-            newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
-            mainWindow.setScene(new TeamSelect().scene(width, height, newGame));
-        }
     }
 }

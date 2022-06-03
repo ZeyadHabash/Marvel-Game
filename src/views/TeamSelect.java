@@ -1,5 +1,6 @@
 package views;
 
+import engine.Player;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +21,9 @@ import javafx.stage.Stage;
 
 import engine.Game;
 import model.abilities.Ability;
+import model.abilities.CrowdControlAbility;
+import model.abilities.DamagingAbility;
+import model.abilities.HealingAbility;
 import model.world.Champion;
 import model.world.Hero;
 import model.world.Villain;
@@ -37,10 +42,9 @@ public class TeamSelect implements EventHandler<ActionEvent> {
     Label secondPlayerTeam;
     double width;
     double height;
-    Game game;
     VBox firstPlayerInfo;
     VBox secondPlayerInfo;
-    HBox championInfo;
+    VBox championInfo;
     HBox currentlySelecting;
     GridPane championSelect;
     boolean leaderSelectPhase = false;
@@ -48,26 +52,33 @@ public class TeamSelect implements EventHandler<ActionEvent> {
     Text firstPlayerName;
     Text secondPlayerName;
     Label currentPlayer;
+    ArrayList<Label> abilityInfo;
 
-    public Scene scene(double width, double height, Game game) {
+    Player player1;
+    Player player2;
+
+    public Scene scene(double width, double height, Player player1, Player player2) {
         this.width = width;
         this.height = height;
-        this.game = game;
+        this.player1 = player1;
+        this.player2 = player2;
+        abilityInfo = new ArrayList<Label>();
+        for (int i = 0; i < 3; i++)
+            abilityInfo.add(new Label());
         BorderPane container = new BorderPane();
 
         championSelect = new GridPane();
-        championInfo = new HBox(); // HBox is prob not the best idea, maybe change to stackpane or smth idk
+        championInfo = new VBox(); // HBox is prob not the best idea, maybe change to stackpane or smth idk
         firstPlayerInfo = new VBox(40);
         secondPlayerInfo = new VBox(40);
         currentlySelecting = new HBox(50);
 
         // champion info layout
-        Label hoveredChampionInfoLabel = new Label();
+        //Label hoveredChampionInfoLabel = new Label();
         Label selectedChampionInfoLabel = new Label();
-        championInfo.getChildren().addAll(selectedChampionInfoLabel, hoveredChampionInfoLabel); // TODO figure out how to set their locations properly
 
         // first player layout
-        firstPlayerName = new Text(game.getFirstPlayer().getName());
+        firstPlayerName = new Text(player1.getName());
         firstPlayerTeam = new Label("Champions: \n");
         firstPlayerConfirmPick = new Button("Confirm Pick");
         firstPlayerConfirmPick.setDisable(false);
@@ -76,7 +87,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         firstPlayerConfirmPick.setAlignment(Pos.BOTTOM_CENTER);
 
         // second player layout
-        secondPlayerName = new Text(game.getSecondPlayer().getName());
+        secondPlayerName = new Text(player2.getName());
         secondPlayerTeam = new Label("Champions: \n");
         secondPlayerConfirmPick = new Button("Confirm Pick");
         secondPlayerConfirmPick.setDisable(true);
@@ -106,20 +117,40 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             else
                 thisChampType = "AntiHero";
             String finalChampAbilities = champAbilities;
-            champions.get(i).setOnMouseEntered(e -> hoveredChampionInfoLabel.setText(thisChamp.getName() +
-                    "\n Type: " + thisChampType +
-                    "\n Max HP: " + thisChamp.getMaxHP() + "\n Mana: " + thisChamp.getMana() +
-                    "\n Max Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
-                    "\n Attack Damage: " + thisChamp.getAttackDamage() + "      Attack Range: " + thisChamp.getAttackRange()
-                    + "\n Speed: " + thisChamp.getSpeed() + "\n Abilities: " + finalChampAbilities));
-            champions.get(i).setOnMouseExited(e -> hoveredChampionInfoLabel.setText(""));
+            Tooltip.install(champions.get(i), new Tooltip(thisChamp.getName() +
+                    "\nType: " + thisChampType +
+                    "\nMax HP: " + thisChamp.getMaxHP() + "\nMana: " + thisChamp.getMana() +
+                    "\nMax Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
+                    "\nAttack Damage: " + thisChamp.getAttackDamage() + "\nAttack Range: " + thisChamp.getAttackRange()
+                    + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities));
+            /*champions.get(i).setOnMouseEntered(e -> hoveredChampionInfoLabel.setText(thisChamp.getName() +
+                    "\nType: " + thisChampType +
+                    "\nMax HP: " + thisChamp.getMaxHP() + "\nMana: " + thisChamp.getMana() +
+                    "\nMax Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
+                    "\nAttack Damage: " + thisChamp.getAttackDamage() + "      Attack Range: " + thisChamp.getAttackRange()
+                    + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities));
+            champions.get(i).setOnMouseExited(e -> hoveredChampionInfoLabel.setText(""));*/
             champions.get(i).setOnMouseClicked(e -> {
                 if (!selectedChampions.contains(thisChamp) || leaderSelectPhase) {
                     currentlySelectedChampion = thisChamp;
-                    String currentChampAbilities = "";
                     for (Ability a : currentlySelectedChampion.getAbilities()) {
-                        // TODO add the rest of the ability details
-                        currentChampAbilities += ("\n" + a.getName());
+                        String extraInfo = "";
+                        String type;
+                        if (a instanceof DamagingAbility) {
+                            type = "\nType: Damaging";
+                            extraInfo += "\nDamage Amount: " + ((DamagingAbility) a).getDamageAmount();
+                        } else if (a instanceof HealingAbility) {
+                            type = "\nType: Healing";
+                            extraInfo += "\nHeal Amount: " + ((HealingAbility) a).getHealAmount();
+                        } else {
+                            type = "\nType: Crowd Control";
+                            extraInfo += "\nEffect: " + ((CrowdControlAbility) a).getEffect().getName() + "   Duration: " + ((CrowdControlAbility) a).getEffect().getDuration();
+                        }
+                        int currIndex = currentlySelectedChampion.getAbilities().indexOf(a);
+                        abilityInfo.get(currIndex).setText(a.getName());
+                        abilityInfo.get(currIndex).setTooltip(new Tooltip(a.getName() + type + "\nMana Cost: " + a.getManaCost() +
+                                "\nAP Required: " + a.getRequiredActionPoints() + "\nBase Cooldown: " + a.getBaseCooldown() +
+                                "\nArea of Effect: " + a.getCastArea() + "\nRange: " + a.getCastRange() + extraInfo));
                     }
                     String currChampType;
                     if (thisChamp instanceof Hero)
@@ -128,11 +159,11 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                         currChampType = "Villain";
                     else
                         currChampType = "AntiHero";
-                    selectedChampionInfoLabel.setText(currentlySelectedChampion.getName() + "\n Type: " + currChampType +
-                            "\n Max HP: " + currentlySelectedChampion.getMaxHP() + "\n Mana: " + currentlySelectedChampion.getMana() +
-                            "\n Max Action Points Per Turn: " + currentlySelectedChampion.getMaxActionPointsPerTurn() +
-                            "\n Attack Damage: " + currentlySelectedChampion.getAttackDamage() + "      Attack Range: " + currentlySelectedChampion.getAttackRange()
-                            + "\n Speed: " + currentlySelectedChampion.getSpeed() + "\n Abilities: " + currentChampAbilities);
+                    selectedChampionInfoLabel.setText(currentlySelectedChampion.getName() + "\nType: " + currChampType +
+                            "\nMax HP: " + currentlySelectedChampion.getMaxHP() + "\nMana: " + currentlySelectedChampion.getMana() +
+                            "\nMax Action Points Per Turn: " + currentlySelectedChampion.getMaxActionPointsPerTurn() +
+                            "\nAttack Damage: " + currentlySelectedChampion.getAttackDamage() + "      Attack Range: " + currentlySelectedChampion.getAttackRange()
+                            + "\nSpeed: " + currentlySelectedChampion.getSpeed() + "\nAbilities: ");
                 }
             });
             // making 3 columns of 5 rows each
@@ -151,7 +182,11 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         container.setRight(secondPlayerInfo);
         container.setCenter(championSelect);
         championSelect.setAlignment(Pos.TOP_CENTER);
+
+        championInfo.getChildren().addAll(selectedChampionInfoLabel, abilityInfo.get(0), abilityInfo.get(1), abilityInfo.get(2));
         container.setBottom(championInfo);
+        championInfo.setAlignment(Pos.CENTER); // TODO find a way to center
+
         container.setTop(currentlySelecting);
         currentlySelecting.setAlignment(Pos.TOP_CENTER);
 
@@ -162,7 +197,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event) {
         if (currentlySelectedChampion == null)
             AlertBox.display("Champion Select", "Please select a champion before confirming");
-        else if(!leaderSelectPhase){
+        else if (!leaderSelectPhase) {
             // TODO add the selected champion to the respective player's team arraylist
             if (event.getSource() == firstPlayerConfirmPick) {
                 // TODO replace this with a loop that finds the label from the champions arraylist and adds that to the VBOX of first player
@@ -172,7 +207,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                         break;
                     }
                 }
-                game.getFirstPlayer().getTeam().add(currentlySelectedChampion);
+                player1.getTeam().add(currentlySelectedChampion);
                 currentPlayer.setText(secondPlayerName.getText());
             } else if (event.getSource() == secondPlayerConfirmPick) {
                 // TODO replace this with a loop that finds the label from the champions arraylist and adds that to the VBOX of second player
@@ -182,7 +217,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                         break;
                     }
                 }
-                game.getSecondPlayer().getTeam().add(currentlySelectedChampion);
+                player2.getTeam().add(currentlySelectedChampion);
                 currentPlayer.setText(firstPlayerName.getText());
             }
             selectedChampions.add(currentlySelectedChampion);
@@ -192,30 +227,30 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             if (selectedChampions.size() == 6) {
                 System.out.println("Game Starting");
                 System.out.println("first Player: ");
-                game.getFirstPlayer().getTeam().forEach(c -> System.out.println(c.getName()));
+                player1.getTeam().forEach(c -> System.out.println(c.getName()));
                 System.out.println("second Player: ");
-                game.getSecondPlayer().getTeam().forEach(c -> System.out.println(c.getName()));
+                player2.getTeam().forEach(c -> System.out.println(c.getName()));
                 leaderSelectPhase = true;
                 currentlyPickingText.setText("Pick Your Leader ");
-                // TODO move to actual game Scene
             }
-        }
-        else{
-            if (event.getSource() == firstPlayerConfirmPick){
-                if(game.getFirstPlayer().getTeam().contains(currentlySelectedChampion)) {
-                    game.getFirstPlayer().setLeader(currentlySelectedChampion);
+        } else {
+            if (event.getSource() == firstPlayerConfirmPick) {
+                if (player1.getTeam().contains(currentlySelectedChampion)) {
+                    player1.setLeader(currentlySelectedChampion);
                     currentlySelectedChampion = null;
                     firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
                     secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
-                }else
+                } else
                     AlertBox.display("Champion not in your team", "Please select a champion from your team as a leader");
-            }else if(event.getSource() == secondPlayerConfirmPick){
-                if(game.getSecondPlayer().getTeam().contains(currentlySelectedChampion)){
-                    game.getSecondPlayer().setLeader(currentlySelectedChampion);
+            } else if (event.getSource() == secondPlayerConfirmPick) {
+                if (player2.getTeam().contains(currentlySelectedChampion)) {
+                    player2.setLeader(currentlySelectedChampion);
                     currentlySelectedChampion = null;
                     firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
                     secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
-                }else
+                    Game newGame = new Game(player1, player2);
+                    StartScreen.mainWindow.setScene(new GameBoard().scene(width,height,newGame));
+                } else
                     AlertBox.display("Champion not in your team", "Please select a champion from your team as a leader");
             }
         }

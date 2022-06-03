@@ -19,8 +19,8 @@ public class Game {
     private boolean firstLeaderAbilityUsed;
     private boolean secondLeaderAbilityUsed;
     private Object[][] board; // [height][width]
-    private static ArrayList<Champion> availableChampions = new ArrayList<Champion>();
-    private static ArrayList<Ability> availableAbilities = new ArrayList<Ability>();
+    private static ArrayList<Champion> availableChampions;
+    private static ArrayList<Ability> availableAbilities;
     private PriorityQueue turnOrder; //contains available characters to pick from
     private static final int BOARDHEIGHT = 5;
     private static final int BOARDWIDTH = 5;
@@ -60,6 +60,7 @@ public class Game {
     }
 
     public static void loadAbilities(String filePath) throws IOException {
+        availableAbilities = new ArrayList<Ability>();
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         String row;
         while ((row = br.readLine()) != null) {
@@ -144,6 +145,7 @@ public class Game {
     }
 
     public static void loadChampions(String filePath) throws IOException {
+        availableChampions = new ArrayList<Champion>();
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         String row;
         while ((row = br.readLine()) != null) {
@@ -356,7 +358,8 @@ public class Game {
         }
     }
 
-    public void attack(Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
+    public void attack(
+            Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
         Champion champion = getCurrentChampion();
         Player enemyPlayer;
         Player currPlayer;
