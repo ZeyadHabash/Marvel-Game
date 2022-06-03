@@ -35,6 +35,8 @@ public class Game implements PriorityQueueListener{
         placeChampions();
         placeCovers();
         prepareChampionTurns();
+
+        turnOrder.setListener(this);
     }
 
     private void placeChampions() {

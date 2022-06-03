@@ -225,13 +225,8 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
             secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
             if (selectedChampions.size() == 6) {
-                System.out.println("Game Starting");
-                System.out.println("first Player: ");
-                player1.getTeam().forEach(c -> System.out.println(c.getName()));
-                System.out.println("second Player: ");
-                player2.getTeam().forEach(c -> System.out.println(c.getName()));
                 leaderSelectPhase = true;
-                currentlyPickingText.setText("Pick Your Leader ");
+                currentlyPickingText.setText("Pick Your Leader: ");
             }
         } else {
             if (event.getSource() == firstPlayerConfirmPick) {

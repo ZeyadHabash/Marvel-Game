@@ -62,7 +62,6 @@ public class StartScreen extends Application {
         player2Name = new TextField("Player 2");
         confirm = new Button("Confirm");
         confirm.setOnAction(e -> {
-            System.out.println("starting game");
             //newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
             mainWindow.setScene(new TeamSelect().scene(width, height, new Player(player1Name.getText()), new Player(player2Name.getText())));
         });

@@ -153,16 +153,10 @@ public abstract class Champion implements Damageable, Comparable {
 	}
 
 	public ArrayList<Ability> getAbilities() {
-		// not sure how to handle changing a champ's abilities so meh
-		if(listener != null)
-			listener.onChampionDetailsUpdated(this);
 		return abilities;
 	}
 
 	public ArrayList<Effect> getAppliedEffects() {
-		// not sure how to handle changing a champ's applied effects, this is temporary (might stay if it works)
-		if(listener != null)
-			listener.onChampionDetailsUpdated(this);
 		return appliedEffects;
 	}
 

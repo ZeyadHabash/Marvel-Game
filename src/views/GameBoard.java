@@ -5,6 +5,7 @@ import engine.GameListener;
 import engine.Player;
 import engine.PriorityQueue;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import model.abilities.Ability;
 import model.abilities.AbilityListener;
@@ -16,9 +17,21 @@ import model.world.ChampionListener;
   */
 public class GameBoard implements GameListener, ChampionListener, AbilityListener {
     public Scene scene(double width, double height, Game game) {
+        // setting the listener of the game, each champion and each ability to this class
         game.setListener(this);
-        HBox layout = new HBox();
-        return new Scene(layout, width, height);
+        game.getFirstPlayer().getTeam().forEach(champion -> {
+            champion.setListener(this);
+            champion.getAbilities().forEach(ability -> ability.setListener(this));
+        });
+        game.getSecondPlayer().getTeam().forEach(champion -> {
+            champion.setListener(this);
+            champion.getAbilities().forEach(ability -> ability.setListener(this));
+        });
+
+        BorderPane container = new BorderPane();
+
+
+        return new Scene(container, width, height);
     }
 
     @Override
