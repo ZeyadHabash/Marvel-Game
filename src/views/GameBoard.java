@@ -15,18 +15,10 @@ import model.world.ChampionListener;
 /** Not sure if I should implement {@link ChampionListener} and {@link AbilityListener} here, in {@link Game}
  * or somewhere completely different
   */
-public class GameBoard implements GameListener, ChampionListener, AbilityListener {
+public class GameBoard implements GameListener{
     public Scene scene(double width, double height, Game game) {
-        // setting the listener of the game, each champion and each ability to this class
+        // setting the listener of the game
         game.setListener(this);
-        game.getFirstPlayer().getTeam().forEach(champion -> {
-            champion.setListener(this);
-            champion.getAbilities().forEach(ability -> ability.setListener(this));
-        });
-        game.getSecondPlayer().getTeam().forEach(champion -> {
-            champion.setListener(this);
-            champion.getAbilities().forEach(ability -> ability.setListener(this));
-        });
 
         BorderPane container = new BorderPane();
 
@@ -36,31 +28,31 @@ public class GameBoard implements GameListener, ChampionListener, AbilityListene
 
     @Override
     public void onBoardUpdated(Object[][] board) {
-
+        // TODO redraw the board grid (update every cell)
     }
 
     @Override
     public void onGameOver(Player winner) {
-
+        // TODO show an alertbox with winning player name and send back to start screen?
     }
 
     @Override
     public void onTurnOrderUpdated(PriorityQueue turnOrder) {
-
+        // TODO redraw the turn order thingy
     }
 
     @Override
-    public void onPlayerTeamUpdated(Player player) {
-
+    public void onPlayerTeamsUpdated() {
+        // TODO redraw both teams
     }
 
     @Override
-    public void onAbilityDetailsUpdated(Ability ability) {
-
+    public void onAbilityCast() {
+        // TODO update all champion details
     }
 
     @Override
-    public void onChampionDetailsUpdated(Champion champion) {
-
+    public void onAttackHit() {
+        // TODO update all champion details
     }
 }

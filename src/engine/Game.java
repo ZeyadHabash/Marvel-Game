@@ -231,22 +231,16 @@ public class Game implements PriorityQueueListener{
         // removes dead champion from team
         if (damageable instanceof Champion) {
             turnOrder.remove(damageable);
-            if (firstPlayer.getTeam().contains(damageable)) {
+            if (firstPlayer.getTeam().contains(damageable))
                 firstPlayer.getTeam().remove(damageable);
-                // listening for team updates
-                if (listener != null)
-                    listener.onPlayerTeamUpdated(firstPlayer);
-            }
-            else {
+            else
                 secondPlayer.getTeam().remove(damageable);
-                // listening for team updates
-                if (listener != null)
-                    listener.onPlayerTeamUpdated(secondPlayer);
-            }
         }
         // letting the view know that an object was removed from the board so board can be updated
-        if (listener != null)
+        if (listener != null) {
+            listener.onPlayerTeamsUpdated();
             listener.onBoardUpdated(board);
+        }
     }
 
     // Helper method to calculate the damage multiplier of Champions when attacking
@@ -452,6 +446,9 @@ public class Game implements PriorityQueueListener{
                 // does no damage if the attacker and the target are from the same team
                 if ((firstPlayer.getTeam().contains(champion) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(champion) && secondPlayer.getTeam().contains(target)))
                     return;
+                // listens for attack hits
+                if(listener != null)
+                    listener.onAttackHit();
                 // does no damage if target dodges
                 if (target instanceof Champion) {
                     for (int i = 0; i < ((Champion) target).getAppliedEffects().size(); i++) {
@@ -479,6 +476,7 @@ public class Game implements PriorityQueueListener{
                 if (target.getCurrentHP() <= 0) {
                     removeDamageable(target);
                 }
+
             }
         }
     }
@@ -581,6 +579,8 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if(listener != null)
+                    listener.onAbilityCast();
             }
         }
     }
@@ -649,6 +649,8 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if(listener != null)
+                    listener.onAbilityCast();
             }
         }
     }
@@ -697,6 +699,8 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if(listener != null)
+                    listener.onAbilityCast();
             }
         }
     }

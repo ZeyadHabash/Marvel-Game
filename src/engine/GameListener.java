@@ -8,5 +8,7 @@ public interface GameListener {
     void onBoardUpdated(Object[][] board);
     void onGameOver(Player winner);
     void onTurnOrderUpdated(PriorityQueue turnOrder);
-    void onPlayerTeamUpdated(Player player);
+    void onPlayerTeamsUpdated();
+    void onAbilityCast();
+    void onAttackHit();
 }
