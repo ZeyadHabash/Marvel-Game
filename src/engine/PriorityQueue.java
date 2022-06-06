@@ -62,11 +62,11 @@ public class PriorityQueue {
    }
 
    public String toString(){
-      String r = "[";
-      for(int i=0;i<elements.length;i++){
-         r += elements[i] + ", ";
+      String r = "Turns: ";
+      int j=1;
+      for(int i=elements.length-1;i>=0;i--){
+         r += "(" + (j++) + ") " + elements[i] + ", ";
       }
-      r+= "]";
       return r;
    }
 

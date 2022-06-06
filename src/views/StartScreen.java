@@ -45,7 +45,7 @@ public class StartScreen extends Application {
             Game.loadChampions("Champions.csv");
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
-            primaryStage.setScene(scene(width = 800, height = 600));
+            primaryStage.setScene(scene(width = 1000, height = 800));
             primaryStage.setMaximized(false); // use this to test maximized
             primaryStage.setFullScreen(false); // use to test fullscreen
             primaryStage.show();
@@ -57,9 +57,9 @@ public class StartScreen extends Application {
     public Scene scene(double width, double height) {
 
         enterP1Name = new Text("Enter Player 1 name");
-        player1Name = new TextField("Player 1");
+        player1Name = new TextField("Player_1");
         enterP2Name = new Text("Enter Player 2 name");
-        player2Name = new TextField("Player 2");
+        player2Name = new TextField("Player_2");
         confirm = new Button("Confirm");
         confirm.setOnAction(e -> {
             //newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));

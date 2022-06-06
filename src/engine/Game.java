@@ -239,7 +239,7 @@ public class Game implements PriorityQueueListener{
         // letting the view know that an object was removed from the board so board can be updated
         if (listener != null) {
             listener.onPlayerTeamsUpdated();
-            listener.onBoardUpdated(board);
+            listener.onBoardUpdated();
         }
     }
 
@@ -363,7 +363,7 @@ public class Game implements PriorityQueueListener{
                 champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 1);
                 // board updates if a champion moves
                 if (listener != null)
-                    listener.onBoardUpdated(board);
+                    listener.onBoardUpdated();
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new UnallowedMovementException("Cannot move out of board bounds");
             }
@@ -706,7 +706,7 @@ public class Game implements PriorityQueueListener{
     }
 
 
-    public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, AbilityUseException, CloneNotSupportedException {
+    public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
         Champion champion = getCurrentChampion();
 
         Player currPlayer;

@@ -123,13 +123,6 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                     "\nMax Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
                     "\nAttack Damage: " + thisChamp.getAttackDamage() + "\nAttack Range: " + thisChamp.getAttackRange()
                     + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities));
-            /*champions.get(i).setOnMouseEntered(e -> hoveredChampionInfoLabel.setText(thisChamp.getName() +
-                    "\nType: " + thisChampType +
-                    "\nMax HP: " + thisChamp.getMaxHP() + "\nMana: " + thisChamp.getMana() +
-                    "\nMax Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
-                    "\nAttack Damage: " + thisChamp.getAttackDamage() + "      Attack Range: " + thisChamp.getAttackRange()
-                    + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities));
-            champions.get(i).setOnMouseExited(e -> hoveredChampionInfoLabel.setText(""));*/
             champions.get(i).setOnMouseClicked(e -> {
                 if (!selectedChampions.contains(thisChamp) || leaderSelectPhase) {
                     currentlySelectedChampion = thisChamp;
@@ -189,7 +182,6 @@ public class TeamSelect implements EventHandler<ActionEvent> {
 
         container.setTop(currentlySelecting);
         currentlySelecting.setAlignment(Pos.TOP_CENTER);
-
         return new Scene(container, width, height);
     }
 
