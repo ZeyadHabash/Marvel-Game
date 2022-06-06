@@ -200,7 +200,6 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         else if (!leaderSelectPhase) {
             // TODO add the selected champion to the respective player's team arraylist
             if (event.getSource() == firstPlayerConfirmPick) {
-                // TODO replace this with a loop that finds the label from the champions arraylist and adds that to the VBOX of first player
                 for (Label l : champions) {
                     if (l.getText().equals(currentlySelectedChampion.getName())) {
                         firstPlayerInfo.getChildren().add(l);
@@ -210,7 +209,6 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                 player1.getTeam().add(currentlySelectedChampion);
                 currentPlayer.setText(secondPlayerName.getText());
             } else if (event.getSource() == secondPlayerConfirmPick) {
-                // TODO replace this with a loop that finds the label from the champions arraylist and adds that to the VBOX of second player
                 for (Label l : champions) {
                     if (l.getText().equals(currentlySelectedChampion.getName())) {
                         secondPlayerInfo.getChildren().add(l);
