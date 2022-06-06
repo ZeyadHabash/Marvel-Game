@@ -29,6 +29,7 @@ public class GameBoard implements GameListener{
     @Override
     public void onBoardUpdated(Object[][] board) {
         // TODO redraw the board grid (update every cell)
+        // maybe give a diff colour to curr Champion
     }
 
     @Override
