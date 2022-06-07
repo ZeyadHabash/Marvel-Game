@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public interface GameListener {
     void onBoardUpdated();
     void onGameOver(Player winner);
-    void onTurnOrderUpdated(PriorityQueue turnOrder);
+    void onTurnEnd();
     void onPlayerTeamsUpdated();
     void onAbilityCast();
     void onAttackHit();

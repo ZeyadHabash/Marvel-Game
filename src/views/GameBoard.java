@@ -34,6 +34,7 @@ public class GameBoard implements GameListener {
     Label p2Champs;
     HBox key;
     VBox key2;
+
     public Scene scene(double width, double height, Game game) {
         // setting the listener of the game, each champion and each ability to this class
         game.setListener(this);
@@ -60,7 +61,7 @@ public class GameBoard implements GameListener {
         Button p2LeaderAbility = new Button("Use " + ((Champion) game.getSecondPlayer().getLeader()).toString() + " Leader Ability");
 
         p1 = new VBox();
-        p1.getChildren().addAll(p1Name, p1Champs, p1LeaderAbility );
+        p1.getChildren().addAll(p1Name, p1Champs, p1LeaderAbility);
         p1.setAlignment(Pos.CENTER_LEFT);
 
         p2 = new VBox();
@@ -73,9 +74,9 @@ public class GameBoard implements GameListener {
 
         HBox top = new HBox();
         top.setAlignment(Pos.CENTER);
-        HBox.setHgrow(p1,Priority.ALWAYS);
+        HBox.setHgrow(p1, Priority.ALWAYS);
         HBox.setHgrow(p2, Priority.ALWAYS);
-        top.getChildren().addAll(p1,turns,p2);
+        top.getChildren().addAll(p1, turns, p2);
 
         container.setTop(top);
 
@@ -94,15 +95,24 @@ public class GameBoard implements GameListener {
         Button right = new Button("RIGHT");
         HBox bottom = new HBox();
         key = new HBox();
-        key.getChildren().addAll(left,down,right);
+        key.getChildren().addAll(left, down, right);
         key.setAlignment(Pos.BOTTOM_CENTER);
-        key2= new VBox();
-        key2.getChildren().addAll(up,key);
+        key2 = new VBox();
+        key2.getChildren().addAll(up, key);
         key2.setAlignment(Pos.BOTTOM_RIGHT);
 
         //key.setAlignment(Pos.BOTTOM_CENTER);
-       // key2.setAlignment(Pos.BOTTOM_RIGHT);
-        bottom.getChildren().addAll();
+        // key2.setAlignment(Pos.BOTTOM_RIGHT);
+        Button endTurn = new Button("End Turn");
+        endTurn.setOnAction(e -> {
+            try {
+                game.endTurn();
+            } catch (CloneNotSupportedException ex) {
+                ex.printStackTrace();
+            }
+        });
+        endTurn.setAlignment(Pos.BOTTOM_LEFT);
+        bottom.getChildren().addAll(key2, endTurn);
         container.setBottom(bottom);
         //////////////////////////////////
         //    Button Functions
@@ -130,34 +140,30 @@ public class GameBoard implements GameListener {
             }
         });
         up.setOnAction(e -> {
-            try{
+            try {
                 game.move(Direction.UP);
-            }
-            catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception){
+            } catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception) {
                 AlertBox.display("Can't move", exception.getMessage());
             }
         });
         down.setOnAction(e -> {
-            try{
+            try {
                 game.move(Direction.DOWN);
-            }
-            catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception){
+            } catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception) {
                 AlertBox.display("Can't move", exception.getMessage());
             }
         });
         left.setOnAction(e -> {
-            try{
+            try {
                 game.move(Direction.LEFT);
-            }
-            catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception){
+            } catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception) {
                 AlertBox.display("Can't move", exception.getMessage());
             }
         });
         right.setOnAction(e -> {
-            try{
+            try {
                 game.move(Direction.RIGHT);
-            }
-            catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception){
+            } catch (UnallowedMovementException | NotEnoughResourcesException | ArrayIndexOutOfBoundsException exception) {
                 AlertBox.display("Can't move", exception.getMessage());
             }
         });
@@ -218,7 +224,7 @@ public class GameBoard implements GameListener {
                 } else {
                     board[i][j].setText("Cover HP:\n" + ((Cover) game.getBoard()[i][j]).getCurrentHP());
                     board[i][j].setTextFill(Color.DEEPPINK);
-                                   }
+                }
                 GridPane.setConstraints(board[i][j], j, Game.getBoardheight() - 1 - i);
                 boardGrid.getChildren().add(board[i][j]); //Please run badal ma haneekak.
             }
@@ -227,16 +233,16 @@ public class GameBoard implements GameListener {
         container.setCenter(boardGrid);
     }
 
-    private void setTeams(){
+    private void setTeams() {
         String p1 = "";
         String p2 = "";
-        for (int i =0; i< game.getFirstPlayer().getTeam().size(); i++){
-            p1+= ((Champion) game.getFirstPlayer().getTeam().get(i)).toString() + "\n";
+        for (int i = 0; i < game.getFirstPlayer().getTeam().size(); i++) {
+            p1 += ((Champion) game.getFirstPlayer().getTeam().get(i)).toString() + "\n";
         }
         p1Champs.setText(p1);
 
-        for (int j =0; j< game.getSecondPlayer().getTeam().size(); j++){
-            p2+= ((Champion) game.getSecondPlayer().getTeam().get(j)).toString() + "\n";
+        for (int j = 0; j < game.getSecondPlayer().getTeam().size(); j++) {
+            p2 += ((Champion) game.getSecondPlayer().getTeam().get(j)).toString() + "\n";
         }
         p2Champs.setText(p2);
     }
@@ -268,12 +274,13 @@ public class GameBoard implements GameListener {
                     "\nMana: " + curr.getMana() +
                     "\nAP: " + curr.getCurrentActionPoints() +
                     "\nAttack Damage: " + curr.getAttackDamage() +
-                    "\nAttack Range: " + curr.getAttackRange()+
+                    "\nAttack Range: " + curr.getAttackRange() +
                     "\nAbilites: "); //TODO find a way to update Mana and AP... with each turn
+            //TODO make the abilities buttons (?) and add tooltips (?)
             Label ch1Ability1 = new Label();
             ch1Ability1.setText("1) " + curr.getAbilities().get(0).getName()); //TODO zabaty 2l display
             Label ch1Ability2 = new Label();
-            ch1Ability2.setText("2) " +curr.getAbilities().get(1).getName());
+            ch1Ability2.setText("2) " + curr.getAbilities().get(1).getName());
             Label ch1Ability3 = new Label();
             ch1Ability3.setText("3) " + curr.getAbilities().get(2).getName());
             /*for (Ability a : curr.getAbilities()) {
@@ -304,20 +311,19 @@ public class GameBoard implements GameListener {
                     + "\nCooldown: " + thisChamp.getSpeed() +
                     "\nAbilities: " + finalChampAbilities));
 */
-        p1ChampionInfo.getChildren().addAll(ch1, ch1Ability1, ch1Ability2, ch1Ability3);
-        p1ChampionInfo.setAlignment(Pos.CENTER);
-        container.setLeft(p1ChampionInfo);
-        }
-        else{
+            p1ChampionInfo.getChildren().addAll(ch1, ch1Ability1, ch1Ability2, ch1Ability3);
+            p1ChampionInfo.setAlignment(Pos.CENTER);
+            container.setLeft(p1ChampionInfo);
+        } else {
             p1ChampionInfo.setVisible(false);
             Label ch2 = new Label();
             ch2.setText("Name: " + curr.toString() +
                     "\nType: " + type +
                     "\nHP: " + curr.getCurrentHP() +
                     "\nMana: " + curr.getMana() +
-                    "\nAP: " + curr.getCurrentActionPoints() +
+                    "\nCurrent Action Points: " + curr.getCurrentActionPoints() +
                     "\nAttack Damage: " + curr.getAttackDamage() +
-                    "\nAttack Range: " + curr.getAttackRange()+
+                    "\nAttack Range: " + curr.getAttackRange() +
                     "\nAbilites: "); //TODO find a way to update Mana and AP... with each turn
             Label ch2Ability1 = new Label();
             ch2Ability1.setText("1) " + curr.getAbilities().get(0).getName()); //TODO zabaty 2l display
@@ -331,7 +337,7 @@ public class GameBoard implements GameListener {
         }
 
 
-        }
+    }
 
     @Override
     public void onBoardUpdated() {
@@ -345,8 +351,10 @@ public class GameBoard implements GameListener {
     }
 
     @Override
-    public void onTurnOrderUpdated(PriorityQueue turnOrder) {
+    public void onTurnEnd() {
         turns.setText(game.getTurnOrder().toString());
+        setTeams();
+        makeBoard();
     }
 
     @Override

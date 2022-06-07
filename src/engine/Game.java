@@ -812,7 +812,9 @@ public class Game implements PriorityQueueListener{
                         i--;
                     }
                 }
-            } while (currChampCondition.equals(Condition.INACTIVE));  //checks whether the current champion is inactive to remove it until it reaches an active champion
+            } while (currChampCondition.equals(Condition.INACTIVE)); //checks whether the current champion is inactive to remove it until it reaches an active champion
+            if(listener != null)
+                listener.onTurnEnd();
         } else if (listener != null)
             listener.onGameOver(winner);
     }
@@ -871,7 +873,7 @@ public class Game implements PriorityQueueListener{
     @Override
     public void onTurnOrderUpdated() {
         if(listener != null)
-            listener.onTurnOrderUpdated(turnOrder);
+            listener.onTurnEnd();
     }
 
 }
