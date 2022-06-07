@@ -57,7 +57,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
     private Player player1;
     private Player player2;
 
-    public Scene scene(double width, double height, Player player1, Player player2) {
+    public Scene scene(Player player1, Player player2) {
         this.width = width;
         this.height = height;
         this.player1 = player1;
@@ -182,7 +182,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
 
         container.setTop(currentlySelecting);
         currentlySelecting.setAlignment(Pos.TOP_CENTER);
-        return new Scene(container, width, height);
+        return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight()-40);
     }
 
     @Override
@@ -235,7 +235,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                     firstPlayerConfirmPick.setDisable(!firstPlayerConfirmPick.isDisabled());
                     secondPlayerConfirmPick.setDisable(!secondPlayerConfirmPick.isDisabled());
                     Game newGame = new Game(player1, player2);
-                    StartScreen.mainWindow.setScene(new GameBoard().scene(width, height, newGame));
+                    StartScreen.mainWindow.setScene(new GameBoard().scene(newGame));
                 } else
                     AlertBox.display("Champion not in your team", "Please select a champion from your team as a leader");
             }

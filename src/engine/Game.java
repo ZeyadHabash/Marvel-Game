@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Game implements PriorityQueueListener{
+public class Game implements PriorityQueueListener {
 
     private Player firstPlayer;
     private Player secondPlayer;
@@ -35,8 +35,6 @@ public class Game implements PriorityQueueListener{
         placeChampions();
         placeCovers();
         prepareChampionTurns();
-
-        turnOrder.setListener(this);
     }
 
     private void placeChampions() {
@@ -371,7 +369,7 @@ public class Game implements PriorityQueueListener{
     }
 
     public void attack(
-            Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
+            Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, CloneNotSupportedException {
         Champion champion = getCurrentChampion();
         Player enemyPlayer;
         Player currPlayer;
@@ -439,16 +437,16 @@ public class Game implements PriorityQueueListener{
             } catch (ArrayIndexOutOfBoundsException ignored) {
                 // Don't think I'm supposed to do anything when this is caught
             } finally {
+                // listens for attack hits
                 champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 2);
+                if (listener != null)
+                    listener.onAttackHit();
                 // does no damage if attacking an empty cell
                 if (target == null)
                     return;
                 // does no damage if the attacker and the target are from the same team
                 if ((firstPlayer.getTeam().contains(champion) && firstPlayer.getTeam().contains(target)) || (secondPlayer.getTeam().contains(champion) && secondPlayer.getTeam().contains(target)))
                     return;
-                // listens for attack hits
-                if(listener != null)
-                    listener.onAttackHit();
                 // does no damage if target dodges
                 if (target instanceof Champion) {
                     for (int i = 0; i < ((Champion) target).getAppliedEffects().size(); i++) {
@@ -466,6 +464,8 @@ public class Game implements PriorityQueueListener{
                         if (((Champion) target).getAppliedEffects().get(i) instanceof Shield) {
                             ((Champion) target).getAppliedEffects().get(i).remove((Champion) target);
                             ((Champion) target).getAppliedEffects().remove(i);
+                            if (listener != null)
+                                listener.onAttackHit();
                             return;
                         }
                     }
@@ -473,6 +473,8 @@ public class Game implements PriorityQueueListener{
                 // does damage when target is an enemy or a cover
                 // using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
                 target.setCurrentHP(target.getCurrentHP() - (int) (champion.getAttackDamage() * damageMultiplier(champion, target)));
+                if (listener != null)
+                    listener.onAttackHit();
                 if (target.getCurrentHP() <= 0) {
                     removeDamageable(target);
                 }
@@ -579,7 +581,7 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
-                if(listener != null)
+                if (listener != null)
                     listener.onAbilityCast();
             }
         }
@@ -649,7 +651,7 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
-                if(listener != null)
+                if (listener != null)
                     listener.onAbilityCast();
             }
         }
@@ -699,7 +701,7 @@ public class Game implements PriorityQueueListener{
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
-                if(listener != null)
+                if (listener != null)
                     listener.onAbilityCast();
             }
         }
@@ -760,21 +762,15 @@ public class Game implements PriorityQueueListener{
             firstLeaderAbilityUsed = true;
         else
             secondLeaderAbilityUsed = true;
+        if (listener != null)
+            listener.onAbilityCast();
     }
 
     private void prepareChampionTurns() {
-        for (int i = 0; i < turnOrder.size(); i++)
-            turnOrder.remove();
-        ArrayList<Champion> list = firstPlayer.getTeam();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-                turnOrder.insert(list.get(i));
-        }
-        list = secondPlayer.getTeam();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-                turnOrder.insert(list.get(i));
-        }
+        for (Champion c : firstPlayer.getTeam())
+            turnOrder.insert(c);
+        for (Champion c : secondPlayer.getTeam())
+            turnOrder.insert(c);
     }
 
     public void endTurn() throws CloneNotSupportedException {
@@ -787,12 +783,14 @@ public class Game implements PriorityQueueListener{
                 if (turnOrder.isEmpty()) {        //checks if the turn order queue is empty to reset it
                     prepareChampionTurns();
                 }
-                // reordering pq incase speeds change (might have to remove in quiz?)
-                PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
-                while (!turnOrder.isEmpty())
-                    tempQ.insert(turnOrder.remove());
-                while (!tempQ.isEmpty())
-                    turnOrder.insert(tempQ.remove());
+
+//                // reordering pq incase speeds change (might have to remove in quiz?)
+//                PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
+//                while (!turnOrder.isEmpty())
+//                    tempQ.insert(turnOrder.remove());
+//                while (!tempQ.isEmpty())
+//                    turnOrder.insert(tempQ.remove());
+
                 // moved this here bec it needs to update effects/ability cooldown of stunned champions too
                 currChamp = getCurrentChampion();
                 currChampCondition = currChamp.getCondition();
@@ -813,7 +811,7 @@ public class Game implements PriorityQueueListener{
                     }
                 }
             } while (currChampCondition.equals(Condition.INACTIVE)); //checks whether the current champion is inactive to remove it until it reaches an active champion
-            if(listener != null)
+            if (listener != null)
                 listener.onTurnEnd();
         } else if (listener != null)
             listener.onGameOver(winner);
@@ -870,10 +868,5 @@ public class Game implements PriorityQueueListener{
         this.listener = listener;
     }
 
-    @Override
-    public void onTurnOrderUpdated() {
-        if(listener != null)
-            listener.onTurnEnd();
-    }
 
 }

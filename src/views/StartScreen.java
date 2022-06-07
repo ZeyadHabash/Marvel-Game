@@ -4,12 +4,14 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
@@ -34,6 +36,8 @@ public class StartScreen extends Application {
 
     public static Stage mainWindow;
 
+    public static Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -45,8 +49,9 @@ public class StartScreen extends Application {
             Game.loadChampions("Champions.csv");
             mainWindow = primaryStage;
             primaryStage.setTitle("marvel");
-            primaryStage.setScene(scene(width = 1000, height = 800));
-            primaryStage.setMaximized(false); // use this to test maximized
+
+            primaryStage.setScene(scene());
+            primaryStage.setMaximized(true); // use this to test maximized
             primaryStage.setFullScreen(false); // use to test fullscreen
             primaryStage.show();
         } catch (IOException e) {
@@ -54,7 +59,7 @@ public class StartScreen extends Application {
         }
     }
 
-    public Scene scene(double width, double height) {
+    public Scene scene() {
 
         enterP1Name = new Text("Enter Player 1 name");
         player1Name = new TextField("Player_1");
@@ -63,13 +68,13 @@ public class StartScreen extends Application {
         confirm = new Button("Confirm");
         confirm.setOnAction(e -> {
             //newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
-            mainWindow.setScene(new TeamSelect().scene(width, height, new Player(player1Name.getText()), new Player(player2Name.getText())));
+            mainWindow.setScene(new TeamSelect().scene( new Player(player1Name.getText()), new Player(player2Name.getText())));
         });
 
         VBox layout = new VBox(50);
         layout.getChildren().addAll(enterP1Name, player1Name, enterP2Name, player2Name, confirm);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        return new Scene(layout, width, height);
+        return new Scene(layout, screenSize.getWidth(), screenSize.getHeight()-40);
     }
 }
