@@ -28,6 +28,7 @@ import model.world.Champion;
 import model.world.Hero;
 import model.world.Villain;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 
@@ -66,11 +67,19 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         for (int i = 0; i < 3; i++)
             abilityInfo.add(new Label());
         BorderPane container = new BorderPane();
+        container.setStyle("-fx-background-color: linear-gradient(to bottom right, #999999, #bcbcbc)");
 
         championSelect = new GridPane();
-        championInfo = new VBox(); // HBox is prob not the best idea, maybe change to stackpane or smth idk
+        championInfo = new VBox();
+        championInfo.setStyle("-fx-font-size: 20px;");
+        //championInfo.setMaxSize(300, 700);
+        //championInfo.setAlignment(Pos.BOTTOM_CENTER);
         firstPlayerInfo = new VBox(40);
+        firstPlayerInfo.setStyle("-fx-font-size: 24px;");
+        firstPlayerInfo.setMinWidth(300);
         secondPlayerInfo = new VBox(40);
+        secondPlayerInfo.setStyle("-fx-font-size: 24px;");
+        secondPlayerInfo.setMinWidth(300);
         currentlySelecting = new HBox(50);
 
         // champion info layout
@@ -163,12 +172,15 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             if (i % 5 == 0)
                 j = 0;
             GridPane.setConstraints(champions.get(i), i / 5, j);
-            championSelect.getChildren().add(champions.get(i));
+            championSelect.getChildren().add(champions.get(i)); //TODO add pics here...
+            championSelect.setStyle("-fx-font-size: 20px;");
         }
 
         // currently picking "layout"
         currentlyPickingText = new Label("Currently Picking: ");
+        currentlyPickingText.setStyle("-fx-font-size: 20px;");
         currentPlayer = new Label(firstPlayerName.getText());
+        currentPlayer.setStyle("-fx-font-size: 20px;");
         currentlySelecting.getChildren().addAll(currentlyPickingText, currentPlayer);
 
         container.setLeft(firstPlayerInfo);

@@ -9,11 +9,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 
@@ -33,6 +34,7 @@ public class StartScreen extends Application {
     private Game newGame;
     private double width;
     private double height;
+    private Label marvel;
 
     public static Stage mainWindow;
 
@@ -54,6 +56,7 @@ public class StartScreen extends Application {
             primaryStage.setMaximized(true); // use this to test maximized
             primaryStage.setFullScreen(false); // use to test fullscreen
             primaryStage.show();
+
         } catch (IOException e) {
             AlertBox.display(e.getLocalizedMessage(), "Please make sure the file is in the game directory and try running the game again");
         }
@@ -61,20 +64,48 @@ public class StartScreen extends Application {
 
     public Scene scene() {
 
+        marvel = new Label("MARVEL AVENGERS ASSEMBLE: \nTHE CLASH OF THE UNIVERSES");
+        marvel.setStyle("-fx-font: 36 arial;");
+        marvel.setTextFill(Color.YELLOW);
+        VBox title = new VBox();
+        title.getChildren().add(marvel);
+        title.setAlignment(Pos.TOP_CENTER);
         enterP1Name = new Text("Enter Player 1 name");
-        player1Name = new TextField("Player_1");
+        enterP1Name.setStyle("-fx-font: 24 arial;");
+        player1Name = new TextField("Player1");
+        player1Name.setMaxSize(500,100);
         enterP2Name = new Text("Enter Player 2 name");
-        player2Name = new TextField("Player_2");
+        enterP2Name.setStyle("-fx-font: 24 arial;");
+        player2Name = new TextField("Player2");
+        player2Name.setMaxSize(500,100);
         confirm = new Button("Confirm");
+        confirm.setStyle("-fx-font: 16 arial");
         confirm.setOnAction(e -> {
             //newGame = new Game(new Player(player1Name.getText()), new Player(player2Name.getText()));
             mainWindow.setScene(new TeamSelect().scene( new Player(player1Name.getText()), new Player(player2Name.getText())));
         });
 
+        VBox p1 = new VBox(25);
+        p1.getChildren().addAll(enterP1Name, player1Name);
+        VBox p2 = new VBox(25);
+        p2.getChildren().addAll(enterP2Name, player2Name);
+        HBox playerNames = new HBox(50);
+        playerNames.getChildren().addAll(p1, p2);
+        playerNames.setAlignment(Pos.CENTER);
         VBox layout = new VBox(50);
-        layout.getChildren().addAll(enterP1Name, player1Name, enterP2Name, player2Name, confirm);
-        layout.setAlignment(Pos.TOP_CENTER);
+        layout.getChildren().addAll(title, playerNames, confirm);
+        layout.setAlignment(Pos.CENTER);
+        StackPane root = new StackPane();
+        root.getChildren().add(layout);
+        Image image = new Image("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/6ba2f2be-be13-46f6-aa12-b87eafc5681b/dd21xbv-6017d26e-6ff9-4e7f-a489-1a209dba8da2.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzZiYTJmMmJlLWJlMTMtNDZmNi1hYTEyLWI4N2VhZmM1NjgxYlwvZGQyMXhidi02MDE3ZDI2ZS02ZmY5LTRlN2YtYTQ4OS0xYTIwOWRiYThkYTIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.hHMh56Z-UWJYOCaPEK4APLyY0X7ppozdNGe0rh7eFGI");
+        BackgroundImage bImg = new BackgroundImage(image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT);
+        Background bGround = new Background(bImg);
+        root.setBackground(bGround);
 
-        return new Scene(layout, screenSize.getWidth(), screenSize.getHeight()-40);
+        return new Scene(root, screenSize.getWidth(), screenSize.getHeight()-40);
     }
 }
