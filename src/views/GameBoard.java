@@ -50,6 +50,7 @@ public class GameBoard implements GameListener {
     Button atk;
     Button move;
     Button punch;
+    //boolean targetted = false;
 
     int xCoordinate;
     int yCoordinate;
@@ -118,7 +119,7 @@ public class GameBoard implements GameListener {
 
         atk = new Button("ATK");
         move = new Button("MOVE");
-        HBox command = new HBox();
+        VBox command = new VBox(35);
         command.getChildren().addAll(atk, move);
         HBox bottom = new HBox(75);
 
@@ -127,7 +128,7 @@ public class GameBoard implements GameListener {
         HBox upBut = new HBox();
         upBut.getChildren().add(up);
         upBut.setAlignment(Pos.CENTER);
-        HBox leftRight = new HBox();
+        HBox leftRight = new HBox(75);
         leftRight.getChildren().addAll(left, right);
         leftRight.setAlignment(Pos.CENTER);
         HBox downBut = new HBox();
@@ -137,15 +138,13 @@ public class GameBoard implements GameListener {
         key.getChildren().addAll(upBut,leftRight,downBut);
 
 
-        HBox key2= new HBox();
+        HBox key2= new HBox(25);
         key2.getChildren().add(key);
 
         Button endTurn = new Button("END TURN");
         bottom.getChildren().addAll(key2, command, endTurn);
-        bottom.setAlignment(Pos.BOTTOM_RIGHT);
-//        HBox.setHgrow(key2, Priority.ALWAYS);
-//        HBox.setHgrow(endTurn, Priority.ALWAYS);
-//        HBox.setHgrow(command, Priority.ALWAYS);
+        bottom.setAlignment(Pos.BOTTOM_CENTER);
+
 
         container.setBottom(bottom);
 
@@ -348,7 +347,6 @@ public class GameBoard implements GameListener {
                     board[i][j].setStyle("-fx-background-color: #D3D3D3");
                     board[i][j].setTextFill(Color.DARKSLATEGRAY);
                 } else if (game.getBoard()[i][j] instanceof Champion) {
-
                     Champion thisChamp = (Champion) game.getBoard()[i][j];
                     String champAbilities = "";
                     for (Ability a : thisChamp.getAbilities()) {
@@ -380,6 +378,8 @@ public class GameBoard implements GameListener {
                     board[i][j].setText(((Champion) game.getBoard()[i][j]).toString());
                     if (((Champion) game.getBoard()[i][j]).equals(game.getCurrentChampion())) {
                         board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
+                        if (((Champion) game.getBoard()[i][j]).equals(game.getFirstPlayer().getLeader()))
+                            board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
                         board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
                         if (((Champion) game.getBoard()[i][j]).equals(game.getFirstPlayer().getLeader()))
@@ -401,8 +401,9 @@ public class GameBoard implements GameListener {
                 int finalI = i;
                 int finalJ = j;
                 board[i][j].setOnMouseClicked(e -> {
-                    xCoordinate = finalI;
-                    yCoordinate = finalJ;
+                        xCoordinate = finalI;
+                        yCoordinate = finalJ;
+                        //targetted= true;
                 });
                 GridPane.setConstraints(board[i][j], j, Game.getBoardheight() - 1 - i);
                 boardGrid.getChildren().add(board[i][j]);
@@ -456,12 +457,20 @@ public class GameBoard implements GameListener {
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
                     punch.setOnAction(l -> {
                         try {
-                            game.castAbility(punchAb, xCoordinate, yCoordinate);
-                        } catch (AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception) {
-                            AlertBox.display("Can't use ability", exception.getMessage());
-                        } catch (CloneNotSupportedException exception) {
-                            exception.printStackTrace();
-                        }
+                                AlertBox.display("Punch", "Choose Target.");
+//                                while(!targetted){
+//                                    wait(1);
+//                                }
+//                                targetted = false;
+                                game.castAbility(punchAb, xCoordinate, yCoordinate);
+
+                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
+                            {
+                                AlertBox.display("Can't use ability", exception.getMessage());
+                            } catch(CloneNotSupportedException exception){
+                                exception.printStackTrace();
+                            }
+
                     });
                 }
                 if (e instanceof Root)
@@ -512,13 +521,21 @@ public class GameBoard implements GameListener {
                 } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
                     // TODO MAKE IT SO THAT YOU TARGET AFTER CLICKING THE BUTTON
                     ch1Abilities[currIndex].setOnAction(e -> {
-                        //AlertBox.display("Single Target Ability", "Choose a target from the board");
-                        try {
-                            game.castAbility(a, xCoordinate, yCoordinate);
-                        } catch (AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception) {
-                            AlertBox.display("Can't use ability", exception.getMessage());
-                        } catch (CloneNotSupportedException exception) {
-                            exception.printStackTrace();
+
+                            try {
+                                AlertBox.display("SINGLE TARGET ABILITY", "Choose Target.");
+//                                while(!targetted){
+//                                    wait(1);
+//                                }
+//                                targetted = false;
+                                game.castAbility(a, xCoordinate, yCoordinate);
+
+                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
+                            {
+                                AlertBox.display("Can't use ability", exception.getMessage());
+                            } catch(CloneNotSupportedException  exception){
+                                exception.printStackTrace();
+
                         }
                     });
                 } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
@@ -610,13 +627,21 @@ public class GameBoard implements GameListener {
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
                     punch.setOnAction(l -> {
-                        try {
-                            game.castAbility(punchAb, xCoordinate, yCoordinate);
-                        } catch (AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception) {
-                            AlertBox.display("Can't use ability", exception.getMessage());
-                        } catch (CloneNotSupportedException exception) {
-                            exception.printStackTrace();
-                        }
+                            try {
+                                AlertBox.display("Punch", "Choose Target.");
+//                                while(!targetted){
+//                                    wait(1);
+//                                }
+//                                targetted = false;
+                                game.castAbility(punchAb, xCoordinate, yCoordinate);
+
+                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
+                            {
+                                AlertBox.display("Can't use ability", exception.getMessage());
+                            } catch(CloneNotSupportedException exception){
+                                exception.printStackTrace();
+                            }
+
                     });
                 }
                 if (e instanceof Root)
@@ -666,14 +691,22 @@ public class GameBoard implements GameListener {
                 } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
                     // TODO MAKE IT SO THAT YOU TARGET AFTER CLICKING THE BUTTON
                     ch2Abilities[currIndex].setOnAction(e -> {
-                        //AlertBox.display("Single Target Ability", "Choose a target from the board");
-                        try {
-                            game.castAbility(a, xCoordinate, yCoordinate);
-                        } catch (AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception) {
-                            AlertBox.display("Can't use ability", exception.getMessage());
-                        } catch (CloneNotSupportedException exception) {
-                            exception.printStackTrace();
-                        }
+                        AlertBox.display("Single Target Ability", "Choose a target from the board");
+                            try {
+                                AlertBox.display("SINGLE TARGET ABILITY", "Choose Target.");
+//                                while(!targetted){
+//                                    wait(1);
+//                                }
+//                                targetted = false;
+                                game.castAbility(a, xCoordinate, yCoordinate);
+
+                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
+                            {
+                                AlertBox.display("Can't use ability", exception.getMessage());
+                            } catch(CloneNotSupportedException exception){
+                                exception.printStackTrace();
+                            }
+
                     });
                 } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
                     ch2Abilities[currIndex].setOnAction(e -> {
