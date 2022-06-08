@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -16,6 +17,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
+
+import java.io.File;
 import java.io.IOException;
 
 import engine.Player;
@@ -96,8 +99,11 @@ public class StartScreen extends Application {
         layout.getChildren().addAll(title, playerNames, confirm);
         layout.setAlignment(Pos.CENTER);
         StackPane root = new StackPane();
+        //root.setStyle("-fx-background: navy;");
         root.getChildren().add(layout);
-        Image image = new Image("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/6ba2f2be-be13-46f6-aa12-b87eafc5681b/dd21xbv-6017d26e-6ff9-4e7f-a489-1a209dba8da2.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzZiYTJmMmJlLWJlMTMtNDZmNi1hYTEyLWI4N2VhZmM1NjgxYlwvZGQyMXhidi02MDE3ZDI2ZS02ZmY5LTRlN2YtYTQ4OS0xYTIwOWRiYThkYTIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.hHMh56Z-UWJYOCaPEK4APLyY0X7ppozdNGe0rh7eFGI");
+        Image image = new Image(getClass().getResourceAsStream("start_screen.png"));
+
+
         BackgroundImage bImg = new BackgroundImage(image,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT,
@@ -106,6 +112,7 @@ public class StartScreen extends Application {
         Background bGround = new Background(bImg);
         root.setBackground(bGround);
 
-        return new Scene(root, screenSize.getWidth(), screenSize.getHeight()-40);
+
+        return new Scene(root, screenSize.getWidth(), screenSize.getHeight()-35);
     }
 }

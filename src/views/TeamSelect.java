@@ -16,8 +16,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.paint.Paint;
 
 import engine.Game;
 import model.abilities.Ability;
@@ -54,6 +56,8 @@ public class TeamSelect implements EventHandler<ActionEvent> {
     private Text secondPlayerName;
     private Label currentPlayer;
     private ArrayList<Label> abilityInfo;
+    private Label champ;
+    Label a;
 
     private Player player1;
     private Player player2;
@@ -64,11 +68,13 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         this.player1 = player1;
         this.player2 = player2;
         abilityInfo = new ArrayList<Label>();
-        for (int i = 0; i < 3; i++)
-            abilityInfo.add(new Label());
+        for (int i = 0; i < 3; i++) {
+            a = new Label();
+            a.setTextFill(Color.WHITE);
+            abilityInfo.add(a);
+        }
         BorderPane container = new BorderPane();
-        container.setStyle("-fx-background-color: linear-gradient(to bottom right, #999999, #bcbcbc)");
-
+        container.setStyle("-fx-background-color: linear-gradient(to bottom right, #105696, #733fa4)");
         championSelect = new GridPane();
         championInfo = new VBox();
         championInfo.setStyle("-fx-font-size: 20px;");
@@ -85,6 +91,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         // champion info layout
         //Label hoveredChampionInfoLabel = new Label();
         Label selectedChampionInfoLabel = new Label();
+        selectedChampionInfoLabel.setTextFill(Color.WHITE);
 
         // first player layout
         firstPlayerName = new Text(player1.getName());
@@ -110,7 +117,8 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         championSelect.setHgap(100);
         champions = new ArrayList<Label>();
         for (int i = 0, j = 0; i < Game.getAvailableChampions().size(); i++, j++) {
-            champions.add(new Label(Game.getAvailableChampions().get(i).getName()));
+            champ = new Label(Game.getAvailableChampions().get(i).getName());
+            champions.add(champ);
             int finalI = i;
             Champion thisChamp = Game.getAvailableChampions().get(finalI);
             String champAbilities = "";
@@ -119,19 +127,27 @@ public class TeamSelect implements EventHandler<ActionEvent> {
                 champAbilities += ("\n" + a.getName());
             }
             String thisChampType;
-            if (thisChamp instanceof Hero)
+            if (thisChamp instanceof Hero){
                 thisChampType = "Hero";
-            else if (thisChamp instanceof Villain)
+                champ.setTextFill(Color.LIGHTGREEN);
+            }
+
+            else if (thisChamp instanceof Villain) {
                 thisChampType = "Villain";
-            else
+                champ.setTextFill(Color.LIGHTCORAL);
+            }
+            else {
                 thisChampType = "AntiHero";
+                champ.setTextFill(Color.YELLOW);
+            }
             String finalChampAbilities = champAbilities;
+
             Tooltip.install(champions.get(i), new Tooltip(thisChamp.getName() +
                     "\nType: " + thisChampType +
                     "\nMax HP: " + thisChamp.getMaxHP() + "\nMana: " + thisChamp.getMana() +
                     "\nMax Action Points Per Turn: " + thisChamp.getMaxActionPointsPerTurn() +
                     "\nAttack Damage: " + thisChamp.getAttackDamage() + "\nAttack Range: " + thisChamp.getAttackRange()
-                    + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities));
+                    + "\nSpeed: " + thisChamp.getSpeed() + "\nAbilities: " + finalChampAbilities)); //TODO find way to color string
             champions.get(i).setOnMouseClicked(e -> {
                 if (!selectedChampions.contains(thisChamp) || leaderSelectPhase) {
                     currentlySelectedChampion = thisChamp;
@@ -174,13 +190,15 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             GridPane.setConstraints(champions.get(i), i / 5, j);
             championSelect.getChildren().add(champions.get(i)); //TODO add pics here...
             championSelect.setStyle("-fx-font-size: 20px;");
+
         }
 
         // currently picking "layout"
         currentlyPickingText = new Label("Currently Picking: ");
-        currentlyPickingText.setStyle("-fx-font-size: 20px;");
+        currentlyPickingText.setStyle("-fx-font-size: 26px;");
         currentPlayer = new Label(firstPlayerName.getText());
-        currentPlayer.setStyle("-fx-font-size: 20px;");
+        currentPlayer.setStyle("-fx-font-size: 26px;");
+        currentPlayer.setTextFill(Color.GREY);
         currentlySelecting.getChildren().addAll(currentlyPickingText, currentPlayer);
 
         container.setLeft(firstPlayerInfo);
@@ -194,7 +212,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
 
         container.setTop(currentlySelecting);
         currentlySelecting.setAlignment(Pos.TOP_CENTER);
-        return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight()-40);
+        return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight()-35);
     }
 
     @Override

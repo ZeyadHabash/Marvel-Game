@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import model.abilities.*;
 import model.effects.Disarm;
 import model.effects.Effect;
@@ -35,8 +36,7 @@ public class GameBoard implements GameListener {
     Label p2Name;
     Label p1Champs;
     Label p2Champs;
-    HBox key;
-    VBox key2;
+    VBox key;
     VBox p1ChampionInfo;
     VBox p2ChampionInfo;
     Label ch1 = new Label();
@@ -118,30 +118,35 @@ public class GameBoard implements GameListener {
 
         atk = new Button("ATK");
         move = new Button("MOVE");
-        VBox command = new VBox();
+        HBox command = new HBox();
         command.getChildren().addAll(atk, move);
-        HBox bottom = new HBox();
+        HBox bottom = new HBox(75);
 
-        bottom.setMinHeight(100); //negarab 3ady w neshoof
+        bottom.setMinHeight(120); //negarab 3ady w neshoof
+
+        HBox upBut = new HBox();
+        upBut.getChildren().add(up);
+        upBut.setAlignment(Pos.CENTER);
+        HBox leftRight = new HBox();
+        leftRight.getChildren().addAll(left, right);
+        leftRight.setAlignment(Pos.CENTER);
+        HBox downBut = new HBox();
+        downBut.getChildren().add(down);
+        downBut.setAlignment(Pos.CENTER);
+        key = new VBox();
+        key.getChildren().addAll(upBut,leftRight,downBut);
 
 
-        key = new HBox();
-        key.getChildren().addAll(left, down, right);
-
-        key2 = new VBox();
-        key2.getChildren().addAll(up, key);
-        up.setAlignment(Pos.TOP_CENTER);
-        key.setAlignment(Pos.BOTTOM_CENTER);
-        key2.setAlignment(Pos.BOTTOM_RIGHT);
+        HBox key2= new HBox();
+        key2.getChildren().add(key);
 
         Button endTurn = new Button("END TURN");
-
-        endTurn.setAlignment(Pos.BOTTOM_LEFT);
         bottom.getChildren().addAll(key2, command, endTurn);
-        HBox.setHgrow(key2, Priority.ALWAYS);
-        HBox.setHgrow(endTurn, Priority.ALWAYS);
-        HBox.setHgrow(command, Priority.ALWAYS);
-        //HBox.setHgrow(move, Priority.ALWAYS);
+        bottom.setAlignment(Pos.BOTTOM_RIGHT);
+//        HBox.setHgrow(key2, Priority.ALWAYS);
+//        HBox.setHgrow(endTurn, Priority.ALWAYS);
+//        HBox.setHgrow(command, Priority.ALWAYS);
+
         container.setBottom(bottom);
 
 
@@ -319,25 +324,28 @@ public class GameBoard implements GameListener {
         p2ChampionInfo.setAlignment(Pos.CENTER);
         container.setRight(p2ChampionInfo);
 
-        return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight() - 40);
+        return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight() - 35);
     }
 
     private void makeBoard() {
         boardGrid = new GridPane();
         for (int i = 0; i < 5; i++) {
-            ColumnConstraints columnConstraints = new ColumnConstraints(100);
+            ColumnConstraints columnConstraints = new ColumnConstraints(140);
             boardGrid.getColumnConstraints().add(columnConstraints);
         }
         for (int i = 0; i < 5; i++) {
-            RowConstraints rowConstraints = new RowConstraints(100);
+            RowConstraints rowConstraints = new RowConstraints(140);
             boardGrid.getRowConstraints().add(rowConstraints);
         }
-        boardGrid.setStyle("-fx-background-color: white ; -fx-grid-lines-visible: true");
+        boardGrid.setStyle("-fx-grid-lines-visible: true");
         for (int i = 0; i < Game.getBoardheight(); i++) {
             for (int j = 0; j < Game.getBoardwidth(); j++) {
                 board[i][j] = new Label();
+                board[i][j].setMinSize(140,140);
+                board[i][j].setAlignment(Pos.CENTER);
                 if (game.getBoard()[i][j] == null) { //TODO play bel border thickness
-                    board[i][j].setText("empty");
+                    board[i][j].setText(" ");
+                    board[i][j].setStyle("-fx-background-color: #D3D3D3");
                     board[i][j].setTextFill(Color.DARKSLATEGRAY);
                 } else if (game.getBoard()[i][j] instanceof Champion) {
 
@@ -371,20 +379,24 @@ public class GameBoard implements GameListener {
                             "\nAbilities: " + finalChampAbilities));
                     board[i][j].setText(((Champion) game.getBoard()[i][j]).toString());
                     if (((Champion) game.getBoard()[i][j]).equals(game.getCurrentChampion())) {
-                        board[i][j].setTextFill(Color.TOMATO); //أسمى ماطم زى طماطم منغير ال"ط"
-
+                        board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
+                        board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
                         if (((Champion) game.getBoard()[i][j]).equals(game.getFirstPlayer().getLeader()))
                             board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
-                        board[i][j].setTextFill(Color.BLUEVIOLET);
+                        board[i][j].setTextFill(Color.BLACK);
+                        board[i][j].setStyle("-fx-background-color: #8A2BE2;");
+
                     } else {
                         if (((Champion) game.getBoard()[i][j]).equals(game.getSecondPlayer().getLeader()))
                             board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
-                        board[i][j].setTextFill(Color.CORNFLOWERBLUE);
+                        board[i][j].setTextFill(Color.BLACK);
+                        board[i][j].setStyle("-fx-background-color: #6495ED;");
                     }
                 } else {
                     board[i][j].setText("Cover\nHP: " + ((Cover) game.getBoard()[i][j]).getCurrentHP());
-                    board[i][j].setTextFill(Color.DEEPPINK);
+                    board[i][j].setTextFill(Color.BLACK);
+                    board[i][j].setStyle("-fx-background-color: #FF1493;"); //TODO nezabat zeft 2l fx..
                 }
                 int finalI = i;
                 int finalJ = j;
@@ -397,6 +409,7 @@ public class GameBoard implements GameListener {
             }
         }
         boardGrid.setAlignment(Pos.CENTER);
+        //boardGrid.setMinSize(1000,1000);
         container.setCenter(boardGrid);
     }
 
@@ -407,6 +420,7 @@ public class GameBoard implements GameListener {
             p1 += ((Champion) game.getFirstPlayer().getTeam().get(i)).toString() + "\n";
         }
         p1Champs.setText(p1);
+
 
         for (int j = 0; j < game.getSecondPlayer().getTeam().size(); j++) {
             p2 += ((Champion) game.getSecondPlayer().getTeam().get(j)).toString() + "\n";
@@ -428,8 +442,9 @@ public class GameBoard implements GameListener {
             p2ChampionInfo.setVisible(false);
             p1ChampionInfo.setVisible(true);
             p1ChampionInfo.setStyle("-fx-background-color: blueviolet ;");
-            p1ChampionInfo.setMaxHeight(700);
+            p1ChampionInfo.setMaxHeight(750);
             p1ChampionInfo.setMinWidth(300);
+
 
             String effects = "";
             for (Effect e : curr.getAppliedEffects()) {
@@ -582,8 +597,9 @@ public class GameBoard implements GameListener {
             p1ChampionInfo.setVisible(false);
             p2ChampionInfo.setVisible(true);
             p2ChampionInfo.setMinWidth(300);
-            p2ChampionInfo.setMaxHeight(700);
+            p2ChampionInfo.setMaxHeight(750);
             p2ChampionInfo.setStyle("-fx-background-color: cornflowerblue ;");
+
 
             String effects = "";
             for (Effect e : curr.getAppliedEffects()) {
