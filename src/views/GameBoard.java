@@ -180,12 +180,11 @@ public class GameBoard implements GameListener {
 
         //Atk button
         atk.setOnAction(e -> {
-            if (!currChampDisarmed){
+            if (!currChampDisarmed)
                 up.setDisable(false);
-                down.setDisable(false);
-                left.setDisable(false);
-                right.setDisable(false);
-            }
+            down.setDisable(false);
+            left.setDisable(false);
+            right.setDisable(false);
             up.setOnAction(l -> {
                 try {
                     up.setDisable(true);
@@ -381,21 +380,21 @@ public class GameBoard implements GameListener {
                             "\nSpeed: " + thisChamp.getSpeed() + "\nCondition: " + thisChamp.getCondition() +
                             "\nApplied effects: " + effects +
                             "\nAbilities: " + finalChampAbilities));
-                    board[i][j].setText(game.getBoard()[i][j].toString()  +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition());
+                    board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition());
                     if (game.getBoard()[i][j].equals(game.getCurrentChampion())) {
                         board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\nLeader");
                         board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #8A2BE2;");
 
                     } else {
                         if (game.getBoard()[i][j].equals(game.getSecondPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #6495ED;");
                     }
@@ -435,10 +434,6 @@ public class GameBoard implements GameListener {
     }
 
     private void callCurrChamp() {
-        move.setDisable(false);
-        atk.setDisable(false);
-        currChampDisarmed = false;
-        currChampRooted = false;
         String type;
         Champion curr = game.getCurrentChampion();
         if (curr instanceof AntiHero) {

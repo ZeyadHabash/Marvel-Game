@@ -74,7 +74,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             abilityInfo.add(a);
         }
         BorderPane container = new BorderPane();
-        container.setStyle("-fx-background-color: #126cbd");
+        container.setStyle("-fx-background-color: linear-gradient(to bottom,  #126cbd, navy)");
         championSelect = new GridPane();
         championInfo = new VBox();
         championInfo.setStyle("-fx-font-size: 20px;");
