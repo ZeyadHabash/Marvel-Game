@@ -47,7 +47,8 @@ public class GameBoard implements GameListener {
     Button right;
     Button atk;
     Button move;
-    Button punch;
+    Button punchp1;
+    Button punchp2;
     Button p1LeaderAbility;
     Button p2LeaderAbility;
 
@@ -306,19 +307,22 @@ public class GameBoard implements GameListener {
         ////////////////////////////////////////
         p1ChampionInfo = new VBox();
         p2ChampionInfo = new VBox();
-        punch = new Button("PUNCH");
-        punch.setDisable(true);
-        punch.setVisible(false);
+        punchp1 = new Button("PUNCH");
+        punchp1.setVisible(false);
+        punchp1.setDisable(true);
+        punchp2 = new Button("PUNCH");
+        punchp2.setVisible(false);
+        punchp2.setDisable(true);
         for (int i = 0; i < 3; i++) {
             ch2Abilities[i] = new Button();
             ch1Abilities[i] = new Button();
         }
 
         callCurrChamp();
-        p1ChampionInfo.getChildren().addAll(ch1, ch1Abilities[0], ch1Abilities[1], ch1Abilities[2], punch);
+        p1ChampionInfo.getChildren().addAll(ch1, ch1Abilities[0], ch1Abilities[1], ch1Abilities[2], punchp1);
         p1ChampionInfo.setAlignment(Pos.CENTER);
         container.setLeft(p1ChampionInfo);
-        p2ChampionInfo.getChildren().addAll(ch2, ch2Abilities[0], ch2Abilities[1], ch2Abilities[2], punch);
+        p2ChampionInfo.getChildren().addAll(ch2, ch2Abilities[0], ch2Abilities[1], ch2Abilities[2], punchp2);
         p2ChampionInfo.setAlignment(Pos.CENTER);
         container.setRight(p2ChampionInfo);
 
@@ -450,10 +454,10 @@ public class GameBoard implements GameListener {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
-                    punch.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
+                    punchp1.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
-                    punch.setOnAction(l -> {
+                    punchp1.setOnAction(l -> {
                         AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
                         enableSingleTargetPick(punchAb);
                     });
@@ -571,11 +575,11 @@ public class GameBoard implements GameListener {
                     });
                 }
                 if (currChampDisarmed) {
-                    punch.setDisable(false);
-                    punch.setVisible(true);
+                    punchp1.setDisable(false);
+                    punchp1.setVisible(true);
                 } else {
-                    punch.setDisable(true);
-                    punch.setVisible(false);
+                    punchp1.setDisable(true);
+                    punchp1.setVisible(false);
                 }
 
             }
@@ -593,10 +597,10 @@ public class GameBoard implements GameListener {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
-                    punch.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
+                    punchp2.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
-                    punch.setOnAction(l -> {
+                    punchp2.setOnAction(l -> {
                         AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
                         enableSingleTargetPick(punchAb);
                     });
@@ -712,14 +716,13 @@ public class GameBoard implements GameListener {
 
                     });
                 }
-                if (currChampDisarmed) {
-                    punch.setDisable(false);
-                    punch.setVisible(true);
-                } else {
-                    punch.setDisable(true);
-                    punch.setVisible(false);
-                }
-
+            }
+            if (currChampDisarmed) {
+                punchp2.setDisable(false);
+                punchp2.setVisible(true);
+            } else {
+                punchp2.setDisable(true);
+                punchp2.setVisible(false);
             }
         }
         atk.setDisable(currChampDisarmed);
@@ -733,6 +736,8 @@ public class GameBoard implements GameListener {
         ch2Abilities[0].setDisable(true);
         ch2Abilities[1].setDisable(true);
         ch2Abilities[2].setDisable(true);
+        punchp1.setDisable(true);
+        punchp2.setDisable(true);
         up.setDisable(true);
         down.setDisable(true);
         left.setDisable(true);
@@ -766,8 +771,10 @@ public class GameBoard implements GameListener {
         ch2Abilities[0].setDisable(false);
         ch2Abilities[1].setDisable(false);
         ch2Abilities[2].setDisable(false);
-        move.setDisable(false);
-        atk.setDisable(false);
+        punchp1.setDisable(currChampDisarmed);
+        punchp2.setDisable(currChampDisarmed);
+        move.setDisable(currChampRooted);
+        atk.setDisable(currChampDisarmed);
         if (!game.isFirstLeaderAbilityUsed())
             p1LeaderAbility.setDisable(false);
         if (!game.isSecondLeaderAbilityUsed())
