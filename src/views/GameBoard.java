@@ -180,11 +180,12 @@ public class GameBoard implements GameListener {
 
         //Atk button
         atk.setOnAction(e -> {
-            if (!currChampDisarmed)
+            if (!currChampDisarmed){
                 up.setDisable(false);
-            down.setDisable(false);
-            left.setDisable(false);
-            right.setDisable(false);
+                down.setDisable(false);
+                left.setDisable(false);
+                right.setDisable(false);
+            }
             up.setOnAction(l -> {
                 try {
                     up.setDisable(true);
@@ -378,21 +379,21 @@ public class GameBoard implements GameListener {
                             "\nSpeed: " + thisChamp.getSpeed() + "\nCondition: " + thisChamp.getCondition() +
                             "\nApplied effects: " + effects +
                             "\nAbilities: " + finalChampAbilities));
-                    board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition());
+                    board[i][j].setText(game.getBoard()[i][j].toString()  +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition());
                     if (game.getBoard()[i][j].equals(game.getCurrentChampion())) {
                         board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\nLeader");
                         board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #8A2BE2;");
 
                     } else {
                         if (game.getBoard()[i][j].equals(game.getSecondPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #6495ED;");
                     }
@@ -432,6 +433,10 @@ public class GameBoard implements GameListener {
     }
 
     private void callCurrChamp() {
+        move.setDisable(false);
+        atk.setDisable(false);
+        currChampDisarmed = false;
+        currChampRooted = false;
         String type;
         Champion curr = game.getCurrentChampion();
         if (curr instanceof AntiHero) {
@@ -447,12 +452,14 @@ public class GameBoard implements GameListener {
             p1ChampionInfo.setStyle("-fx-background-color: blueviolet ;");
             p1ChampionInfo.setMaxHeight(750);
             p1ChampionInfo.setMinWidth(300);
-
-
             String effects = "";
             for (Effect e : curr.getAppliedEffects()) {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
+                    atk.setDisable(false);
+                    punch.setVisible(true);
+                    punch.setDisable(false);
+
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
                     punchp1.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
@@ -462,9 +469,11 @@ public class GameBoard implements GameListener {
                         enableSingleTargetPick(punchAb);
                     });
                 }
-                if (e instanceof Root)
-                    currChampRooted = true;
-                effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
+                if (e instanceof Root){
+                        currChampRooted = true;
+                        move.setDisable(true);
+                    }
+                    effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
             }
             if (effects.equals(""))
                 effects = "none";
@@ -596,6 +605,9 @@ public class GameBoard implements GameListener {
             for (Effect e : curr.getAppliedEffects()) {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
+                    atk.setDisable(false);
+                    punch.setVisible(true);
+                    punch.setDisable(false);
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
                     punchp2.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
@@ -605,7 +617,7 @@ public class GameBoard implements GameListener {
                         enableSingleTargetPick(punchAb);
                     });
                 }
-                if (e instanceof Root)
+                if (e instanceof Root) {
                     currChampRooted = true;
                 effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
             }
@@ -716,15 +728,18 @@ public class GameBoard implements GameListener {
 
                     });
                 }
-            }
-            if (currChampDisarmed) {
-                punchp2.setDisable(false);
-                punchp2.setVisible(true);
-            } else {
-                punchp2.setDisable(true);
-                punchp2.setVisible(false);
+//                if (currChampDisarmed) {
+//                    punch.setDisable(false);
+//                    punch.setVisible(true);
+//                } else {
+//                    punch.setDisable(true);
+//                    punch.setVisible(false);
+//                }
+
             }
         }
+        punch.setDisable(!currChampDisarmed);
+        punch.setVisible(currChampDisarmed);
         atk.setDisable(currChampDisarmed);
         move.setDisable(currChampRooted);
     }
@@ -736,8 +751,6 @@ public class GameBoard implements GameListener {
         ch2Abilities[0].setDisable(true);
         ch2Abilities[1].setDisable(true);
         ch2Abilities[2].setDisable(true);
-        punchp1.setDisable(true);
-        punchp2.setDisable(true);
         up.setDisable(true);
         down.setDisable(true);
         left.setDisable(true);
