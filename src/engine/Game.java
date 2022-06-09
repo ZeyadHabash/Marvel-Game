@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Game {
+public class Game implements PriorityQueueListener {
 
     private Player firstPlayer;
     private Player secondPlayer;
@@ -24,6 +24,8 @@ public class Game {
     private PriorityQueue turnOrder; //contains available characters to pick from
     private static final int BOARDHEIGHT = 5;
     private static final int BOARDWIDTH = 5;
+
+    private GameListener listener;
 
     public Game(Player first, Player second) {
         this.firstPlayer = first;
@@ -232,6 +234,13 @@ public class Game {
             else
                 secondPlayer.getTeam().remove(damageable);
         }
+        // letting the view know that an object was removed from the board so board can be updated
+        if (listener != null) {
+            listener.onPlayerTeamsUpdated();
+            listener.onBoardUpdated();
+            if (checkGameOver() != null)
+                listener.onGameOver(checkGameOver());
+        }
     }
 
     // Helper method to calculate the damage multiplier of Champions when attacking
@@ -282,7 +291,7 @@ public class Game {
 
     //////////////////////////////////////////////////////////////////////////////
 
-    // Required methods
+    // Required methods <3
 
     //////////////////////////////////////////////////////////////////////////////
 
@@ -352,6 +361,9 @@ public class Game {
                         break;
                 }
                 champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 1);
+                // board updates if a champion moves
+                if (listener != null)
+                    listener.onBoardUpdated();
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new UnallowedMovementException("Cannot move out of board bounds");
             }
@@ -359,7 +371,7 @@ public class Game {
     }
 
     public void attack(
-            Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, ArrayIndexOutOfBoundsException, CloneNotSupportedException {
+            Direction direction) throws NotEnoughResourcesException, ChampionDisarmedException, CloneNotSupportedException {
         Champion champion = getCurrentChampion();
         Player enemyPlayer;
         Player currPlayer;
@@ -427,7 +439,10 @@ public class Game {
             } catch (ArrayIndexOutOfBoundsException ignored) {
                 // Don't think I'm supposed to do anything when this is caught
             } finally {
+                // listens for attack hits
                 champion.setCurrentActionPoints(champion.getCurrentActionPoints() - 2);
+                if (listener != null)
+                    listener.onAttackHit();
                 // does no damage if attacking an empty cell
                 if (target == null)
                     return;
@@ -451,6 +466,8 @@ public class Game {
                         if (((Champion) target).getAppliedEffects().get(i) instanceof Shield) {
                             ((Champion) target).getAppliedEffects().get(i).remove((Champion) target);
                             ((Champion) target).getAppliedEffects().remove(i);
+                            if (listener != null)
+                                listener.onAttackHit();
                             return;
                         }
                     }
@@ -458,9 +475,12 @@ public class Game {
                 // does damage when target is an enemy or a cover
                 // using a helper method to determine the types of the champion and target and return the multiplication of the damage accordingly
                 target.setCurrentHP(target.getCurrentHP() - (int) (champion.getAttackDamage() * damageMultiplier(champion, target)));
+                if (listener != null)
+                    listener.onAttackHit();
                 if (target.getCurrentHP() <= 0) {
                     removeDamageable(target);
                 }
+
             }
         }
     }
@@ -563,6 +583,8 @@ public class Game {
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if (listener != null)
+                    listener.onAbilityCast();
             }
         }
     }
@@ -631,6 +653,8 @@ public class Game {
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if (listener != null)
+                    listener.onAbilityCast();
             }
         }
     }
@@ -679,12 +703,14 @@ public class Game {
                         if (targets.get(i).getCurrentHP() <= 0)
                             removeDamageable(targets.get(i));
                 }
+                if (listener != null)
+                    listener.onAbilityCast();
             }
         }
     }
 
 
-    public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, AbilityUseException, CloneNotSupportedException {
+    public void useLeaderAbility() throws LeaderAbilityAlreadyUsedException, LeaderNotCurrentException, CloneNotSupportedException {
         Champion champion = getCurrentChampion();
 
         Player currPlayer;
@@ -738,21 +764,15 @@ public class Game {
             firstLeaderAbilityUsed = true;
         else
             secondLeaderAbilityUsed = true;
+        if (listener != null)
+            listener.onAbilityCast();
     }
 
     private void prepareChampionTurns() {
-        for (int i = 0; i < turnOrder.size(); i++)
-            turnOrder.remove();
-        ArrayList<Champion> list = firstPlayer.getTeam();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-                turnOrder.insert(list.get(i));
-        }
-        list = secondPlayer.getTeam();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getCondition() != Condition.KNOCKEDOUT)
-                turnOrder.insert(list.get(i));
-        }
+        for (Champion c : firstPlayer.getTeam())
+            turnOrder.insert(c);
+        for (Champion c : secondPlayer.getTeam())
+            turnOrder.insert(c);
     }
 
     public void endTurn() throws CloneNotSupportedException {
@@ -765,12 +785,14 @@ public class Game {
                 if (turnOrder.isEmpty()) {        //checks if the turn order queue is empty to reset it
                     prepareChampionTurns();
                 }
-                // reordering pq incase speeds change (might have to remove in quiz?)
-                PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
-                while (!turnOrder.isEmpty())
-                    tempQ.insert(turnOrder.remove());
-                while (!tempQ.isEmpty())
-                    turnOrder.insert(tempQ.remove());
+
+//                // reordering pq incase speeds change (might have to remove in quiz?)
+//                PriorityQueue tempQ = new PriorityQueue(turnOrder.size());
+//                while (!turnOrder.isEmpty())
+//                    tempQ.insert(turnOrder.remove());
+//                while (!tempQ.isEmpty())
+//                    turnOrder.insert(tempQ.remove());
+
                 // moved this here bec it needs to update effects/ability cooldown of stunned champions too
                 currChamp = getCurrentChampion();
                 currChampCondition = currChamp.getCondition();
@@ -785,15 +807,17 @@ public class Game {
                 for (int i = 0; i < currChamp.getAppliedEffects().size(); i++) {
                     currChamp.getAppliedEffects().get(i).setDuration(currChamp.getAppliedEffects().get(i).getDuration() - 1);
                     if (currChamp.getAppliedEffects().get(i).getDuration() <= 0) {
-                        currChamp.getAppliedEffects().get(i).remove(currChamp);
+                        Effect currEffect = currChamp.getAppliedEffects().get(i);
                         currChamp.getAppliedEffects().remove(i);
+                        currEffect.remove(currChamp);
                         i--;
                     }
                 }
-            } while (currChampCondition.equals(Condition.INACTIVE));              //checks whether the current champion is inactive to remove it until it reaches an active champion
-
-
-        }
+            } while (currChampCondition.equals(Condition.INACTIVE)); //checks whether the current champion is inactive to remove it until it reaches an active champion
+            if (listener != null)
+                listener.onTurnEnd();
+        } else if (listener != null)
+            listener.onGameOver(winner);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -801,7 +825,6 @@ public class Game {
     // Setters and Getters
 
     //////////////////////////////////////////////////////////////////////////////
-
 
     public Player getFirstPlayer() {
         return firstPlayer;
@@ -842,4 +865,10 @@ public class Game {
     public static int getBoardwidth() {
         return BOARDWIDTH;
     }
+
+    public void setListener(GameListener listener) {
+        this.listener = listener;
+    }
+
+
 }

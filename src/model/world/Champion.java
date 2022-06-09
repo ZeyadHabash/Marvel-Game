@@ -22,6 +22,8 @@ public abstract class Champion implements Damageable, Comparable {
 	private Condition condition;
 	private Point location;
 
+	// private or protected?
+	protected ChampionListener listener;
 
 
 	public Champion(String name, int maxHP, int mana, int maxActions, int speed, int attackRange, int attackDamage) {
@@ -58,6 +60,9 @@ public abstract class Champion implements Damageable, Comparable {
 			this.currentHP = maxHP;
 		else
 			this.currentHP = currentHP;
+
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public int getMaxActionPointsPerTurn() {
@@ -66,6 +71,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public void setMaxActionPointsPerTurn(int maxActionPointsPerTurn) {
 		this.maxActionPointsPerTurn = maxActionPointsPerTurn;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public int getAttackDamage() {
@@ -74,6 +81,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public void setAttackDamage(int attackDamage) {
 		this.attackDamage = attackDamage;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public int getSpeed() {
@@ -82,6 +91,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public void setSpeed(int speed) {
 		this.speed = speed;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public Condition getCondition() {
@@ -90,6 +101,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public void setCondition(Condition condition) {
 		this.condition = condition;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public Point getLocation() {
@@ -98,6 +111,8 @@ public abstract class Champion implements Damageable, Comparable {
 
 	public void setLocation(Point location) {
 		this.location = location;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public String getName() {
@@ -112,7 +127,11 @@ public abstract class Champion implements Damageable, Comparable {
 		return mana;
 	}
 
-	public void setMana(int mana) { this.mana = mana; }
+	public void setMana(int mana) {
+		this.mana = mana;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
+	}
 
 	public int getCurrentActionPoints() {
 		return currentActionPoints;
@@ -125,6 +144,8 @@ public abstract class Champion implements Damageable, Comparable {
 			this.currentActionPoints = maxActionPointsPerTurn;
 		else
 			this.currentActionPoints = currentActionPoints;
+		if(listener != null)
+			listener.onChampionDetailsUpdated(this);
 	}
 
 	public int getAttackRange() {
@@ -139,6 +160,8 @@ public abstract class Champion implements Damageable, Comparable {
 		return appliedEffects;
 	}
 
+	public void setListener(ChampionListener listener) { this.listener = listener; }
+
 
 
 	public int compareTo(Object o) {
@@ -150,5 +173,7 @@ public abstract class Champion implements Damageable, Comparable {
 		}
 		return this.getName().compareTo(c.getName());
 	}
-
+	public String toString(){
+		return this.name;
+	}
 }
