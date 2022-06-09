@@ -74,7 +74,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
             abilityInfo.add(a);
         }
         BorderPane container = new BorderPane();
-        container.setStyle("-fx-background-color: linear-gradient(to bottom right, #105696, #733fa4)");
+        container.setStyle("-fx-background-color: #126cbd");
         championSelect = new GridPane();
         championInfo = new VBox();
         championInfo.setStyle("-fx-font-size: 20px;");
@@ -198,7 +198,7 @@ public class TeamSelect implements EventHandler<ActionEvent> {
         currentlyPickingText.setStyle("-fx-font-size: 26px;");
         currentPlayer = new Label(firstPlayerName.getText());
         currentPlayer.setStyle("-fx-font-size: 26px;");
-        currentPlayer.setTextFill(Color.GREY);
+        currentPlayer.setTextFill(Color.web("#9C0F0F"));
         currentlySelecting.getChildren().addAll(currentlyPickingText, currentPlayer);
 
         container.setLeft(firstPlayerInfo);
