@@ -56,7 +56,7 @@ public class StartScreen extends Application {
             primaryStage.setTitle("marvel");
 
             primaryStage.setScene(scene());
-            primaryStage.setMaximized(true); // use this to test maximized
+            primaryStage.setMaximized(false); // use this to test maximized
             primaryStage.setFullScreen(false); // use to test fullscreen
             primaryStage.show();
 

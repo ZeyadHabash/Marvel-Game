@@ -238,6 +238,8 @@ public class Game implements PriorityQueueListener {
         if (listener != null) {
             listener.onPlayerTeamsUpdated();
             listener.onBoardUpdated();
+            if (checkGameOver() != null)
+                listener.onGameOver(checkGameOver());
         }
     }
 
@@ -805,8 +807,9 @@ public class Game implements PriorityQueueListener {
                 for (int i = 0; i < currChamp.getAppliedEffects().size(); i++) {
                     currChamp.getAppliedEffects().get(i).setDuration(currChamp.getAppliedEffects().get(i).getDuration() - 1);
                     if (currChamp.getAppliedEffects().get(i).getDuration() <= 0) {
-                        currChamp.getAppliedEffects().get(i).remove(currChamp);
+                        Effect currEffect = currChamp.getAppliedEffects().get(i);
                         currChamp.getAppliedEffects().remove(i);
+                        currEffect.remove(currChamp);
                         i--;
                     }
                 }
@@ -822,7 +825,6 @@ public class Game implements PriorityQueueListener {
     // Setters and Getters
 
     //////////////////////////////////////////////////////////////////////////////
-
 
     public Player getFirstPlayer() {
         return firstPlayer;

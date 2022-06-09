@@ -21,8 +21,8 @@ public class Hero extends Champion{
 				// changed this from "Debuff" to EffectType.DEBUFF bec we're not comparing strings
 				Effect effect = target.getAppliedEffects().get(j);
 				if (effect.getType() == EffectType.DEBUFF) {
-					effect.remove(target);
 					target.getAppliedEffects().remove(effect);
+					effect.remove(target);
 					j--;
 				}
 			}

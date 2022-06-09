@@ -3,7 +3,6 @@ package views;
 import engine.Game;
 import engine.GameListener;
 import engine.Player;
-import engine.PriorityQueue;
 import exceptions.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,7 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import model.abilities.*;
 import model.effects.Disarm;
 import model.effects.Effect;
@@ -50,10 +48,11 @@ public class GameBoard implements GameListener {
     Button atk;
     Button move;
     Button punch;
-    //boolean targetted = false;
+    Button p1LeaderAbility;
+    Button p2LeaderAbility;
 
-    int xCoordinate;
-    int yCoordinate;
+//    int xCoordinate;
+//    int yCoordinate;
 
     boolean currChampDisarmed = false;
     boolean currChampRooted = false;
@@ -81,8 +80,8 @@ public class GameBoard implements GameListener {
         p2Champs.setAlignment(Pos.TOP_RIGHT);
         setTeams();
 
-        Button p1LeaderAbility = new Button("Use " + ((Champion) game.getFirstPlayer().getLeader()).toString() + " Leader Ability");
-        Button p2LeaderAbility = new Button("Use " + ((Champion) game.getSecondPlayer().getLeader()).toString() + " Leader Ability");
+        p1LeaderAbility = new Button("Use " + game.getFirstPlayer().getLeader().toString() + " Leader Ability");
+        p2LeaderAbility = new Button("Use " + game.getSecondPlayer().getLeader().toString() + " Leader Ability");
 
         p1 = new VBox();
         p1.getChildren().addAll(p1Name, p1Champs, p1LeaderAbility);
@@ -135,10 +134,10 @@ public class GameBoard implements GameListener {
         downBut.getChildren().add(down);
         downBut.setAlignment(Pos.CENTER);
         key = new VBox();
-        key.getChildren().addAll(upBut,leftRight,downBut);
+        key.getChildren().addAll(upBut, leftRight, downBut);
 
 
-        HBox key2= new HBox(25);
+        HBox key2 = new HBox(25);
         key2.getChildren().add(key);
 
         Button endTurn = new Button("END TURN");
@@ -340,7 +339,7 @@ public class GameBoard implements GameListener {
         for (int i = 0; i < Game.getBoardheight(); i++) {
             for (int j = 0; j < Game.getBoardwidth(); j++) {
                 board[i][j] = new Label();
-                board[i][j].setMinSize(140,140);
+                board[i][j].setMinSize(140, 140);
                 board[i][j].setAlignment(Pos.CENTER);
                 if (game.getBoard()[i][j] == null) { //TODO play bel border thickness
                     board[i][j].setText(" ");
@@ -375,21 +374,21 @@ public class GameBoard implements GameListener {
                             "\nSpeed: " + thisChamp.getSpeed() + "\nCondition: " + thisChamp.getCondition() +
                             "\nApplied effects: " + effects +
                             "\nAbilities: " + finalChampAbilities));
-                    board[i][j].setText(((Champion) game.getBoard()[i][j]).toString());
-                    if (((Champion) game.getBoard()[i][j]).equals(game.getCurrentChampion())) {
+                    board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition());
+                    if (game.getBoard()[i][j].equals(game.getCurrentChampion())) {
                         board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
-                        if (((Champion) game.getBoard()[i][j]).equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
+                        if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\nLeader");
                         board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
-                        if (((Champion) game.getBoard()[i][j]).equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
+                        if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #8A2BE2;");
 
                     } else {
-                        if (((Champion) game.getBoard()[i][j]).equals(game.getSecondPlayer().getLeader()))
-                            board[i][j].setText(((Champion) game.getBoard()[i][j]).toString() + "\nLeader");
+                        if (game.getBoard()[i][j].equals(game.getSecondPlayer().getLeader()))
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #6495ED;");
                     }
@@ -398,13 +397,12 @@ public class GameBoard implements GameListener {
                     board[i][j].setTextFill(Color.BLACK);
                     board[i][j].setStyle("-fx-background-color: #FF1493;"); //TODO nezabat zeft 2l fx..
                 }
-                int finalI = i;
-                int finalJ = j;
-                board[i][j].setOnMouseClicked(e -> {
-                        xCoordinate = finalI;
-                        yCoordinate = finalJ;
-                        //targetted= true;
-                });
+//                int finalI = i;
+//                int finalJ = j;
+//                board[i][j].setOnMouseClicked(e -> {
+//                        xCoordinate = finalI;
+//                        yCoordinate = finalJ;
+//                });
                 GridPane.setConstraints(board[i][j], j, Game.getBoardheight() - 1 - i);
                 boardGrid.getChildren().add(board[i][j]);
             }
@@ -418,13 +416,13 @@ public class GameBoard implements GameListener {
         String p1 = "";
         String p2 = "";
         for (int i = 0; i < game.getFirstPlayer().getTeam().size(); i++) {
-            p1 += ((Champion) game.getFirstPlayer().getTeam().get(i)).toString() + "\n";
+            p1 += game.getFirstPlayer().getTeam().get(i).toString() + "\n";
         }
         p1Champs.setText(p1);
 
 
         for (int j = 0; j < game.getSecondPlayer().getTeam().size(); j++) {
-            p2 += ((Champion) game.getSecondPlayer().getTeam().get(j)).toString() + "\n";
+            p2 += game.getSecondPlayer().getTeam().get(j).toString() + "\n";
         }
         p2Champs.setText(p2);
     }
@@ -456,21 +454,8 @@ public class GameBoard implements GameListener {
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
                     punch.setOnAction(l -> {
-                        try {
-                                AlertBox.display("Punch", "Choose Target.");
-//                                while(!targetted){
-//                                    wait(1);
-//                                }
-//                                targetted = false;
-                                game.castAbility(punchAb, xCoordinate, yCoordinate);
-
-                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
-                            {
-                                AlertBox.display("Can't use ability", exception.getMessage());
-                            } catch(CloneNotSupportedException exception){
-                                exception.printStackTrace();
-                            }
-
+                        AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
+                        enableSingleTargetPick(punchAb);
                     });
                 }
                 if (e instanceof Root)
@@ -479,7 +464,7 @@ public class GameBoard implements GameListener {
             }
             if (effects.equals(""))
                 effects = "none";
-            ch1.setText("Name: " + curr.toString() +
+            ch1.setText("Name: " + curr +
                     "\nType: " + type +
                     "\nHP: " + curr.getCurrentHP() + "/" + curr.getMaxHP() +
                     "\nMana: " + curr.getMana() +
@@ -519,24 +504,9 @@ public class GameBoard implements GameListener {
                         }
                     });
                 } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
-                    // TODO MAKE IT SO THAT YOU TARGET AFTER CLICKING THE BUTTON
                     ch1Abilities[currIndex].setOnAction(e -> {
-
-                            try {
-                                AlertBox.display("SINGLE TARGET ABILITY", "Choose Target.");
-//                                while(!targetted){
-//                                    wait(1);
-//                                }
-//                                targetted = false;
-                                game.castAbility(a, xCoordinate, yCoordinate);
-
-                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
-                            {
-                                AlertBox.display("Can't use ability", exception.getMessage());
-                            } catch(CloneNotSupportedException  exception){
-                                exception.printStackTrace();
-
-                        }
+                        AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
+                        enableSingleTargetPick(a);
                     });
                 } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
                     ch1Abilities[currIndex].setOnAction(e -> {
@@ -552,7 +522,7 @@ public class GameBoard implements GameListener {
                                 right.setDisable(true);
                                 game.castAbility(a, Direction.UP);
                             } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                                AlertBox.display("Can't attack", exception.getMessage());
+                                AlertBox.display("Can't use ability", exception.getMessage());
                             } catch (CloneNotSupportedException exception) {
                                 exception.printStackTrace();
                             }
@@ -627,21 +597,8 @@ public class GameBoard implements GameListener {
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
                     punch.setOnAction(l -> {
-                            try {
-                                AlertBox.display("Punch", "Choose Target.");
-//                                while(!targetted){
-//                                    wait(1);
-//                                }
-//                                targetted = false;
-                                game.castAbility(punchAb, xCoordinate, yCoordinate);
-
-                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
-                            {
-                                AlertBox.display("Can't use ability", exception.getMessage());
-                            } catch(CloneNotSupportedException exception){
-                                exception.printStackTrace();
-                            }
-
+                        AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
+                        enableSingleTargetPick(punchAb);
                     });
                 }
                 if (e instanceof Root)
@@ -650,9 +607,9 @@ public class GameBoard implements GameListener {
             }
             if (effects.equals(""))
                 effects = "none";
-            ch2.setText("Name: " + curr.toString() +
+            ch2.setText("Name: " + curr +
                     "\nType: " + type +
-                    "\nHP: " + curr.getCurrentHP() + "/" + curr.getMaxHP()+
+                    "\nHP: " + curr.getCurrentHP() + "/" + curr.getMaxHP() +
                     "\nMana: " + curr.getMana() +
                     "\nAction Points: " + curr.getCurrentActionPoints() +
                     "\nAttack Damage: " + curr.getAttackDamage() +
@@ -689,24 +646,9 @@ public class GameBoard implements GameListener {
                         }
                     });
                 } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
-                    // TODO MAKE IT SO THAT YOU TARGET AFTER CLICKING THE BUTTON
                     ch2Abilities[currIndex].setOnAction(e -> {
-                        AlertBox.display("Single Target Ability", "Choose a target from the board");
-                            try {
-                                AlertBox.display("SINGLE TARGET ABILITY", "Choose Target.");
-//                                while(!targetted){
-//                                    wait(1);
-//                                }
-//                                targetted = false;
-                                game.castAbility(a, xCoordinate, yCoordinate);
-
-                            } catch(AbilityUseException | NotEnoughResourcesException | InvalidTargetException exception)
-                            {
-                                AlertBox.display("Can't use ability", exception.getMessage());
-                            } catch(CloneNotSupportedException exception){
-                                exception.printStackTrace();
-                            }
-
+                        AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
+                        enableSingleTargetPick(a);
                     });
                 } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
                     ch2Abilities[currIndex].setOnAction(e -> {
@@ -722,7 +664,7 @@ public class GameBoard implements GameListener {
                                 right.setDisable(true);
                                 game.castAbility(a, Direction.UP);
                             } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                                AlertBox.display("Can't attack", exception.getMessage());
+                                AlertBox.display("Can't use ability", exception.getMessage());
                             } catch (CloneNotSupportedException exception) {
                                 exception.printStackTrace();
                             }
@@ -779,14 +721,62 @@ public class GameBoard implements GameListener {
                 }
 
             }
-            if (currChampDisarmed)
-                atk.setDisable(true);
-            else
-                atk.setDisable(false);
-            if (currChampRooted)
-                move.setDisable(true);
-            else
-                move.setDisable(false);
+        }
+        atk.setDisable(currChampDisarmed);
+        move.setDisable(currChampRooted);
+    }
+
+    private void enableSingleTargetPick(Ability ability) {
+        ch1Abilities[0].setDisable(true);
+        ch1Abilities[1].setDisable(true);
+        ch1Abilities[2].setDisable(true);
+        ch2Abilities[0].setDisable(true);
+        ch2Abilities[1].setDisable(true);
+        ch2Abilities[2].setDisable(true);
+        up.setDisable(true);
+        down.setDisable(true);
+        left.setDisable(true);
+        right.setDisable(true);
+        move.setDisable(true);
+        atk.setDisable(true);
+        p1LeaderAbility.setDisable(true);
+        p2LeaderAbility.setDisable(true);
+        for (int i = 0; i < Game.getBoardheight(); i++) {
+            for (int j = 0; j < Game.getBoardwidth(); j++) {
+                int finalI = i;
+                int finalJ = j;
+                board[i][j].setOnMouseClicked(e -> {
+                    try {
+                        disableSingleTargetPick();
+                        game.castAbility(ability, finalI, finalJ);
+                    } catch (AbilityUseException | InvalidTargetException | NotEnoughResourcesException exception) {
+                        AlertBox.display("Can't use ability", exception.getMessage());
+                    } catch (CloneNotSupportedException exception) {
+                        exception.printStackTrace();
+                    }
+                });
+            }
+        }
+    }
+
+    private void disableSingleTargetPick() {
+        ch1Abilities[0].setDisable(false);
+        ch1Abilities[1].setDisable(false);
+        ch1Abilities[2].setDisable(false);
+        ch2Abilities[0].setDisable(false);
+        ch2Abilities[1].setDisable(false);
+        ch2Abilities[2].setDisable(false);
+        move.setDisable(false);
+        atk.setDisable(false);
+        if (!game.isFirstLeaderAbilityUsed())
+            p1LeaderAbility.setDisable(false);
+        if (!game.isSecondLeaderAbilityUsed())
+            p2LeaderAbility.setDisable(false);
+        for (int i = 0; i < Game.getBoardheight(); i++) {
+            for (int j = 0; j < Game.getBoardwidth(); j++) {
+                board[i][j].setOnMouseClicked(e -> {
+                });
+            }
         }
     }
 
@@ -804,6 +794,11 @@ public class GameBoard implements GameListener {
 
     @Override
     public void onTurnEnd() {
+        up.setDisable(true);
+        down.setDisable(true);
+        left.setDisable(true);
+        right.setDisable(true);
+        disableSingleTargetPick();
         turns.setText(game.getTurnOrder().toString());
         makeBoard();
         callCurrChamp();
