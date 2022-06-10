@@ -47,7 +47,8 @@ public class GameBoard implements GameListener {
     Button right;
     Button atk;
     Button move;
-    Button punch;
+    Button punchp1;
+    Button punchp2;
     Button p1LeaderAbility;
     Button p2LeaderAbility;
 
@@ -179,12 +180,11 @@ public class GameBoard implements GameListener {
 
         //Atk button
         atk.setOnAction(e -> {
-            if (!currChampDisarmed){
+            if (!currChampDisarmed)
                 up.setDisable(false);
-                down.setDisable(false);
-                left.setDisable(false);
-                right.setDisable(false);
-            }
+            down.setDisable(false);
+            left.setDisable(false);
+            right.setDisable(false);
             up.setOnAction(l -> {
                 try {
                     up.setDisable(true);
@@ -307,21 +307,26 @@ public class GameBoard implements GameListener {
         ////////////////////////////////////////
         p1ChampionInfo = new VBox();
         p2ChampionInfo = new VBox();
-        punch = new Button("PUNCH");
-        punch.setDisable(true);
-        punch.setVisible(false);
+        punchp1 = new Button("PUNCH");
+        punchp1.setVisible(false);
+        punchp1.setDisable(true);
+        punchp2 = new Button("PUNCH");
+        punchp2.setVisible(false);
+        punchp2.setDisable(true);
         for (int i = 0; i < 3; i++) {
             ch2Abilities[i] = new Button();
             ch1Abilities[i] = new Button();
         }
 
         callCurrChamp();
-        p1ChampionInfo.getChildren().addAll(ch1, ch1Abilities[0], ch1Abilities[1], ch1Abilities[2], punch);
-        p1ChampionInfo.setAlignment(Pos.CENTER);
-        container.setLeft(p1ChampionInfo);
-        p2ChampionInfo.getChildren().addAll(ch2, ch2Abilities[0], ch2Abilities[1], ch2Abilities[2], punch);
-        p2ChampionInfo.setAlignment(Pos.CENTER);
-        container.setRight(p2ChampionInfo);
+       p1ChampionInfo.getChildren().addAll(ch1, ch1Abilities[0], ch1Abilities[1], ch1Abilities[2], punchp1);
+//        p1ChampionInfo.setAlignment(Pos.CENTER);
+//        //p1ChampionInfo.setStyle("-fx-font-size: 20px");
+//        container.setLeft(p1ChampionInfo);
+        p2ChampionInfo.getChildren().addAll(ch2, ch2Abilities[0], ch2Abilities[1], ch2Abilities[2], punchp2);
+//        p2ChampionInfo.setAlignment(Pos.CENTER);
+//        //p2ChampionInfo.setStyle("-fx-font-size: 20px");
+//        container.setRight(p2ChampionInfo);
 
         return new Scene(container, StartScreen.screenSize.getWidth(), StartScreen.screenSize.getHeight() - 35);
     }
@@ -375,21 +380,21 @@ public class GameBoard implements GameListener {
                             "\nSpeed: " + thisChamp.getSpeed() + "\nCondition: " + thisChamp.getCondition() +
                             "\nApplied effects: " + effects +
                             "\nAbilities: " + finalChampAbilities));
-                    board[i][j].setText(game.getBoard()[i][j].toString()  +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition());
+                    board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition());
                     if (game.getBoard()[i][j].equals(game.getCurrentChampion())) {
                         board[i][j].setTextFill(Color.BLACK); //أسمى ماطم زى طماطم منغير ال"ط"
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\nLeader");
                         board[i][j].setStyle("-fx-background-color: #FF6347;");
                     } else if (game.getFirstPlayer().getTeam().contains((Champion) game.getBoard()[i][j])) {
                         if (game.getBoard()[i][j].equals(game.getFirstPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #8A2BE2;");
 
                     } else {
                         if (game.getBoard()[i][j].equals(game.getSecondPlayer().getLeader()))
-                            board[i][j].setText(game.getBoard()[i][j].toString() +"\nHP: " + thisChamp.getCurrentHP() + "\n" + thisChamp.getCondition() + "\nLeader");
+                            board[i][j].setText(game.getBoard()[i][j].toString() + "\n" + thisChamp.getCondition() + "\nLeader");
                         board[i][j].setTextFill(Color.BLACK);
                         board[i][j].setStyle("-fx-background-color: #6495ED;");
                     }
@@ -429,10 +434,6 @@ public class GameBoard implements GameListener {
     }
 
     private void callCurrChamp() {
-        move.setDisable(false);
-        atk.setDisable(false);
-        currChampDisarmed = false;
-        currChampRooted = false;
         String type;
         Champion curr = game.getCurrentChampion();
         if (curr instanceof AntiHero) {
@@ -445,31 +446,33 @@ public class GameBoard implements GameListener {
         if ((game.getFirstPlayer().getTeam()).contains(curr)) {
             p2ChampionInfo.setVisible(false);
             p1ChampionInfo.setVisible(true);
-            p1ChampionInfo.setStyle("-fx-background-color: blueviolet ;");
+            p1ChampionInfo.setStyle("-fx-background-color: blueviolet ; -fx-text-size: 20px");
             p1ChampionInfo.setMaxHeight(750);
             p1ChampionInfo.setMinWidth(300);
+            p1ChampionInfo.setAlignment(Pos.CENTER);
+            container.setLeft(p1ChampionInfo);
             String effects = "";
             for (Effect e : curr.getAppliedEffects()) {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
                     atk.setDisable(false);
-                    punch.setVisible(true);
-                    punch.setDisable(false);
+                    punchp1.setVisible(true);
+                    punchp1.setDisable(false);
 
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
-                    punch.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
+                    punchp1.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
-                    punch.setOnAction(l -> {
+                    punchp1.setOnAction(l -> {
                         AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
                         enableSingleTargetPick(punchAb);
                     });
                 }
-                if (e instanceof Root){
-                        currChampRooted = true;
-                        move.setDisable(true);
-                    }
-                    effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
+                if (e instanceof Root) {
+                    currChampRooted = true;
+                    move.setDisable(true);
+                }
+                effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
             }
             if (effects.equals(""))
                 effects = "none";
@@ -580,11 +583,11 @@ public class GameBoard implements GameListener {
                     });
                 }
                 if (currChampDisarmed) {
-                    punch.setDisable(false);
-                    punch.setVisible(true);
+                    punchp1.setDisable(false);
+                    punchp1.setVisible(true);
                 } else {
-                    punch.setDisable(true);
-                    punch.setVisible(false);
+                    punchp1.setDisable(true);
+                    punchp1.setVisible(false);
                 }
 
             }
@@ -594,138 +597,138 @@ public class GameBoard implements GameListener {
             p2ChampionInfo.setVisible(true);
             p2ChampionInfo.setMinWidth(300);
             p2ChampionInfo.setMaxHeight(750);
-            p2ChampionInfo.setStyle("-fx-background-color: cornflowerblue ;");
-
+            p2ChampionInfo.setStyle("-fx-background-color: cornflowerblue ; -fx-text-size: 20px");
+            p2ChampionInfo.setAlignment(Pos.CENTER);
+            container.setRight(p2ChampionInfo);
 
             String effects = "";
             for (Effect e : curr.getAppliedEffects()) {
                 if (e instanceof Disarm) {
                     currChampDisarmed = true;
                     atk.setDisable(false);
-                    punch.setVisible(true);
-                    punch.setDisable(false);
+                    punchp2.setVisible(true);
+                    punchp2.setDisable(false);
                     DamagingAbility punchAb = (DamagingAbility) curr.getAbilities().get(3);
-                    punch.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
+                    punchp2.setTooltip(new Tooltip(punchAb.getName() + "\nType: Damaging" + "\nMana Cost: " + punchAb.getManaCost() +
                             "\nAP Required: " + punchAb.getRequiredActionPoints() + "\nCurrent Cooldown: " + punchAb.getCurrentCooldown() + "\nBase Cooldown: " + punchAb.getBaseCooldown() +
                             "\nArea of Effect: " + punchAb.getCastArea() + "\nRange: " + punchAb.getCastRange() + "\nDamage Amount" + punchAb.getDamageAmount()));
-                    punch.setOnAction(l -> {
+                    punchp2.setOnAction(l -> {
                         AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
                         enableSingleTargetPick(punchAb);
                     });
                 }
                 if (e instanceof Root) {
                     currChampRooted = true;
-                    move.setDisable(true);
+                    effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
                 }
-                effects += "\n" + e.getName() + "  Duration: " + e.getDuration();
+                if (effects.equals(""))
+                    effects = "none";
             }
-            if (effects.equals(""))
-                effects = "none";
-            ch2.setText("Name: " + curr +
-                    "\nType: " + type +
-                    "\nHP: " + curr.getCurrentHP() + "/" + curr.getMaxHP() +
-                    "\nMana: " + curr.getMana() +
-                    "\nAction Points: " + curr.getCurrentActionPoints() +
-                    "\nAttack Damage: " + curr.getAttackDamage() +
-                    "\nAttack Range: " + curr.getAttackRange() +
-                    "\nApplied effects: " + effects +
-                    "\nAbilites: ");
-            for (int currIndex = 0; currIndex < 3; currIndex++) {
-                Ability a = curr.getAbilities().get(currIndex);
-                ch2Abilities[currIndex].setText(a.getName());
-                String extraInfo = "";
-                String abilityType;
-                if (a instanceof DamagingAbility) {
-                    abilityType = "\nType: Damaging";
-                    extraInfo += "\nDamage Amount: " + ((DamagingAbility) a).getDamageAmount();
-                } else if (a instanceof HealingAbility) {
-                    abilityType = "\nType: Healing";
-                    extraInfo += "\nHeal Amount: " + ((HealingAbility) a).getHealAmount();
-                } else {
-                    abilityType = "\nType: Crowd Control";
-                    extraInfo += "\nEffect: " + ((CrowdControlAbility) a).getEffect().getName() + "   Duration: " + ((CrowdControlAbility) a).getEffect().getDuration();
-                }
-                ch2Abilities[currIndex].setTooltip(new Tooltip(a.getName() + abilityType + "\nMana Cost: " + a.getManaCost() +
-                        "\nAP Required: " + a.getRequiredActionPoints() + "\nCurrent Cooldown: " + a.getCurrentCooldown() + "\nBase Cooldown: " + a.getBaseCooldown() +
-                        "\nArea of Effect: " + a.getCastArea() + "\nRange: " + a.getCastRange() + extraInfo));
+                ch2.setText("Name: " + curr +
+                        "\nType: " + type +
+                        "\nHP: " + curr.getCurrentHP() + "/" + curr.getMaxHP() +
+                        "\nMana: " + curr.getMana() +
+                        "\nAction Points: " + curr.getCurrentActionPoints() +
+                        "\nAttack Damage: " + curr.getAttackDamage() +
+                        "\nAttack Range: " + curr.getAttackRange() +
+                        "\nApplied effects: " + effects +
+                        "\nAbilites: ");
+                for (int currIndex = 0; currIndex < 3; currIndex++) {
+                    Ability a = curr.getAbilities().get(currIndex);
+                    ch2Abilities[currIndex].setText(a.getName());
+                    String extraInfo = "";
+                    String abilityType;
+                    if (a instanceof DamagingAbility) {
+                        abilityType = "\nType: Damaging";
+                        extraInfo += "\nDamage Amount: " + ((DamagingAbility) a).getDamageAmount();
+                    } else if (a instanceof HealingAbility) {
+                        abilityType = "\nType: Healing";
+                        extraInfo += "\nHeal Amount: " + ((HealingAbility) a).getHealAmount();
+                    } else {
+                        abilityType = "\nType: Crowd Control";
+                        extraInfo += "\nEffect: " + ((CrowdControlAbility) a).getEffect().getName() + "   Duration: " + ((CrowdControlAbility) a).getEffect().getDuration();
+                    }
+                    ch2Abilities[currIndex].setTooltip(new Tooltip(a.getName() + abilityType + "\nMana Cost: " + a.getManaCost() +
+                            "\nAP Required: " + a.getRequiredActionPoints() + "\nCurrent Cooldown: " + a.getCurrentCooldown() + "\nBase Cooldown: " + a.getBaseCooldown() +
+                            "\nArea of Effect: " + a.getCastArea() + "\nRange: " + a.getCastRange() + extraInfo));
 
-                if (a.getCastArea() == AreaOfEffect.SELFTARGET || a.getCastArea() == AreaOfEffect.TEAMTARGET || a.getCastArea() == AreaOfEffect.SURROUND) {
-                    ch2Abilities[currIndex].setOnAction(e -> {
-                        try {
-                            game.castAbility(a);
-                        } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                            AlertBox.display("Can't use ability", exception.getMessage());
-                        } catch (CloneNotSupportedException exception) {
-                            exception.printStackTrace();
-                        }
-                    });
-                } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
-                    ch2Abilities[currIndex].setOnAction(e -> {
-                        AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
-                        enableSingleTargetPick(a);
-                    });
-                } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
-                    ch2Abilities[currIndex].setOnAction(e -> {
-                        up.setDisable(false);
-                        down.setDisable(false);
-                        left.setDisable(false);
-                        right.setDisable(false);
-                        up.setOnAction(l -> {
+                    if (a.getCastArea() == AreaOfEffect.SELFTARGET || a.getCastArea() == AreaOfEffect.TEAMTARGET || a.getCastArea() == AreaOfEffect.SURROUND) {
+                        ch2Abilities[currIndex].setOnAction(l -> {
                             try {
-                                up.setDisable(true);
-                                down.setDisable(true);
-                                left.setDisable(true);
-                                right.setDisable(true);
-                                game.castAbility(a, Direction.UP);
+                                game.castAbility(a);
                             } catch (NotEnoughResourcesException | AbilityUseException exception) {
                                 AlertBox.display("Can't use ability", exception.getMessage());
                             } catch (CloneNotSupportedException exception) {
                                 exception.printStackTrace();
                             }
+                        });
+                    } else if (a.getCastArea() == AreaOfEffect.SINGLETARGET) {
+                        ch2Abilities[currIndex].setOnAction(l -> {
+                            AlertBox.display("Single Target Select", "Please select the target you want to cast this ability on");
+                            enableSingleTargetPick(a);
+                        });
+                    } else if (a.getCastArea() == AreaOfEffect.DIRECTIONAL) {
+                        ch2Abilities[currIndex].setOnAction(e -> {
+                            up.setDisable(false);
+                            down.setDisable(false);
+                            left.setDisable(false);
+                            right.setDisable(false);
+                            up.setOnAction(l -> {
+                                try {
+                                    up.setDisable(true);
+                                    down.setDisable(true);
+                                    left.setDisable(true);
+                                    right.setDisable(true);
+                                    game.castAbility(a, Direction.UP);
+                                } catch (NotEnoughResourcesException | AbilityUseException exception) {
+                                    AlertBox.display("Can't use ability", exception.getMessage());
+                                } catch (CloneNotSupportedException exception) {
+                                    exception.printStackTrace();
+                                }
+
+                            });
+                            down.setOnAction(l -> {
+                                try {
+                                    up.setDisable(true);
+                                    down.setDisable(true);
+                                    left.setDisable(true);
+                                    right.setDisable(true);
+                                    game.castAbility(a, Direction.DOWN);
+                                } catch (NotEnoughResourcesException | AbilityUseException exception) {
+                                    AlertBox.display("Can't attack", exception.getMessage());
+                                } catch (CloneNotSupportedException exception) {
+                                    exception.printStackTrace();
+                                }
+                            });
+                            left.setOnAction(l -> {
+                                try {
+                                    up.setDisable(true);
+                                    down.setDisable(true);
+                                    left.setDisable(true);
+                                    right.setDisable(true);
+                                    game.castAbility(a, Direction.LEFT);
+                                } catch (NotEnoughResourcesException | AbilityUseException exception) {
+                                    AlertBox.display("Can't attack", exception.getMessage());
+                                } catch (CloneNotSupportedException exception) {
+                                    exception.printStackTrace();
+                                }
+                            });
+                            right.setOnAction(l -> {
+                                try {
+                                    up.setDisable(true);
+                                    down.setDisable(true);
+                                    left.setDisable(true);
+                                    right.setDisable(true);
+                                    game.castAbility(a, Direction.RIGHT);
+                                } catch (NotEnoughResourcesException | AbilityUseException exception) {
+                                    AlertBox.display("Can't attack", exception.getMessage());
+                                } catch (CloneNotSupportedException exception) {
+                                    exception.printStackTrace();
+                                }
+                            });
 
                         });
-                        down.setOnAction(l -> {
-                            try {
-                                up.setDisable(true);
-                                down.setDisable(true);
-                                left.setDisable(true);
-                                right.setDisable(true);
-                                game.castAbility(a, Direction.DOWN);
-                            } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                                AlertBox.display("Can't attack", exception.getMessage());
-                            } catch (CloneNotSupportedException exception) {
-                                exception.printStackTrace();
-                            }
-                        });
-                        left.setOnAction(l -> {
-                            try {
-                                up.setDisable(true);
-                                down.setDisable(true);
-                                left.setDisable(true);
-                                right.setDisable(true);
-                                game.castAbility(a, Direction.LEFT);
-                            } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                                AlertBox.display("Can't attack", exception.getMessage());
-                            } catch (CloneNotSupportedException exception) {
-                                exception.printStackTrace();
-                            }
-                        });
-                        right.setOnAction(l -> {
-                            try {
-                                up.setDisable(true);
-                                down.setDisable(true);
-                                left.setDisable(true);
-                                right.setDisable(true);
-                                game.castAbility(a, Direction.RIGHT);
-                            } catch (NotEnoughResourcesException | AbilityUseException exception) {
-                                AlertBox.display("Can't attack", exception.getMessage());
-                            } catch (CloneNotSupportedException exception) {
-                                exception.printStackTrace();
-                            }
-                        });
-
-                    });
-                }
+                    }
 //                if (currChampDisarmed) {
 //                    punch.setDisable(false);
 //                    punch.setVisible(true);
@@ -734,13 +737,14 @@ public class GameBoard implements GameListener {
 //                    punch.setVisible(false);
 //                }
 
+                }
             }
+            punchp2.setDisable(!currChampDisarmed);
+            punchp2.setVisible(currChampDisarmed);
+            atk.setDisable(currChampDisarmed);
+            move.setDisable(currChampRooted);
         }
-        punch.setDisable(!currChampDisarmed);
-        punch.setVisible(currChampDisarmed);
-        atk.setDisable(currChampDisarmed);
-        move.setDisable(currChampRooted);
-    }
+
 
     private void enableSingleTargetPick(Ability ability) {
         ch1Abilities[0].setDisable(true);
@@ -749,8 +753,6 @@ public class GameBoard implements GameListener {
         ch2Abilities[0].setDisable(true);
         ch2Abilities[1].setDisable(true);
         ch2Abilities[2].setDisable(true);
-        if (currChampDisarmed)
-            punch.setDisable(true);
         up.setDisable(true);
         down.setDisable(true);
         left.setDisable(true);
@@ -784,16 +786,10 @@ public class GameBoard implements GameListener {
         ch2Abilities[0].setDisable(false);
         ch2Abilities[1].setDisable(false);
         ch2Abilities[2].setDisable(false);
-        atk.setDisable(false);
-        move.setDisable(false);
-        if(currChampDisarmed) {
-            punch.setDisable(false);
-            atk.setDisable(true);
-        }
-        if(currChampRooted){
-            move.setDisable(true);
-        }
-
+        punchp1.setDisable(currChampDisarmed);
+        punchp2.setDisable(currChampDisarmed);
+        move.setDisable(currChampRooted);
+        atk.setDisable(currChampDisarmed);
         if (!game.isFirstLeaderAbilityUsed())
             p1LeaderAbility.setDisable(false);
         if (!game.isSecondLeaderAbilityUsed())
